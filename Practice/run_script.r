@@ -1,7 +1,8 @@
 library(shiny)
 library(ggplot2)
+library(plotly)
 
-runApp("C:/HighSeas_Allocation/Shiny/Practice/practiceapp.r")
+runApp("C:/Users/samm/Desktop/GitHub_Desk/CATGIRL/Practice/practiceapp.r")
 
 
 
