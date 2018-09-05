@@ -22,70 +22,79 @@ ui <- fluidPage(
   titlePanel(title=div(img(height=150, width=100, src="cat.jpg"), "CATGIRL - a catch/effort allocation visualisation tool")),
   
   # Sidebar layout with input and output definitions ----
-  sidebarLayout(
     
     # Sidebar panel for inputs ----
-    sidebarPanel(
+    fluidRow(
+      column(2,
       
       # Input: Selector for variable to plot against mpg ----
       selectInput("variable", "Gear type:", # Put the choice between PS and LL here
                   c("Purse seine" = "Purse",
                     "Longline" = "LongL"), width="150px"),
       
-      # Input: Selector for variable to plot against mpg ----
-      selectInput("PHinc", "Include Philippines?", # Put the choice between PS and LL here
-                  c("Include PH" = "InPH",
-                    "Exclude PH" = "OutPH"), width="150px"),
-      
-      numericInput("num1", h3("Allocation TAE"), value=10000, width="150px"),
-      
-      # Input: Checkbox for whether outliers should be included ----
       checkboxInput("Scen1", "Best effort HS 06-16", TRUE),
       
       conditionalPanel(condition="input.Scen1 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider1", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen2", "Avg highest 2 effort HS 14-16", TRUE),
+      checkboxInput("Scen2", "Avg highest 2 effort HS 14-16", FALSE),
       
       conditionalPanel(condition="input.Scen2 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider2", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen3", "Avg highest 3 effort HS 07-16", TRUE),
-      
-      conditionalPanel(condition="input.Scen3 == true",#condition = "input.ScenChoice.includes('Eff1')",
-                       sliderInput("slider3", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-      
-      checkboxInput("Scen4", "Avg highest 5 effort HS 02-16", TRUE),
+      checkboxInput("Scen4", "Avg highest 5 effort HS 02-16", FALSE),
       
       conditionalPanel(condition="input.Scen4 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider4", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen5", "Current HS allocation Att Tab 1", TRUE),
-      
-      conditionalPanel(condition="input.Scen5 == true",#condition = "input.ScenChoice.includes('Eff1')",
-                       sliderInput("slider5", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-      
-      checkboxInput("Scen6", "Current EEZ allocation Att Tab 1", TRUE),
+      checkboxInput("Scen6", "Current EEZ allocation Att Tab 1", FALSE),
       
       conditionalPanel(condition="input.Scen6 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider6", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen7", "Biomass SKJ in zones", TRUE),
+      checkboxInput("Scen8", "EEZ size in CA", FALSE),
+      
+      conditionalPanel(condition="input.Scen8 == true",#condition = "input.ScenChoice.includes('Eff1')",
+                       sliderInput("slider8", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE))),
+      
+      column(2,
+      
+             # Input: Selector for variable to plot against mpg ----
+             selectInput("PHinc", "Include Philippines?", # Put the choice between PS and LL here
+                         c("Include PH" = "InPH",
+                           "Exclude PH" = "OutPH"), width="150px"),       
+             
+             numericInput("num1", h4("Allocation TAE"), value=10000, width="150px"),
+             
+      # Input: Checkbox for whether outliers should be included ----
+      
+      checkboxInput("Scen3", "Avg highest 3 effort HS 07-16", FALSE),
+      
+      conditionalPanel(condition="input.Scen3 == true",#condition = "input.ScenChoice.includes('Eff1')",
+                       sliderInput("slider3", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+      
+     
+      
+      checkboxInput("Scen5", "Current HS allocation Att Tab 1", FALSE),
+      
+      conditionalPanel(condition="input.Scen5 == true",#condition = "input.ScenChoice.includes('Eff1')",
+                       sliderInput("slider5", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+      
+      
+      
+      checkboxInput("Scen7", "Biomass SKJ in zones", FALSE),
       
       conditionalPanel(condition="input.Scen7 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider7", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen8", "EEZ size in CA", TRUE),
       
-      conditionalPanel(condition="input.Scen8 == true",#condition = "input.ScenChoice.includes('Eff1')",
-                       sliderInput("slider8", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen9", "Economic dependency", TRUE),
+      checkboxInput("Scen9", "Economic dependency", FALSE),
       
       conditionalPanel(condition="input.Scen9 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider9", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
       
-      checkboxInput("Scen10", "Equal split", TRUE),
+      checkboxInput("Scen10", "Equal split", FALSE),
       
       conditionalPanel(condition="input.Scen10 == true",#condition = "input.ScenChoice.includes('Eff1')",
                        sliderInput("slider10", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE))
@@ -109,18 +118,10 @@ ui <- fluidPage(
     ),
     
     # Main panel for displaying outputs ----
-    mainPanel(
-      
-      
-      # Output: Formatted text for caption ----
-      #h3(textOutput("caption")),
-      
-      # Output: Plot of the requested variable against mpg ----
-      #plotOutput("IndPlot")
-      column(8, plotlyOutput("IndPlot")),
-      column(2, dataTableOutput("AllocTab"))
-      )
-  )
+    column(4, plotlyOutput("IndPlot")),
+    column(2, offset=1, dataTableOutput("AllocTab")))
+    # For a more simple table:
+    # column(1, offset=1, dataTableOutput("AllocTab")))
 )
 
 
@@ -184,7 +185,7 @@ server <- function(input, output) {
   })
   
   dattab <- reactive({
-    test <- data.frame(CCM=datrel$CCM, Percent=round(aa()*100, 0), Allocate=aa()*input$num1)
+    test <- data.frame(CCM=datrel$CCM, Percent=round(aa()*100, 0), Allocate=round(aa()*input$num1,0))
     
     if(input$PHinc == "OutPH"){
       test <- filter(test, CCM != "PH")
@@ -204,7 +205,7 @@ server <- function(input, output) {
   #   
   output$IndPlot <- renderPlotly({
     plot_ly(datpl(), labels=~CCM, values=~Resrnd, type="pie",
-            textposition="outside", textinfo="label+value", width=700, height=700) %>%
+            textposition="inside", textinfo="label+value", width=700, height=700) %>%
       layout(title = "CCM - Allocations",
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
@@ -212,7 +213,11 @@ server <- function(input, output) {
     
   })
   
-  output$AllocTab <- renderDataTable(dattab())
+  output$AllocTab <- renderDataTable(dattab(), options=list(pageLength=15))
+  # To show the default no. output$AllocTab <- renderDataTable(dattab())
+  
+  # For a more simple table:
+  # output$AllocTab <- renderTable(dattab())#, options=list(pageLength=10))
   
 }
 
