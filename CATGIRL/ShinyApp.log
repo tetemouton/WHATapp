@@ -1,0 +1,33 @@
+
+Attaching package: 'plotly'
+
+The following object is masked from 'package:ggplot2':
+
+    last_plot
+
+The following object is masked from 'package:stats':
+
+    filter
+
+The following object is masked from 'package:graphics':
+
+    layout
+
+-- Attaching packages --------------------------------------- tidyverse 1.2.1 --
+v tibble  1.4.2     v purrr   0.2.5
+v tidyr   0.8.1     v dplyr   0.7.6
+v readr   1.1.1     v stringr 1.3.1
+v tibble  1.4.2     v forcats 0.3.0
+-- Conflicts ------------------------------------------ tidyverse_conflicts() --
+x dplyr::filter() masks plotly::filter(), stats::filter()
+x dplyr::lag()    masks stats::lag()
+library paths:
+... C:/GitHub/CATGIRL/CATGIRL/R-Portable/App/R-Portable/library
+
+Listening on http://127.0.0.1:7264
+Browser path: C:\GitHub\CATGIRL\CATGIRL\GoogleChromePortable\App\Chrome-bin\chrome.exe
+[12416:3592:1010/160346.248:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
+[12416:3592:1010/160346.248:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
+[12416:3592:1010/160346.248:ERROR:disk_cache.cc(168)] Unable to create cache
+[12416:3592:1010/160346.248:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
+Created new window in existing browser session.

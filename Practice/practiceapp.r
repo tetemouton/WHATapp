@@ -11,15 +11,13 @@ CCM_cols <- setNames(c("olivedrab","firebrick3","darkorchid","darkred","lightsky
                      c("AS","AU","CN","CA","CK","EU","FM","FJ","PF","GU","ID","JP","KI","KR","MH","NR","NC","NZ","NU","MP","PW","PG","PH","WS","SB","TW","TK","TO","TV","US","VU","WF"))
 
 
-# pl <- ggplot(dat, aes(x=factor(1), y=Equal, fill=as.factor(CCM))) + geom_bar(stat="identity", width=1) + coord_polar(theta="y")
-# print(pl)
 
 
 ui <- fluidPage(
   
   # App title ----
   #titlePanel("CATGIRL - a catch/effort allocation tool"),
-  titlePanel(title=div(img(height=150, width=100, src="cat.jpg"), "CATGIRL - a catch/effort allocation visualisation tool")),
+  titlePanel(title=div(img(height=150, width=100, src="cat.jpg"), "CATGIRL - Catch Allocation Tool Generalised to Include Regional Longlining")),
   
   # Sidebar layout with input and output definitions ----
     
@@ -59,12 +57,11 @@ ui <- fluidPage(
       
       column(2,
       
-             # Input: Selector for variable to plot against mpg ----
-             selectInput("PHinc", "Include Philippines?", # Put the choice between PS and LL here
+             numericInput("num1", h4("Allocation TAE"), value=10000, width="150px"),
+             
+             selectInput("PHinc", "Include Philippines?", 
                          c("Include PH" = "InPH",
                            "Exclude PH" = "OutPH"), width="150px"),       
-             
-             numericInput("num1", h4("Allocation TAE"), value=10000, width="150px"),
              
       # Input: Checkbox for whether outliers should be included ----
       
