@@ -24,10 +24,11 @@ x dplyr::lag()    masks stats::lag()
 library paths:
 ... C:/GitHub/CATGIRL/CATGIRL/R-Portable/App/R-Portable/library
 
-Listening on http://127.0.0.1:7264
+Listening on http://127.0.0.1:4208
 Browser path: C:\GitHub\CATGIRL\CATGIRL\GoogleChromePortable\App\Chrome-bin\chrome.exe
-[12416:3592:1010/160346.248:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
-[12416:3592:1010/160346.248:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
-[12416:3592:1010/160346.248:ERROR:disk_cache.cc(168)] Unable to create cache
-[12416:3592:1010/160346.248:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
+[26684:18704:1011/165405.765:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
+[26684:18704:1011/165405.765:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
+[26684:18704:1011/165405.765:ERROR:disk_cache.cc(168)] Unable to create cache
+[26684:18704:1011/165405.765:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
 Created new window in existing browser session.
+^C

@@ -112,16 +112,16 @@ server <- function(input, output) {
   #   
   #   
   output$IndPlot <- renderPlotly({
-    plot_ly(datpl(), labels=~CCM, values=~Resrnd, type="pie",
-            textposition="inside", textinfo="label+value", width=700, height=700) %>%
-            layout(title = "CCM - Allocations",
+    plot_ly(datpl(), labels=~CCM, values=~Resrnd, type="pie", marker=list(colors=CCM_cols), sort=FALSE,
+            textposition="inside", textinfo="label+value", width=700, height=700) %>% config(displayModeBar = F) %>%
+            layout(title = "CCM - Allocations (Percentages)",
                    xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
                    yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
     
     
   })
   
-  output$AllocTab <- renderDataTable(dattab(), options=list(pageLength=15))
+  output$AllocTab <- renderDataTable(dattab(), options=list(pageLength=15, searching=FALSE, dom="ltp")) #, lengthChange = FALSE))
   # To show the default no. output$AllocTab <- renderDataTable(dattab())
   
   # For a more simple table:

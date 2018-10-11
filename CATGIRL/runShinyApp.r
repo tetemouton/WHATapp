@@ -7,6 +7,9 @@ library(tidyverse)
 
 theme_set(theme_bw())
 
+CCM_cols <- c("dodgerblue2","firebrick3","darkorchid","darkred","lightskyblue","yellow1","orange1","honeydew3","darkgoldenrod3","deeppink3","dodgerblue4","seagreen3","purple4","grey48","yellow3","black","pink","green","blue","olivedrab","dodgerblue1","seagreen1","darkgoldenrod4","azure","bisque1","tomato","wheat1","turquoise1","turquoise3","deeppink4","coral3","coral4")
+
+
 dat <- read.csv(paste0(getwd(), "/shiny/Data/Data_Matrix.csv"), header=TRUE)
 
 datsum <- apply(dat[, -c(1,2)], 2, sum)
