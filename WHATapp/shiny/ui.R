@@ -5,7 +5,7 @@ ui <- fluidPage(
   ),
   
   #titlePanel("CATGIRL - a catch/effort allocation tool"),
-  titlePanel(title=div(img(height=150, width=1200, src="HeaderBar1.png")), windowTitle="Mmmmeeeeeoooowwwww"),
+  titlePanel(title=div(img(height=120, width=1500, src="HeaderBar.png")), windowTitle="Mmmmeeeeeoooowwwww"),
   #titlePanel(title=div(img(height=150, width=100, src="cat.jpg"), "CATGIRL - Catch Allocation Tool Generalised to Include Regional Longlining"), windowTitle="Mmmmeeeeeoooowwwww"),
   #headerPanel( title=div(img(height=150, width=100, src="cat.jpg"),
   #                       h3("CATGIRL - Catch Allocation Tool Generalised to Include Regional Longlining", align="center", style="bold")
