@@ -85,3 +85,4 @@ Browser path: C:\GitHub\CATGIRL\WHATapp\GoogleChromePortable\App\Chrome-bin\chro
 [14900:12260:1107/091444.926:ERROR:ssl_client_socket_impl.cc(1050)] handshake failed; returned -1, SSL error code 1, net_error -100
 [14900:12260:1107/091444.926:ERROR:ssl_client_socket_impl.cc(1050)] handshake failed; returned -1, SSL error code 1, net_error -100
 [14900:12260:1107/091445.167:ERROR:ssl_client_socket_impl.cc(1050)] handshake failed; returned -1, SSL error code 1, net_error -100
+^C^C
