@@ -24,11 +24,64 @@ x dplyr::lag()    masks stats::lag()
 library paths:
 ... C:/GitHub/CATGIRL/WHATapp/R-Portable/App/R-Portable/library
 
-Listening on http://127.0.0.1:7833
+Listening on http://127.0.0.1:6848
 Browser path: C:\GitHub\CATGIRL\WHATapp\GoogleChromePortable\App\Chrome-bin\chrome.exe
-[29972:36904:1102/153916.243:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
-[29972:36904:1102/153916.243:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
-[29972:36904:1102/153916.243:ERROR:disk_cache.cc(168)] Unable to create cache
-[29972:36904:1102/153916.243:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
-Created new window in existing browser session.
-^C^C
+[14900:10432:1107/082644.905:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.906:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.907:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.908:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/082644.909:ERROR:in_progress_cache_impl.cc(192)] Cache is not initialized, cannot RetrieveEntry.
+[14900:10432:1107/091235.500:ERROR:gcm_channel_status_request.cc(151)] GCM channel request failed.
+[14900:12260:1107/091444.926:ERROR:ssl_client_socket_impl.cc(1050)] handshake failed; returned -1, SSL error code 1, net_error -100
+[14900:12260:1107/091444.926:ERROR:ssl_client_socket_impl.cc(1050)] handshake failed; returned -1, SSL error code 1, net_error -100
+[14900:12260:1107/091445.167:ERROR:ssl_client_socket_impl.cc(1050)] handshake failed; returned -1, SSL error code 1, net_error -100
