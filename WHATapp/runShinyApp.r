@@ -3,6 +3,7 @@ library(ggplot2)
 library(plotly)
 library(ggplot2)
 library(tidyverse)
+library(shinyWidgets)
 
 
 theme_set(theme_bw())
@@ -17,6 +18,13 @@ datsum <- apply(dat[, -c(1,2)], 2, sum)
 datrel <- dat
 datrel[, -c(1,2)] <- dat[, -c(1,2)]/datsum
 
+
+effrt <- read.csv(paste0(getwd(), "/shiny/Data/Annual_PS_Effort.csv"), header=TRUE)
+
+catch <- read.csv(paste0(getwd(), "/shiny/Data/Annual_LL_Catch.csv"), header=TRUE)
+
+minyr <- 2002
+maxyr <- 2016
 
 message('library paths:\n', paste('... ', .libPaths(), sep='', collapse='\n'))
 

@@ -176,13 +176,30 @@ Once a certain scenario has been set and the criteria for the allocations chosen
 This section details the calculations and definitions used to determine the values used for each CCM for each criteria. 
 
 \subsection{Criteria for purse seine scenarios}
-\item {\bf Historical effort};
-\item {\bf Current high seas limits}; Some CCMs already have purse seine effort limits on the high seas. This criteria uses the values for CCMs that are outlined in table 2 of CMM 2017-01 Attachment 1 and all CCMs not specified in that table receive zero values.
-\item {\bf Current EEZ limits};  Many CCMs have purse seine effort limits within their EEZs and these are outlined in table 1 of CMM 2017-01 Attachment 1. These values are used for all applicable CCMs with the values used for individual PNA members {\bf based on...} The EEZ limits for Australia, New Caledonia and New Zealand are catch-based and these were converted to effort limits by calculating the mean CPUE for the three EEZs over the period {\bf XXXX-XXXX} and dividing the catch value in the table by the appropriate CPUE to give an equivalent effort-based limit. All CCMs not specified in that table receive zero values for this criteria.
-\item {\bf Biomass of skipjack in EEZs};
-\item {\bf Economic dependency};
-\item {\bf Equal split}; Very simply, this criteria allocates over all CCMs equally.
-\item {\bf Catch in adjacent zones}; 
+
+\subsubsection*{Current high seas limits}
+Some CCMs already have purse seine effort limits on the high seas. This criteria uses the values for CCMs that are outlined in table 2 of CMM 2017-01 Attachment 1 and all CCMs not specified in that table receive zero values.
+
+\subsubsection*{Current EEZ limits}
+Many CCMs have purse seine effort limits within their EEZs and these are outlined in table 1 of CMM 2017-01 Attachment 1. These values are used for all applicable CCMs with the values used for individual PNA members {\bf based on...} The EEZ limits for Australia, New Caledonia and New Zealand are catch-based and these were converted to effort limits by calculating the mean CPUE for the three EEZs over the period {\bf XXXX-XXXX} and dividing the catch value in the table by the appropriate CPUE to give an equivalent effort-based limit. All CCMs not specified in that table receive zero values for this criteria.
+
+\subsubsection*{Biomass of skipjack in EEZs}
+
+\subsubsection*{Economic dependency}
+
+\subsubsection*{EEZ size}
+The area of EEZ in the WCPFC convention area between 20\degree N and 20\degree S, {\bf excluding land area and archipelagic waters}.
+
+\subsubsection*{Equal split}
+Very simply, this criteria allocates over all CCMs equally.
+
+\subsubsection*{Catch in adjacent zones} 
+
+
+\subsubsection*{Historical effort}
+This criteria allocates more of the TAE to a CCM if it has a history of fishing in the high seas. The user has additional choices available in the app for this criteria related to the timing of the calculations of historical effort. Initially the annual effort fished by each CCM in the high seas between 20\degree N and 20\degree S, for the period 2002--{\bf 2016} was extracted from the databases. When the tick box for this criteria is checked three widgets will appear - the usual criteria weighting bar, but also an additional sliding bar and a numeric box which together determine the timing and methods of calculating historical effort.
+
+
 
 \section{General discussion}
 

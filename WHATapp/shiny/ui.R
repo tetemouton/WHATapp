@@ -11,10 +11,16 @@ ui <- fluidPage(
   #                       h3("CATGIRL - Catch Allocation Tool Generalised to Include Regional Longlining", align="center", style="bold")
   #)),
   
+  #setBackgroundColor("blue"),
   
- 
+  setBackgroundColor(
+    color = c("white", "lightgrey"),
+    gradient = "linear",
+    direction = c("bottom","left")
+  ),
+  
   fluidRow(
-    column(2,
+    column(2, #style = "background-color:#4d3a7d;",
            
            #br(),
            #hr(),
@@ -25,62 +31,23 @@ ui <- fluidPage(
            br(),
            br(),
            
-           conditionalPanel(condition="input.variable == 'Purse'",#condition = "input.ScenChoice.includes('Eff1')",
-                            checkboxInput("Scen1", "Best effort HS 06-16", TRUE)),
-           
-           conditionalPanel(condition="input.Scen1 == true & input.variable == 'Purse'",
-                            sliderInput("slider1", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-           
-           conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen11", "Best effort HS 06-16", TRUE)),
-           
-           conditionalPanel(condition="input.Scen11 == true & input.variable == 'LongL'",
-                            sliderInput("slider11", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-           
+
            #__________________
            
            conditionalPanel(condition="input.variable == 'Purse'",
-                            checkboxInput("Scen2", "Avg highest 2 effort HS 14-16", FALSE)),
+                            checkboxInput("Scen5", "Current HS allocation Att Tab 1", FALSE)),
            
-           conditionalPanel(condition="input.Scen2 == true & input.variable == 'Purse'",
-                            sliderInput("slider2", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           conditionalPanel(condition="input.Scen5 == true & input.variable == 'Purse'",
+                            sliderInput("slider5", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
            
            conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen12", "Avg highest 2 effort HS 14-16", FALSE)),
+                            checkboxInput("Scen15", "Current HS allocation Att Tab 1", FALSE)),
            
-           conditionalPanel(condition="input.Scen12 == true & input.variable == 'LongL'",
-                            sliderInput("slider12", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           conditionalPanel(condition="input.Scen15 == true & input.variable == 'LongL'",
+                            sliderInput("slider15", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
-           #__________________
-           
-           
-           conditionalPanel(condition="input.variable == 'Purse'",
-                            checkboxInput("Scen3", "Avg highest 3 effort HS 07-16", FALSE)),
-           
-           conditionalPanel(condition="input.Scen3 == true & input.variable == 'Purse'",
-                            sliderInput("slider3", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-           
-           conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen13", "Avg highest 3 effort HS 07-16", FALSE)),
-           
-           conditionalPanel(condition="input.Scen13 == true & input.variable == 'LongL'",
-                            sliderInput("slider13", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-           
-           
-           #__________________
-           
-           conditionalPanel(condition="input.variable == 'Purse'",
-                            checkboxInput("Scen4", "Avg highest 5 effort HS 02-16", FALSE)),
-           
-           conditionalPanel(condition="input.Scen4 == true & input.variable == 'Purse'",
-                            sliderInput("slider4", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-           
-           conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen14", "Avg highest 5 effort HS 02-16", FALSE)),
-           
-           conditionalPanel(condition="input.Scen14 == true & input.variable == 'LongL'",
-                            sliderInput("slider14", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-           
+
            #__________________
            
            conditionalPanel(condition="input.variable == 'Purse'",
@@ -88,6 +55,52 @@ ui <- fluidPage(
            
            conditionalPanel(condition="input.Scen6 == true & input.variable == 'Purse'",
                             sliderInput("slider6", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+
+           
+           conditionalPanel(condition="input.variable == 'LongL'",
+                            checkboxInput("Scen18", "Economic dependency", FALSE)),
+           
+           conditionalPanel(condition="input.Scen18 == true & input.variable == 'LongL'",
+                            sliderInput("slider18", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           #__________________
+           
+           conditionalPanel(condition="input.variable == 'Purse'",
+                            checkboxInput("Scen9", "Economic dependency", FALSE)),
+           
+           conditionalPanel(condition="input.Scen9 == true & input.variable == 'Purse'",
+                            sliderInput("slider9", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+
+           
+           conditionalPanel(condition="input.variable == 'LongL'",
+                            checkboxInput("Scen23", "Development status", FALSE)),
+           
+           conditionalPanel(condition="input.Scen23 == true & input.variable == 'LongL'",
+                            sliderInput("slider23", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           #__________________
+           
+           conditionalPanel(condition="input.variable == 'Purse'",
+                            checkboxInput("Scen24", "Development status", FALSE)),
+           
+           conditionalPanel(condition="input.Scen24 == true & input.variable == 'Purse'",
+                            sliderInput("slider24", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           
+           conditionalPanel(condition="input.variable == 'LongL'",
+                            checkboxInput("Scen25", "Adjacency", FALSE)),
+           
+           conditionalPanel(condition="input.Scen25 == true & input.variable == 'LongL'",
+                            sliderInput("slider25", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           #__________________  
+           
+           conditionalPanel(condition="input.variable == 'Purse'",
+                            checkboxInput("Scen26", "Adjacency", FALSE)),
+           
+           conditionalPanel(condition="input.Scen26 == true & input.variable == 'Purse'",
+                            sliderInput("slider26", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
            
            conditionalPanel(condition="input.variable == 'LongL'",
                             checkboxInput("Scen16", "Biomass BET in zones", FALSE)),
@@ -95,8 +108,23 @@ ui <- fluidPage(
            conditionalPanel(condition="input.Scen16 == true & input.variable == 'LongL'",
                             sliderInput("slider16", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
-           #__________________
+           #__________________          
            
+
+           
+           conditionalPanel(condition="input.variable == 'Purse'",
+                            checkboxInput("Scen7", "Biomass SKJ in zones", FALSE)),
+           
+           conditionalPanel(condition="input.Scen7 == true & input.variable == 'Purse'",
+                            sliderInput("slider7", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           conditionalPanel(condition="input.variable == 'LongL'",
+                            checkboxInput("Scen17", "EEZ size in CA", FALSE)),
+           
+           conditionalPanel(condition="input.Scen17 == true & input.variable == 'LongL'",
+                            sliderInput("slider17", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           #__________________
            
            conditionalPanel(condition="input.variable == 'Purse'",
                             checkboxInput("Scen8", "EEZ size in CA", FALSE)),
@@ -105,68 +133,51 @@ ui <- fluidPage(
                             sliderInput("slider8", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
            conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen18", "Economic dependency", FALSE)),
+                            checkboxInput("Scen19", "Equal split", FALSE)),
            
-           conditionalPanel(condition="input.Scen18 == true & input.variable == 'LongL'",
-                            sliderInput("slider18", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    #__________________
+           conditionalPanel(condition="input.Scen19 == true & input.variable == 'LongL'",
+                            sliderInput("slider19", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
-    
-    conditionalPanel(condition="input.variable == 'Purse'",
-                     checkboxInput("Scen5", "Current HS allocation Att Tab 1", FALSE)),
-    
-    conditionalPanel(condition="input.Scen5 == true & input.variable == 'Purse'",
-                     sliderInput("slider5", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    conditionalPanel(condition="input.variable == 'LongL'",
-                     checkboxInput("Scen15", "Current HS allocation Att Tab 1", FALSE)),
-    
-    conditionalPanel(condition="input.Scen15 == true & input.variable == 'LongL'",
-                     sliderInput("slider15", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    #__________________
-    
-    conditionalPanel(condition="input.variable == 'Purse'",
-                     checkboxInput("Scen7", "Biomass SKJ in zones", FALSE)),
-    
-    conditionalPanel(condition="input.Scen7 == true & input.variable == 'Purse'",
-                     sliderInput("slider7", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    conditionalPanel(condition="input.variable == 'LongL'",
-                     checkboxInput("Scen17", "EEZ size in CA", FALSE)),
-    
-    conditionalPanel(condition="input.Scen17 == true & input.variable == 'LongL'",
-                     sliderInput("slider17", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    #__________________
-    
-    conditionalPanel(condition="input.variable == 'Purse'",
-                     checkboxInput("Scen9", "Economic dependency", FALSE)),
-    
-    conditionalPanel(condition="input.Scen9 == true & input.variable == 'Purse'",
-                     sliderInput("slider9", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    conditionalPanel(condition="input.variable == 'LongL'",
-                     checkboxInput("Scen19", "Equal split", FALSE)),
-    
-    conditionalPanel(condition="input.Scen19 == true & input.variable == 'LongL'",
-                     sliderInput("slider19", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
-    
-    #__________________
-    
-    conditionalPanel(condition="input.variable == 'Purse'",
-                     checkboxInput("Scen10", "Equal split", FALSE)),
-    
-    conditionalPanel(condition="input.Scen10 == true & input.variable == 'Purse'",
-                     sliderInput("slider10", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE))
-    
-    #__________________
+           #__________________
            
-  ),
+           conditionalPanel(condition="input.variable == 'Purse'",
+                            checkboxInput("Scen10", "Equal split", FALSE)),
+           
+           conditionalPanel(condition="input.Scen10 == true & input.variable == 'Purse'",
+                            sliderInput("slider10", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           #__________________
+           
+           
+           conditionalPanel(condition="input.variable == 'Purse'",#condition = "input.ScenChoice.includes('Eff1')",
+                            checkboxInput("Scen1", "Historical effort", TRUE)),
+           
+           conditionalPanel(condition="input.Scen1 == true & input.variable == 'Purse'",
+                            sliderInput("sliderrng", NULL,  min=minyr, max=maxyr, value=c(minyr,maxyr), width="200px", ticks=TRUE, sep="")),
+           
+           conditionalPanel(condition="input.Scen1 == true & input.variable == 'Purse'",
+                            uiOutput("numest")),
+           
+           conditionalPanel(condition="input.Scen1 == true & input.variable == 'Purse'",
+                            sliderInput("slider1", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
+           conditionalPanel(condition="input.variable == 'LongL'",#condition = "input.ScenChoice.includes('Eff1')",
+                            checkboxInput("Scen11", "Historical catch", TRUE)),
+           
+           conditionalPanel(condition="input.Scen11 == true & input.variable == 'LongL'",
+                            sliderInput("sliderrng1", NULL,  min=minyr, max=maxyr, value=c(minyr,maxyr), width="200px", ticks=TRUE, sep="")),
+           
+           conditionalPanel(condition="input.Scen11 == true & input.variable == 'LongL'",
+                            uiOutput("numest1")),
+           
+           conditionalPanel(condition="input.Scen11 == true & input.variable == 'LongL'",
+                            sliderInput("slider11", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE))
+           
+           
+    ),
     
     
-    column(2,
+    column(2, #style = "background-color:#4d3a2d;",
            
            #br(),
            #hr(),
@@ -181,11 +192,11 @@ ui <- fluidPage(
            selectInput("variable", h4("Gear type:"), # Put the choice between PS and LL here
                        c("Purse seine" = "Purse",
                          "Longline" = "LongL"), width="150px"),
-          
+           
            
            numericInput("num1", h4("Allocation TAE/TAC"), value=10000, width="180px"),
-          
-            
+           
+           
            conditionalPanel(condition="input.variable == 'Purse'",
                             selectInput("PHinc", h4("Include Philippines?"), 
                                         c("Include PH" = "InPH",
@@ -195,12 +206,10 @@ ui <- fluidPage(
            radioButtons("figtype", label = h4("Figure scale:"),
                         choices = list("By CCM" = 1, "By category" = 2), 
                         selected = 1)
-          
            
-
     ),
     
-
+    
     column(4, br(), br(), plotlyOutput("IndPlot")),
     column(2, offset=1, dataTableOutput("AllocTab")))
   # For a more simple table:
