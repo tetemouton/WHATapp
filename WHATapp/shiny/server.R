@@ -33,6 +33,7 @@ server <- function(input, output) {
                  value=1, width="70px")
   })
   
+  
   output$numest1 <- renderUI({
     numericInput("numbest1", h5("No. Years"), min=1, 
                  max=input$sliderrng1[2] - (input$sliderrng1[1] - 1),
@@ -40,8 +41,21 @@ server <- function(input, output) {
   })
   
   
-  histfish <- reactive({
+  HSPdat <- reactive({
     
+    if(input$HSPinc == "InHSP"){
+      
+      hspdat <- effrt
+      
+    } else {
+      
+      hspdat <- effrthsp
+      
+    }
+  })
+  
+  
+  histfish <- reactive({
     
     if(input$variable == "Purse"){
       
@@ -49,7 +63,7 @@ server <- function(input, output) {
       ind2 <- input$sliderrng[2] - (minyr - 2)
       Nyrs <- input$sliderrng[2] - (input$sliderrng[1] - 1)
       
-      effrng <- effrt[, c(1,ind1:ind2)]
+      effrng <- HSPdat()[, c(1,ind1:ind2)]
       
       tmpdat <- effrng
       

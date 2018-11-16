@@ -202,6 +202,11 @@ ui <- fluidPage(
                                         c("Include PH" = "InPH",
                                           "Exclude PH" = "OutPH"), width="180px")),
            
+           conditionalPanel(condition="input.variable == 'Purse'",
+                            selectInput("HSPinc", h4("Include HSP1 etc.?"), 
+                                        c("Keep pockets" = "InHSP",
+                                          "Exclude pockets" = "OutHSP"), width="180px")),
+           
            
            radioButtons("figtype", label = h4("Figure scale:"),
                         choices = list("By CCM" = 1, "By category" = 2), 
