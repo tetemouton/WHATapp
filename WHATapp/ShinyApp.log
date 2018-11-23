@@ -24,10 +24,10 @@ x dplyr::lag()    masks stats::lag()
 library paths:
 ... C:/GitHub/WHATapp/WHATapp/R-Portable/App/R-Portable/library
 
-Listening on http://127.0.0.1:7346
+Listening on http://127.0.0.1:4914
 Browser path: C:\GitHub\WHATapp\WHATapp\GoogleChromePortable\App\Chrome-bin\chrome.exe
-[18452:13796:1116/165129.131:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
-[18452:13796:1116/165129.131:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
-[18452:13796:1116/165129.131:ERROR:disk_cache.cc(168)] Unable to create cache
-[18452:13796:1116/165129.131:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
+[20856:22408:1121/160755.816:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
+[20856:22408:1121/160755.816:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
+[20856:22408:1121/160755.816:ERROR:disk_cache.cc(168)] Unable to create cache
+[20856:22408:1121/160755.816:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
 Created new window in existing browser session.

@@ -79,15 +79,15 @@ citecolor= NavyBlue}
 
 \begin{tikzpicture} [remember picture, overlay,every node/.style={anchor=center}] {               
 \node  at (page cs:0,0.8) {                                % [anchor=\bound]
-\includegraphics [width=22cm]{C:/GitHub/CATGIRL/Writing/flag_logos/banner_new.png}};
+\includegraphics [width=22cm]{C:/GitHub/WHATapp/Writing/flag_logos/banner_new.png}};
 \node  at (page cs:0,0.3) [blue]{ 
 {{\huge{\bfseries An introduction to the WHATapp tool for}}}};
 \node  at (page cs:0,0.23) [blue]{ 
 {{\huge{\bfseries visualising high seas allocations}}}};
 \node  at (page cs:0,-0.05) {
-\includegraphics [width= 3in]{C:/GitHub/CATGIRL/Writing/flag_logos/FFA.png}};
+\includegraphics [width= 3in]{C:/GitHub/WHATapp/Writing/flag_logos/FFA.png}};
 \node  at (page cs:0,-0.6) {
-\includegraphics [width= 1in]{C:/GitHub/CATGIRL/Writing/flag_logos/NZ_aid_logo.png}};
+\includegraphics [width= 1in]{C:/GitHub/WHATapp/Writing/flag_logos/NZ_aid_logo.png}};
 \node  at (page cs:0,-0.4) {
 {\Large This report was funded by the New Zealand Aid Progamme.}};
 \node  at (page cs:0,-0.8) [blue]{ 
@@ -102,16 +102,16 @@ citecolor= NavyBlue}
 
 \pagenumbering{arabic}  % start the page numbering again
 \section{Introduction} \label{sec:intro}
-The establishment of hard limits and allocations for the high seas were addressed in CMM 2017-01 with decision making scheduled for the 2019 commission meeting. In preparation, FFA members have conducted a series of workshops to develop criteria and a strategy for approaching the allocation process. These have highlighted the complexity of the issues involved, the large number of potential criteria that may be considered, the diverse approaches taken by other tuna RFMOs and similar bodies, and the potentially conflicting rankings that different actors in the WCPFC will give to different criteria.
+The establishment of hard limits and allocations for the high seas were addressed in CMM 2017-01 with decision making scheduled for the 2019 commission meeting. In preparation, FFA members have conducted a series of workshops to develop criteria and a strategy for approaching the allocation process. These have highlighted the complexity of the issues involved, the large number of potential criteria that may be considered, the diverse approaches taken by other tuna RFMOs and similar bodies, and the potentially conflicting rankings that different CCMs in the WCPFC will give to different criteria.
 
-Although there are difficulties in identifying and sometimes formulating criteria, what is clear is the need for members to have a means of visualising allocations under different scenarios. This is particularly the case when allocations are based on multiple criteria with the possibility of applying different weightings. Initial tools to this end were constructed in excel and have recently been extended to `Shiny' - software based on the R statistical language that allows the construction of interactive web-based apps. This report is intended to be a support document for the app that demonstrates how to install and run the app, the range of features that can be modified, and explicitely outlines the calculations behind the scenarios included.
+Although there are difficulties in identifying and sometimes formulating criteria, what is clear is the need for members to have a means of visualising allocations under different scenarios. This is particularly the case when allocations are based on multiple criteria each of which may be given different weightings when calculating allocation values. Initial tools to this end were constructed in excel and have recently been extended to `Shiny' - software based on the R statistical language that allows the construction of interactive web-based apps. This report is intended to be a support document for the app that demonstrates how to install and run the app, the range of features that can be modified, and explicitely outlines the calculations behind the scenarios included.
 
-The app is simply a tool to visualise the criteria (and their weightings) and the difficulties are instead centred around the selection and formulation of the criteria. For example, some criteria such as economic dependency are difficult to define and synthesise into discrete values for each CCM. The set of criteria included in the app and the methods to weight them should not therefore be considered a final set or an accepted methodology and we will continue to develop the app to suit the needs of the membership as further criteria are suggested or existing criteria are modified.
+The app is simply a tool to visualise the criteria (and their weightings) and the difficulties associated with the allocation process therefore tend to be centred around the selection and formulation of the criteria rather than the developement of the app itself. For example, some criteria such as economic dependency are difficult to define and synthesise into discrete values for each CCM. The set of criteria included in the app and the methods to weight them should not therefore be considered a final set or an accepted methodology and we will continue to develop the app to suit the needs of the membership as further criteria are suggested or existing criteria are modified.
 
 
 
 \section{Running the app}
-Shiny apps typically run via a local server or are web-based which requires users to have the R software (and applicable packages) installed, and in the case of the latter, a reliable internet connection. These are both barriers to easy distribution of an app, for example at workshops, particularly in the Pacific where internet connectivity can be limited.
+Shiny apps typically run via a local server or are web-based which requires users to have the R software (and applicable packages) installed, and in the case of the latter, a reliable internet connection. These are both barriers to easy distribution of an app, for example at workshops - particularly in the Pacific where internet connectivity can be limited.
 
 We have therefore developed a fully portable version of the app that does not require internet access, or the installation of R and knowlege of its use. The downside of this approach is that a web browser and a portable version of R must be packaged together with the usual components of the app. This leads to a relatively large file size, although  no true `installation' is necessary and so deletion of the app after use is simple. At this stage it is also restricted to windows operating systems. 
 
@@ -121,7 +121,7 @@ Depending on your machines security settings you may encounter a warning popup w
 
  \begin{figure} [h]
   \centering
-\includegraphics[width=1\textwidth]{C:/GitHub/CATGIRL/Writing/Explorer_Folder_1.png}
+\includegraphics[width=1\textwidth]{C:/GitHub/WHATapp/Writing/Explorer_Folder_1.png}
   \caption {The cmd.exe screen that must be closed when exiting WHATapp when running via the run.bat option.}
   \label{fig:expl1screen}
 \end{figure}
@@ -130,7 +130,7 @@ Depending on your machines security settings you may encounter a warning popup w
 
  \begin{figure} [h]
   \centering
-\includegraphics[width=1\textwidth]{C:/GitHub/CATGIRL/Writing/Bat_Screenshot.png}
+\includegraphics[width=1\textwidth]{C:/GitHub/WHATapp/Writing/Bat_Screenshot.png}
   \caption {The cmd.exe screen that must be closed when exiting WHATapp when running via the run.bat option.}
   \label{fig:batscreen}
 \end{figure}
@@ -138,7 +138,7 @@ Depending on your machines security settings you may encounter a warning popup w
 
  \begin{figure} [h]
   \centering
-\includegraphics[width=1\textwidth]{C:/GitHub/CATGIRL/Writing/App_Front_Page.png}
+\includegraphics[width=1\textwidth]{C:/GitHub/WHATapp/Writing/App_Front_Page.png}
   \caption {The cmd.exe screen that must be closed when exiting WHATapp when running via the run.bat option.}
   \label{fig:frontpg}
 \end{figure}
@@ -146,7 +146,7 @@ Depending on your machines security settings you may encounter a warning popup w
 
  \begin{figure} [h]
   \centering
-\includegraphics[width=0.8\textwidth]{C:/GitHub/CATGIRL/Writing/Features_Fig.png}
+\includegraphics[width=0.8\textwidth]{C:/GitHub/WHATapp/Writing/Features_Fig.png}
   \caption {The cmd.exe screen that must be closed when exiting WHATapp when running via the run.bat option.}
   \label{fig:featpg}
 \end{figure}
@@ -155,19 +155,34 @@ Depending on your machines security settings you may encounter a warning popup w
 
 
 \section{Features of the app}
+
+\subsection{Controlling the scenarios}
 Once the app is running you will see two columns of text and features on the left hand side of the dashboard (Fig. \ref{fig:featpg}). These control the scenarios that you can investigate and also some other features of the plots and tables that show the resulting allocations. To control the app you can modify the following:
 \begin{itemize}
-\item The left-most column shows each of the {\bf X} criteria that can be selected and any number can be selected at once by clicking the check boxes (see letter {\bf A}).
+\item The left-most column (under `Choose your scenario') shows each of the {\bf X} criteria that can be selected and multiple scenarios can be selected simultaneously by simply clicking the appropriate check boxes (see letter {\bf A}). Further details of each sceario are presented in section \ref{sec:scendet} and the remainder of this section outlines the control of the settings.
 \item Once a check box is selected and a tick appears, a slider bar will also be activated for that criteria ({\bf B}). The slider bar sets the weighting of that particular criteria with values between 1 and 10 being allowable. If only one tick box is checked then moving the slider will not impact the allocation at all (the plot and table will not change). However, if multiple boxes are ticked then the sliders determine how much weight is given to each criteria. For example, if the first two boxes are ticked and the slider for criteria 1 is set at 1, and for criteria 2 it is set at at 3, then the latter will have 3 times the weighting of the former. If the slider bar for each criteria is set at 1 then they will all have the same weighting.
-\item The second column of widgets defines features of the app other than the criteria to be considered. The drop down menu ({\bf C}) allows switching between the purse seine and longline allocations. Note that there are different criteria present for the two gear types.
-\item The box shown with the {\bf D} defines the total allowable effort (TAE; in days) and total allowable catch (TAC; in metric tonnes) for purse seine and longline respectively, from which the allocations are made. The value can be modified by clicking on the box and typing in the desired value. This number represents the total catch or effort on the high seas that must be decided before individual CCMs can be allocated specific quantities.
-\item Under the purse seine scenario there is a drop down manu that allows allocations to be made either including or excluding the Philippines (PH). The option to exclude PH is in response to the unique nature of this fleet on the high seas: they have special conditions under the CMM; are predominantly operating in high seas pocket 1; they have very low CPUE and are operationally very different from other fleets; they have a very high effort that can dominate the effort allocations when based on historical effort criteria. For these reasons, it may be neccessary for this fleet to be treated differently during allocations, and its presence in the app can obscure patterns of allocations among the remaining CCMs under certain condtions. It is therefore up to the user to determine if this fleet should be excluded.
+\item The second column of widgets defines other (than critera) features of the app to be considered. The drop down menu ({\bf C}) allows switching between the purse seine and longline allocations. Note that there are different criteria present for the two gear types.
+\item The box shown by {\bf D} defines the total allowable effort (TAE; in days) and total allowable catch (TAC; in metric tonnes), for purse seine and longline respectively, from which the allocations are made. The value can be modified by clicking on the box and typing in the desired value. This number represents the total catch or effort on the high seas that must be decided before individual CCMs can be allocated specific quantities.
+\item Under the purse seine scenarios there is a drop down menu that allows allocations to be made either including or excluding the Philippines (PH). The option to exclude PH is in response to the unique nature of this fleet on the high seas: they have special conditions under the CMM; are predominantly operating in high seas pocket 1; they have very low CPUE and are operationally very different from other fleets; and they have a very high effort that can dominate the effort allocations when based on historical effort criteria. For these reasons, it may be neccessary for this fleet to be treated differently during allocations, and its presence in the app can obscure patterns of allocations among the remaining CCMs under certain condtions. Consequently, the user can decide if this fleet should be excluded from the visualisations or not.
+\item Also under the purse seine scenerios there is a further drop down menu that allows the user to either include or exclude several high seas pockets from the historical catch scenarios. The reason for this option is that several high seas pockets (e.g. HSP1; Fig. {\bf X}) were effectively closed to fishing by the CMM around {\bf 2009}.
 \item The final option allows the user to switch between viewing the allocations by individual CCMs or by subregional groupings by clicking on the desired button. These groupings are distant water fishing nations (DWFN), FFA members that also belong to the PNA (FFA-PNA), other FFA members (FFA-OTH), Indonesia and Philipines (IDPH) and other CCMs that do not belong to any of these categories (OTH; for example New Caledonia and French Polynesia).
 \end{itemize}
-Once a certain scenario has been set and the criteria for the allocations chosen, then the app will automatically update and display the allocations for each CCM or sub regional group. This is in the form of a pie chart with the CCM/group and the proportional allocation (\%), and also a table that allocates the TAE/TAC into absolute allocations to the indivicual CCMs/groups in days (purse seine) and metric tonnes of catch (longline). Note that the format of the table is interactive with the number of entries shown and their order completely user defined.
 
 
-\section{Calculation of values for each criteria}
+\subsection{Summaries of resulting allocations}
+Once a certain scenario has been set and the criteria for the allocations chosen, then the app will automatically update and display the allocations for each CCM or sub regional group, with the main features illustrated in Fig. \ref{fig:outputpic}. The allocations are displayed in the form of a pie chart with the CCM/group and the proportional allocation (in percentage form - see {\bf A} in the figure) - by hovering over a pie segment the values for that CCM/group will be displayed in more detail. The chart only shows the proportional allocation and so a table is also displayed that restates the percentage allocated ({\bf B} in the figure) but also allocates the TAE/TAC into absolute allocations ({\bf C}) to the indivicual CCMs/groups in days (purse seine) and metric tonnes of catch (longline). Note that the format of the table is also interactive with the number of entries user-defined by the drop down box ({\bf D}) and their order can be changed by clicking on the bold table headers (e.g. `{\bf Allocate}'; {\bf C}). If the entry in {\bf D} is left blank and not all CCMs are displayed, the `pages' indicated by {\bf E} can be scrolled through to find a particular CCM.
+
+
+
+ \begin{figure} [h]
+  \centering
+\includegraphics[width=0.8\textwidth]{C:/GitHub/WHATapp/Writing/Output_Figure.png}
+  \caption {A picture of part of the app dashboard showing some of the features of the allocation ouput.}
+  \label{fig:outputpic}
+\end{figure}
+
+
+\section{Calculation of values for each criteria} \label{sec:scendet}
 This section details the calculations and definitions used to determine the values used for each CCM for each criteria. 
 
 \subsection{Criteria for purse seine scenarios}
@@ -175,30 +190,30 @@ This section details the calculations and definitions used to determine the valu
 \subsubsection*{Current high seas limits}
 Some CCMs already have purse seine effort limits on the high seas. This criteria uses the values for CCMs that are outlined in table 2 of CMM 2017-01 Attachment 1 and all CCMs not specified in that table receive zero values.
 
-\subsubsection{Current EEZ limits}
+\subsubsection*{Current EEZ limits}
 Many CCMs have purse seine effort limits within their EEZs and these are outlined in table 1 of CMM 2017-01 Attachment 1. These values are used for all applicable CCMs with the values used for individual PNA members {\bf based on...} The EEZ limits for Australia, New Caledonia and New Zealand are catch-based and these were converted to effort limits by calculating the mean CPUE for the three EEZs over the period {\bf XXXX-XXXX} and dividing the catch value in the table by the appropriate CPUE to give an equivalent effort-based limit. All CCMs not specified in that table receive zero values for this criteria.
 
-\subsubsection{Biomass of skipjack in EEZs}
+\subsubsection*{Biomass of skipjack in EEZs}
 
-\subsubsection{Economic dependency}
+\subsubsection*{Economic dependency}
 
-\subsubsection{EEZ size}
+\subsubsection*{EEZ size}
 The area of EEZ in the WCPFC convention area between 20\degree N and 20\degree S, {\bf excluding land area and archipelagic waters}.
 
-\subsubsection{Equal split}
+\subsubsection*{Equal split}
 Very simply, this criteria allocates over all CCMs equally.
 
-\subsubsection{Catch in adjacent zones} 
+\subsubsection*{Catch in adjacent zones} 
 
 
-\subsubsection{Historical effort}
-
+\subsubsection*{Historical effort}
+This criteria allocates more of the TAE to a CCM if it has a history of fishing in the high seas. The user has additional choices available in the app for this criteria related to the timing of the calculations of historical effort. Initially the annual effort fished by each CCM in the high seas between 20\degree N and 20\degree S, for the period 2002--{\bf 2016} was extracted from the databases. When the tick box for this criteria is checked three widgets will appear - the usual criteria weighting bar, but also an additional sliding bar and a numeric box which together determine the timing and methods of calculating historical effort.
 
 
 
 \section{General discussion}
 
-
+The purpose of the software and this report is to make the visualisation of potential allocation scenarios easily accessible to members. To this end we welcome feedback on how the app could be improved. This may include improvements in the presentation of results or the instructions of how the app is to be used.
 
 
 
