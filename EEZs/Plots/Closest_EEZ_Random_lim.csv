@@ -1,0 +1,981 @@
+"","eez","Dist"
+"1","Hawaii",24141.3764123699
+"2","Johnston Atoll",184733.938130892
+"3","French Polynesia",133618.773510511
+"4","Marshall Islands",94767.647622835
+"5","French Polynesia",168723.165266543
+"6","Jarvis Island",175130.271659473
+"7","Jarvis Island",52624.3285684161
+"8","Jarvis Island",163862.017991822
+"9","Line Group",29242.1284345456
+"10","Indonesia",141866.672497219
+"11","Nauru",4396.48628286968
+"12","Johnston Atoll",178482.036874868
+"13","Palmyra Atoll",127515.080105165
+"14","Northern Mariana Islands",81538.7024922608
+"15","Micronesia",115053.165626273
+"16","Palmyra Atoll",171133.12598333
+"17","Gilbert Islands",28922.4213703804
+"18","French Polynesia",183227.738930825
+"19","Philippines",119578.885990621
+"20","Papua New Guinea",65660.9813140028
+"21","Wake Island",15747.1685882156
+"22","Micronesia",610.285313557108
+"23","Line Group",73015.7637901609
+"24","French Polynesia",174195.616508186
+"25","Phoenix Group",96038.9557510192
+"26","French Polynesia",121229.907603123
+"27","Papua New Guinea",30546.1619310483
+"28","French Polynesia",67734.1545485874
+"29","Vanuatu",33482.3645658618
+"30","Micronesia",152267.116845797
+"31","Palmyra Atoll",163457.742701739
+"32","Tokelau",12725.5123182501
+"33","Papua New Guinea",32933.203482906
+"34","Marshall Islands",68988.2822646743
+"35","Phoenix Group",95692.8514371133
+"36","Japan",79259.169995682
+"37","Micronesia",11259.8299142655
+"38","Tuvalu",32694.1615338926
+"39","Marshall Islands",167486.677834521
+"40","Gilbert Islands",131157.412736776
+"41","French Polynesia",100503.619281165
+"42","Howland and Baker islands",135697.392786289
+"43","French Polynesia",8379.8105653705
+"44","Marshall Islands",52078.602580616
+"45","Micronesia",72859.549978568
+"46","Marshall Islands",173308.52027772
+"47","Marshall Islands",54972.3292189869
+"48","Palmyra Atoll",169843.271787163
+"49","Tuvalu",74966.767184925
+"50","Line Group",146218.202977209
+"51","Micronesia",183411.36602862
+"52","Micronesia",133611.281923395
+"53","Northern Mariana Islands",46261.9487544471
+"54","Jarvis Island",101595.706488535
+"55","French Polynesia",104360.21005818
+"56","Japan",177164.237986934
+"57","Johnston Atoll",86843.0757598833
+"58","Gilbert Islands",86868.3619163295
+"59","Palmyra Atoll",90567.6215723529
+"60","Line Group",105463.556396943
+"61","Palmyra Atoll",43886.154062217
+"62","Phoenix Group",65245.8413322005
+"63","Hawaii",22404.3353706793
+"64","Japan",53585.2255561381
+"65","Micronesia",64505.4061550903
+"66","Northern Mariana Islands",81068.6396422627
+"67","Papua New Guinea",44388.1770202035
+"68","Palau",15072.1756289559
+"69","Papua New Guinea",10754.3730031752
+"70","Jarvis Island",15513.8472453368
+"71","Howland and Baker islands",40563.2940192948
+"72","Gilbert Islands",4916.6523943737
+"73","Line Group",23110.7453061597
+"74","Marshall Islands",16189.7159412092
+"75","Cook Islands",64652.6554395744
+"76","Howland and Baker islands",79648.3351938296
+"77","Howland and Baker islands",66258.4289909184
+"78","Phoenix Group",115375.939594031
+"79","Micronesia",33581.3431375241
+"80","Micronesia",144769.842358798
+"81","Gilbert Islands",7634.40080775935
+"82","Micronesia",134253.008146515
+"83","Cook Islands",62145.4924412317
+"84","Marshall Islands",146096.213318249
+"85","Tuvalu",2935.8036388028
+"86","Solomon Islands",9218.63376108096
+"87","Jarvis Island",138377.867023149
+"88","Line Group",42944.2343560359
+"89","Philippines",78905.3706846256
+"90","Japan",46574.15837852
+"91","Howland and Baker islands",115151.77173229
+"92","Line Group",2165.81668301059
+"93","Palmyra Atoll",128189.795180995
+"94","Solomon Islands",16981.7622596275
+"95","Line Group",27230.5239336639
+"96","Hawaii",46550.7147403102
+"97","Hawaii",145300.922717777
+"98","Solomon Islands",142460.520541728
+"99","Micronesia",164748.599429158
+"100","French Polynesia",76145.9833071704
+"101","Wake Island",168974.126285409
+"102","Phoenix Group",16480.1573386148
+"103","Line Group",85887.0287440718
+"104","Micronesia",82365.6006223871
+"105","Philippines",145414.756165644
+"106","Howland and Baker islands",72180.0929978461
+"107","Japan",82363.033498126
+"108","Jarvis Island",53380.3041560254
+"109","Line Group",105529.91881549
+"110","Wake Island",163868.726633296
+"111","Marshall Islands",162413.598173051
+"112","Papua New Guinea",171000.802825433
+"113","Hawaii",80129.9976024309
+"114","Palmyra Atoll",115915.219741733
+"115","Hawaii",9801.82693722803
+"116","Micronesia",13205.3424434491
+"117","Jarvis Island",42709.6421320112
+"118","Wake Island",6582.38376440909
+"119","Japan",40960.9622025547
+"120","French Polynesia",157154.938719131
+"121","Micronesia",33389.089651668
+"122","Marshall Islands",134791.654635625
+"123","Line Group",63132.1517012367
+"124","Tuvalu",4462.89571270001
+"125","Marshall Islands",169719.025101899
+"126","Line Group",55719.7790080851
+"127","Line Group",144912.328604395
+"128","Micronesia",15339.2695017757
+"129","Micronesia",43997.028393215
+"130","French Polynesia",165044.338316795
+"131","Philippines",34182.0161536901
+"132","Papua New Guinea",48189.6552692458
+"133","Cook Islands",1047.53792742353
+"134","Hawaii",3721.92710227999
+"135","Vanuatu",1601.46374470523
+"136","Line Group",18596.6497575908
+"137","Howland and Baker islands",20602.6066605199
+"138","Palmyra Atoll",1000.77494654447
+"139","Johnston Atoll",173984.858953672
+"140","Japan",163057.825249732
+"141","Palmyra Atoll",63107.3348460485
+"142","Cook Islands",20270.7276940558
+"143","Nauru",62539.7949340899
+"144","Cook Islands",98804.992427322
+"145","Marshall Islands",129868.949812123
+"146","Northern Mariana Islands",101150.156092088
+"147","Johnston Atoll",19329.786806263
+"148","French Polynesia",54307.7083971598
+"149","Marshall Islands",31618.1497792825
+"150","Papua New Guinea",18052.4583311608
+"151","Phoenix Group",100123.75781804
+"152","Hawaii",13480.4490298962
+"153","Northern Mariana Islands",15457.6661574603
+"154","Palmyra Atoll",126919.043776531
+"155","Hawaii",40108.4877305067
+"156","Howland and Baker islands",5792.02684584585
+"157","Marshall Islands",173756.682252635
+"158","French Polynesia",70259.2403023037
+"159","Micronesia",179684.731624957
+"160","Gilbert Islands",88005.3984769677
+"161","Palau",35197.8848550576
+"162","Palau",99099.3536682505
+"163","Marshall Islands",70621.8565605026
+"164","Howland and Baker islands",121714.389445087
+"165","Micronesia",89970.4375491415
+"166","Johnston Atoll",33853.1664995791
+"167","Micronesia",181833.834996137
+"168","Indonesia",148072.037891089
+"169","Hawaii",53910.2067495192
+"170","Northern Mariana Islands",156207.546898998
+"171","Palmyra Atoll",85489.8538146569
+"172","Philippines",103826.851597672
+"173","Howland and Baker islands",46177.8717695265
+"174","Marshall Islands",53757.5788125198
+"175","French Polynesia",81483.7902879799
+"176","Line Group",107198.12355406
+"177","Indonesia",32495.4929525508
+"178","Line Group",124052.061604307
+"179","Japan",167990.506311621
+"180","Line Group",50638.2061211715
+"181","Line Group",76082.8261984991
+"182","Phoenix Group",48561.471408771
+"183","Tuvalu",6642.61779313718
+"184","Palmyra Atoll",101529.821597136
+"185","Johnston Atoll",3587.07333932883
+"186","Jarvis Island",78815.918863974
+"187","Palmyra Atoll",121048.959294139
+"188","Phoenix Group",121328.840361303
+"189","Phoenix Group",157631.454598199
+"190","Gilbert Islands",69947.7768607233
+"191","Johnston Atoll",161928.167615696
+"192","Phoenix Group",19700.5787637517
+"193","French Polynesia",9507.83954452527
+"194","Palmyra Atoll",62071.3683790616
+"195","Palmyra Atoll",110730.65460036
+"196","Line Group",19070.2110888029
+"197","Line Group",20966.0542003727
+"198","French Polynesia",170461.364814839
+"199","Phoenix Group",157224.749780507
+"200","Marshall Islands",156140.134172906
+"201","Phoenix Group",102809.944737902
+"202","Gilbert Islands",177911.582667683
+"203","Guam",126486.435642637
+"204","Palau",157613.724907421
+"205","Johnston Atoll",121956.576964471
+"206","French Polynesia",16902.1740625542
+"207","Tuvalu",85005.092685553
+"208","Nauru",6831.79885420169
+"209","Nauru",27988.1052113267
+"210","Micronesia",94587.1200019327
+"211","Philippines",10746.0385436848
+"212","Micronesia",108283.067020634
+"213","Cook Islands",49931.334410639
+"214","Johnston Atoll",104996.23597107
+"215","Palau",49954.0009242367
+"216","French Polynesia",35037.5161046106
+"217","Hawaii",95257.0636382748
+"218","Japan",141811.109756181
+"219","Howland and Baker islands",73399.7830238575
+"220","Line Group",19436.7037466587
+"221","Palmyra Atoll",77453.4251584567
+"222","Howland and Baker islands",7503.95798421394
+"223","Northern Mariana Islands",45025.9951405233
+"224","Philippines",5472.42390564161
+"225","Marshall Islands",31916.3493682569
+"226","Marshall Islands",322.177470484676
+"227","Palau",106340.934199019
+"228","Gilbert Islands",84567.8468044417
+"229","Nauru",76490.0279842406
+"230","Phoenix Group",148136.941009182
+"231","Micronesia",54200.2580341295
+"232","Jarvis Island",109450.728939102
+"233","Phoenix Group",119149.420428475
+"234","Micronesia",24301.2362307249
+"235","Phoenix Group",50239.835152521
+"236","Jarvis Island",96950.7087196188
+"237","Indonesia",82966.1613672279
+"238","Line Group",110855.5886727
+"239","Northern Mariana Islands",121453.082195551
+"240","Marshall Islands",74061.0399120876
+"241","Palmyra Atoll",166166.585752917
+"242","Jarvis Island",70998.2962351379
+"243","Papua New Guinea",3171.55769124748
+"244","Johnston Atoll",104460.658078881
+"245","Gilbert Islands",3347.68411990567
+"246","French Polynesia",4945.13898622593
+"247","Papua New Guinea",99007.4301600203
+"248","Marshall Islands",151156.970574448
+"249","Jarvis Island",98062.6441035888
+"250","Solomon Islands",88394.4761794763
+"251","Micronesia",113804.598189316
+"252","Jarvis Island",7134.59552085762
+"253","Line Group",52461.0380360362
+"254","French Polynesia",155676.85965477
+"255","Japan",135761.872275447
+"256","Philippines",116353.524015286
+"257","Wake Island",95777.1680574346
+"258","Cook Islands",16644.9941915539
+"259","Line Group",142001.133457257
+"260","Johnston Atoll",90689.7390389596
+"261","French Polynesia",135251.061807058
+"262","Cook Islands",145916.93926784
+"263","Gilbert Islands",77751.6109309703
+"264","Philippines",98770.4392679873
+"265","Marshall Islands",57387.1382133231
+"266","Phoenix Group",118347.918617208
+"267","French Polynesia",158829.790661541
+"268","Nauru",67825.4441414936
+"269","Marshall Islands",53135.5226373011
+"270","Howland and Baker islands",40347.762842908
+"271","Northern Mariana Islands",174720.819547391
+"272","Howland and Baker islands",27920.8896252516
+"273","Micronesia",75404.2281019745
+"274","Micronesia",46619.9788177478
+"275","Palmyra Atoll",76865.6844968532
+"276","Johnston Atoll",120275.079738658
+"277","Micronesia",102237.671895275
+"278","Philippines",147162.799374008
+"279","French Polynesia",40234.9770033083
+"280","Marshall Islands",75816.4309491648
+"281","Hawaii",158072.822946366
+"282","Japan",168815.390204123
+"283","Hawaii",106091.950514291
+"284","Line Group",48337.8465764939
+"285","Papua New Guinea",74985.0757381734
+"286","French Polynesia",94679.9569399157
+"287","Howland and Baker islands",59532.9334276476
+"288","Marshall Islands",132054.220629276
+"289","Jarvis Island",63339.770722616
+"290","Palau",152235.216747193
+"291","Indonesia",91707.1026812482
+"292","Cook Islands",140371.295078556
+"293","Marshall Islands",362.0770985202
+"294","Guam",79834.745190743
+"295","Philippines",182282.050088515
+"296","Micronesia",2055.06753039931
+"297","French Polynesia",70290.3543932976
+"298","Hawaii",168599.342642366
+"299","French Polynesia",41799.1969766675
+"300","French Polynesia",104619.602748861
+"301","Johnston Atoll",123823.724923336
+"302","Japan",123573.460119116
+"303","Micronesia",116714.366043583
+"304","Japan",145925.467807517
+"305","Palmyra Atoll",149024.886737498
+"306","French Polynesia",110945.458154054
+"307","Palmyra Atoll",139555.006470137
+"308","Philippines",130122.730793656
+"309","Gilbert Islands",55053.5066827857
+"310","Marshall Islands",166190.348787163
+"311","Johnston Atoll",133842.465002832
+"312","Howland and Baker islands",39502.6994130149
+"313","Marshall Islands",130930.39016896
+"314","Marshall Islands",177372.614771715
+"315","Marshall Islands",67016.7597332135
+"316","Johnston Atoll",108624.126358046
+"317","Micronesia",27533.3147333153
+"318","French Polynesia",40600.4968894725
+"319","Johnston Atoll",138918.540121649
+"320","Solomon Islands",27387.7306670753
+"321","Johnston Atoll",134614.579943439
+"322","Papua New Guinea",59888.5844775851
+"323","French Polynesia",36880.398015107
+"324","Johnston Atoll",142642.066039861
+"325","Line Group",32825.176525316
+"326","Micronesia",4456.07237534675
+"327","Japan",115783.059633967
+"328","Philippines",137673.530853528
+"329","Solomon Islands",82193.1189541425
+"330","Marshall Islands",175545.299116045
+"331","Line Group",32506.2971870553
+"332","Jarvis Island",167795.777292033
+"333","Northern Mariana Islands",14530.2060470467
+"334","Gilbert Islands",81200.2948453774
+"335","Johnston Atoll",125092.618490196
+"336","Howland and Baker islands",158128.147966797
+"337","Marshall Islands",117292.802726709
+"338","Jarvis Island",139790.497218791
+"339","Japan",145596.749400133
+"340","French Polynesia",92811.9894396293
+"341","Cook Islands",70426.0524632961
+"342","Palau",29745.7504430147
+"343","French Polynesia",154891.804561097
+"344","Papua New Guinea",19210.659417303
+"345","Wake Island",21928.439044754
+"346","Line Group",2869.89216096775
+"347","Papua New Guinea",33198.5898498354
+"348","Hawaii",16210.7991528482
+"349","Hawaii",180835.944986062
+"350","Marshall Islands",156099.035203668
+"351","French Polynesia",45284.5445417918
+"352","Papua New Guinea",149022.001330366
+"353","Wake Island",176480.074603677
+"354","Northern Mariana Islands",52124.316999444
+"355","Tuvalu",9329.31901562437
+"356","Gilbert Islands",140364.451647797
+"357","Northern Mariana Islands",65982.692613207
+"358","Palmyra Atoll",47644.3956026301
+"359","Howland and Baker islands",164628.887281803
+"360","Line Group",104445.042566657
+"361","Papua New Guinea",26124.5032050766
+"362","Philippines",10523.2219554282
+"363","French Polynesia",162182.546926107
+"364","Palmyra Atoll",48944.1340801975
+"365","Jarvis Island",169375.615104328
+"366","Nauru",27538.4615520431
+"367","Marshall Islands",106254.755130477
+"368","Cook Islands",87732.2469379562
+"369","Hawaii",65328.8565048388
+"370","Hawaii",54128.5813975864
+"371","Solomon Islands",48285.4723950428
+"372","Micronesia",52031.9016360937
+"373","French Polynesia",181522.797999878
+"374","Jarvis Island",154675.653081052
+"375","Tuvalu",176787.135329981
+"376","Gilbert Islands",148922.952353164
+"377","Line Group",154330.150998593
+"378","Johnston Atoll",153655.9081285
+"379","Phoenix Group",77686.4120874506
+"380","Johnston Atoll",180742.051664537
+"381","Hawaii",42509.8626333423
+"382","Indonesia",16295.7277490427
+"383","Gilbert Islands",150674.644757635
+"384","Cook Islands",150673.641426923
+"385","Line Group",181125.274447334
+"386","Nauru",37200.3928747446
+"387","Papua New Guinea",96159.8375210983
+"388","French Polynesia",46030.3478987789
+"389","Johnston Atoll",963.410537194041
+"390","French Polynesia",146359.393674157
+"391","Nauru",89744.7407950433
+"392","Line Group",73704.1753424415
+"393","Johnston Atoll",860.079112363205
+"394","Palmyra Atoll",58668.8179643948
+"395","Northern Mariana Islands",77673.126327803
+"396","Philippines",144060.636343995
+"397","Line Group",99135.4220383082
+"398","French Polynesia",57207.1651306322
+"399","Palmyra Atoll",139574.288338415
+"400","Marshall Islands",38665.4532921473
+"401","Johnston Atoll",35066.1926403167
+"402","Marshall Islands",133940.638076164
+"403","Northern Mariana Islands",43138.4698377373
+"404","Tuvalu",15858.4251892495
+"405","French Polynesia",19973.4384630112
+"406","Phoenix Group",116727.611600173
+"407","Micronesia",160156.465391435
+"408","Micronesia",29475.6748923516
+"409","French Polynesia",3728.75342892734
+"410","Solomon Islands",69489.1362462417
+"411","Gilbert Islands",81056.8764503935
+"412","Gilbert Islands",178202.65515635
+"413","Line Group",108522.241938258
+"414","Solomon Islands",62761.2986170083
+"415","French Polynesia",120710.57595838
+"416","Palau",15441.8519217592
+"417","Nauru",74396.5060773643
+"418","Marshall Islands",173323.348406899
+"419","Micronesia",136821.051436852
+"420","French Polynesia",72127.810653238
+"421","Phoenix Group",14596.4143738997
+"422","Cook Islands",58045.0358631669
+"423","Nauru",14570.4558609417
+"424","Micronesia",95625.8425778003
+"425","Papua New Guinea",43441.2829698887
+"426","Palmyra Atoll",56410.7978845766
+"427","Tokelau",76229.1256407115
+"428","Phoenix Group",38373.9672369098
+"429","Palmyra Atoll",3724.30615987828
+"430","Howland and Baker islands",164887.800196805
+"431","Marshall Islands",89171.3672575143
+"432","Tuvalu",46020.9751533297
+"433","Hawaii",111440.167187976
+"434","Line Group",708.14668414897
+"435","Philippines",94813.1449735871
+"436","Gilbert Islands",180047.360576599
+"437","Howland and Baker islands",116106.832552048
+"438","Philippines",44270.3684359078
+"439","Philippines",86908.6134703683
+"440","Hawaii",90703.0990222232
+"441","Micronesia",72171.4431379459
+"442","Howland and Baker islands",32650.173952462
+"443","Papua New Guinea",44293.0514504887
+"444","Phoenix Group",113329.009143448
+"445","Micronesia",101891.98722726
+"446","Japan",138257.948563515
+"447","Papua New Guinea",20829.1801889778
+"448","Jarvis Island",105320.907127749
+"449","Papua New Guinea",8704.45547506403
+"450","Howland and Baker islands",38931.9506560802
+"451","Japan",104642.129287191
+"452","Fiji",66630.8222776036
+"453","Hawaii",135042.61235579
+"454","Guam",137506.400832375
+"455","Jarvis Island",123592.23981747
+"456","French Polynesia",32347.8358571279
+"457","Howland and Baker islands",10116.8908842303
+"458","Tokelau",67982.1450490277
+"459","Cook Islands",86405.2806801562
+"460","Johnston Atoll",114962.095248089
+"461","Japan",118730.18220038
+"462","Howland and Baker islands",151959.814292917
+"463","Howland and Baker islands",103881.674618033
+"464","Johnston Atoll",27294.2140858655
+"465","Cook Islands",94863.0814367621
+"466","Line Group",166856.21011576
+"467","Johnston Atoll",30995.1432655783
+"468","Palau",52669.8013970234
+"469","Howland and Baker islands",52865.8326804137
+"470","Phoenix Group",153774.719690923
+"471","Hawaii",124226.038891499
+"472","Northern Mariana Islands",139403.089592883
+"473","Palmyra Atoll",15302.7439504689
+"474","French Polynesia",38746.34736307
+"475","Marshall Islands",174729.796223092
+"476","Hawaii",76477.5922888199
+"477","Micronesia",138335.65740599
+"478","Line Group",168916.230278216
+"479","Johnston Atoll",11843.0125777754
+"480","Northern Mariana Islands",182521.410177203
+"481","Micronesia",22295.1559658334
+"482","Tuvalu",1776.21497275611
+"483","Hawaii",78061.2249883629
+"484","Line Group",138024.899795636
+"485","Hawaii",26781.2075088351
+"486","Micronesia",68701.6047402071
+"487","Johnston Atoll",27618.2632922776
+"488","Tuvalu",42778.0603439995
+"489","Marshall Islands",38550.1051379437
+"490","French Polynesia",175833.924556892
+"491","Line Group",31412.0914335527
+"492","Wake Island",117938.759004878
+"493","Papua New Guinea",51908.3549939643
+"494","Howland and Baker islands",140964.149605294
+"495","Philippines",38570.895114822
+"496","Cook Islands",5384.43173714461
+"497","Tuvalu",55886.4750898961
+"498","Micronesia",83239.4153283151
+"499","French Polynesia",75152.7597759388
+"500","French Polynesia",168484.353112128
+"501","Line Group",111591.59237422
+"502","Tokelau",62286.668377137
+"503","Phoenix Group",111248.042390104
+"504","Northern Mariana Islands",13997.8126931672
+"505","Howland and Baker islands",148063.458471079
+"506","Micronesia",118473.15325181
+"507","Gilbert Islands",156266.686253232
+"508","Phoenix Group",72582.3930491929
+"509","Japan",107127.360690175
+"510","Japan",121863.823557459
+"511","French Polynesia",94328.3346913244
+"512","Cook Islands",100476.759746568
+"513","Micronesia",17195.659845421
+"514","Micronesia",66294.1721241803
+"515","Marshall Islands",134798.546859291
+"516","Palau",94956.0659735062
+"517","Palau",123307.059623292
+"518","Marshall Islands",62124.8148521092
+"519","Papua New Guinea",24355.0497167141
+"520","Papua New Guinea",58613.609603282
+"521","Micronesia",96779.3042178236
+"522","Jarvis Island",8564.29233088719
+"523","Line Group",6646.19187802022
+"524","Gilbert Islands",26417.9860515651
+"525","Line Group",27830.9004586323
+"526","Marshall Islands",48401.9659567506
+"527","French Polynesia",179359.784912144
+"528","Palmyra Atoll",117957.63900103
+"529","Johnston Atoll",19431.7655116466
+"530","Line Group",41493.2558280495
+"531","Line Group",26556.103414105
+"532","Palmyra Atoll",117066.460907411
+"533","Gilbert Islands",14900.5560240657
+"534","Papua New Guinea",99247.6603563259
+"535","Philippines",69323.3713019464
+"536","Hawaii",183252.317028211
+"537","Japan",166473.856684127
+"538","Hawaii",8426.15810775765
+"539","Line Group",152474.210411782
+"540","Tuvalu",44948.576610144
+"541","Phoenix Group",145740.506529392
+"542","Johnston Atoll",69759.6439121327
+"543","Gilbert Islands",139514.547913463
+"544","Japan",135450.395831419
+"545","Line Group",96626.4899527499
+"546","Wake Island",91010.5424396111
+"547","Fiji",20393.387709209
+"548","Japan",41348.5826660608
+"549","Howland and Baker islands",69924.4982231527
+"550","Tuvalu",68990.627300554
+"551","Northern Mariana Islands",11775.9170849383
+"552","Phoenix Group",116686.504399549
+"553","French Polynesia",140056.087606244
+"554","Micronesia",76072.3934108843
+"555","Marshall Islands",123626.710529174
+"556","Marshall Islands",87779.341108031
+"557","Philippines",177463.583572094
+"558","French Polynesia",89109.1380776178
+"559","Cook Islands",3917.21546320511
+"560","Marshall Islands",155173.236288677
+"561","French Polynesia",6898.17591775396
+"562","Johnston Atoll",130984.410875515
+"563","Johnston Atoll",129657.900260451
+"564","Tuvalu",69427.3922401425
+"565","Tuvalu",37934.578996576
+"566","French Polynesia",40279.7967766355
+"567","Phoenix Group",85979.4187413564
+"568","Johnston Atoll",88897.1783884944
+"569","Philippines",41123.8787915722
+"570","French Polynesia",26652.1388166582
+"571","Johnston Atoll",165070.975248996
+"572","Palau",99215.7097868771
+"573","Jarvis Island",43017.0354372594
+"574","Marshall Islands",149312.368097209
+"575","French Polynesia",124583.215919909
+"576","Hawaii",148840.753432289
+"577","Cook Islands",145232.557978894
+"578","Palau",167337.186714072
+"579","Marshall Islands",162589.431834218
+"580","Micronesia",165287.370062091
+"581","Jarvis Island",97256.8075129698
+"582","Micronesia",52483.9972308137
+"583","Nauru",146132.555618064
+"584","Johnston Atoll",47990.5871689811
+"585","Hawaii",25271.1675704055
+"586","Howland and Baker islands",55032.1979596328
+"587","Nauru",85265.9256025497
+"588","Marshall Islands",139617.838125201
+"589","Wake Island",42353.858989059
+"590","French Polynesia",136606.449963852
+"591","Marshall Islands",103968.281088189
+"592","French Polynesia",34528.8430052018
+"593","French Polynesia",148399.614718786
+"594","Philippines",109345.933453099
+"595","Solomon Islands",18267.6612087321
+"596","Micronesia",62417.4321609004
+"597","Johnston Atoll",36316.3566846779
+"598","Papua New Guinea",23952.9103449625
+"599","Papua New Guinea",41167.2106626132
+"600","Phoenix Group",15031.7021090577
+"601","Micronesia",99512.1157626343
+"602","Micronesia",162410.537346873
+"603","Jarvis Island",89544.5995904384
+"604","French Polynesia",136096.864497775
+"605","French Polynesia",9568.9554409764
+"606","Philippines",98547.0779886808
+"607","Solomon Islands",101616.354533204
+"608","Marshall Islands",122690.822456221
+"609","Solomon Islands",30983.7074652551
+"610","Howland and Baker islands",4744.9137533489
+"611","Marshall Islands",92462.128816125
+"612","Line Group",132077.885032321
+"613","Wake Island",42781.0780244049
+"614","Hawaii",103199.652862082
+"615","Johnston Atoll",21976.4918844544
+"616","Micronesia",135495.311878747
+"617","Marshall Islands",93632.45820091
+"618","Marshall Islands",2124.26321852397
+"619","Palau",50929.905870606
+"620","Solomon Islands",163197.699640431
+"621","Tokelau",107495.657567515
+"622","Phoenix Group",78030.9790760024
+"623","Papua New Guinea",102120.674270603
+"624","Palau",6894.38939218993
+"625","Johnston Atoll",179755.385503987
+"626","Micronesia",26074.4539643304
+"627","Johnston Atoll",158995.609290238
+"628","Hawaii",8830.64907191795
+"629","Japan",78243.4261717014
+"630","Palmyra Atoll",108333.402517239
+"631","Howland and Baker islands",32567.4627533271
+"632","Papua New Guinea",131048.697389318
+"633","French Polynesia",31387.6231389118
+"634","Northern Mariana Islands",63952.5289666879
+"635","Line Group",72111.3602305405
+"636","Tuvalu",13141.3231666401
+"637","Marshall Islands",9992.40517361618
+"638","Howland and Baker islands",16068.5274270336
+"639","Hawaii",61647.3336597244
+"640","Johnston Atoll",147866.324443135
+"641","Palmyra Atoll",59516.7939512918
+"642","Japan",40399.6037528045
+"643","Solomon Islands",47922.9117535718
+"644","Nauru",84496.2325879812
+"645","Palmyra Atoll",123190.620742796
+"646","Nauru",129355.410152222
+"647","Line Group",113776.005336468
+"648","French Polynesia",160194.556923673
+"649","Marshall Islands",83865.8565046207
+"650","Micronesia",125420.216575057
+"651","French Polynesia",135125.130589976
+"652","Jarvis Island",53346.4324960692
+"653","Jarvis Island",68711.6839167689
+"654","Japan",149834.724182304
+"655","Northern Mariana Islands",14896.9797428401
+"656","Philippines",6383.569969136
+"657","Johnston Atoll",72169.5944844432
+"658","Line Group",93070.4361793249
+"659","Phoenix Group",73685.977884015
+"660","French Polynesia",100693.532028599
+"661","Palmyra Atoll",117354.374476076
+"662","Micronesia",162641.819569046
+"663","Marshall Islands",11748.8729861283
+"664","Phoenix Group",41485.0564493848
+"665","Line Group",30189.6847136711
+"666","Philippines",92852.705839194
+"667","Gilbert Islands",161905.728898788
+"668","Philippines",166148.061867873
+"669","French Polynesia",18859.7839087995
+"670","Solomon Islands",127622.032541034
+"671","Line Group",21559.1226283254
+"672","French Polynesia",80752.5752836917
+"673","French Polynesia",42662.9431618064
+"674","Phoenix Group",41974.5753750438
+"675","Hawaii",151310.898294973
+"676","Cook Islands",20713.5359255448
+"677","Northern Mariana Islands",75072.5767175404
+"678","Marshall Islands",49342.960408572
+"679","Phoenix Group",8022.89320018844
+"680","French Polynesia",175100.544026758
+"681","Solomon Islands",31206.9636412856
+"682","Jarvis Island",8844.45365073539
+"683","Marshall Islands",150718.948084447
+"684","Johnston Atoll",95707.9036708863
+"685","Micronesia",105356.824972169
+"686","Marshall Islands",46942.309067337
+"687","Papua New Guinea",55512.3069421054
+"688","French Polynesia",3653.81466220779
+"689","Micronesia",40215.6747039948
+"690","Palmyra Atoll",46568.4490760863
+"691","Papua New Guinea",165989.670279896
+"692","Marshall Islands",159467.435370019
+"693","Marshall Islands",19321.2270283358
+"694","Hawaii",121346.167029048
+"695","Micronesia",181909.314158863
+"696","Solomon Islands",98756.7959898519
+"697","Howland and Baker islands",15651.6897913603
+"698","Line Group",80226.7009441058
+"699","Micronesia",1512.52890996213
+"700","French Polynesia",72779.3949001577
+"701","Micronesia",54552.3794424911
+"702","Marshall Islands",154862.241740778
+"703","Marshall Islands",115291.558924672
+"704","Jarvis Island",160788.457667134
+"705","French Polynesia",83139.246861878
+"706","Johnston Atoll",98152.7027550275
+"707","Nauru",132436.113946315
+"708","Indonesia",1623.36453400569
+"709","Japan",72526.7153623148
+"710","French Polynesia",89535.8381163438
+"711","Micronesia",17299.8013001258
+"712","Line Group",89928.5909435054
+"713","Micronesia",61916.195628154
+"714","Palmyra Atoll",153239.319859944
+"715","Jarvis Island",74694.4325795844
+"716","Micronesia",16258.3800156361
+"717","Palmyra Atoll",43414.509529111
+"718","Marshall Islands",181270.074558737
+"719","French Polynesia",105803.314978363
+"720","Wake Island",110244.11796627
+"721","Northern Mariana Islands",77473.5005568084
+"722","Japan",151967.634042526
+"723","Palmyra Atoll",40878.9692074654
+"724","Marshall Islands",143486.006540884
+"725","Johnston Atoll",161474.789964207
+"726","Northern Mariana Islands",64575.0639492849
+"727","Nauru",39415.5995231297
+"728","French Polynesia",63582.6097713607
+"729","Line Group",139889.979995652
+"730","Johnston Atoll",51827.0230730588
+"731","Marshall Islands",96290.5311650628
+"732","Solomon Islands",51734.8325741809
+"733","Micronesia",42221.1448166376
+"734","French Polynesia",57418.8918703327
+"735","Line Group",76140.8777132035
+"736","Micronesia",124350.303248019
+"737","Marshall Islands",78740.6960947635
+"738","Solomon Islands",10118.9281922293
+"739","French Polynesia",150605.877991604
+"740","Marshall Islands",27389.4966227443
+"741","Indonesia",101046.498665151
+"742","Wake Island",39131.4029106967
+"743","Line Group",29065.5242541897
+"744","Hawaii",169157.331825325
+"745","Micronesia",86913.1163508401
+"746","Jarvis Island",32850.4205832522
+"747","Northern Mariana Islands",49787.6357428094
+"748","Philippines",121642.743177418
+"749","Solomon Islands",45033.7029104217
+"750","Hawaii",103714.769515088
+"751","Marshall Islands",70360.2371910822
+"752","French Polynesia",138382.20459682
+"753","French Polynesia",44986.273119664
+"754","Northern Mariana Islands",83062.0128795387
+"755","Johnston Atoll",140984.685666698
+"756","Palmyra Atoll",172822.290231657
+"757","Line Group",69708.8203724427
+"758","Solomon Islands",91188.2631980488
+"759","Jarvis Island",124224.077296479
+"760","Marshall Islands",21735.08994403
+"761","Philippines",96766.7310177407
+"762","Johnston Atoll",181503.913688337
+"763","Northern Mariana Islands",8264.66983378054
+"764","Palmyra Atoll",91549.7273795838
+"765","Howland and Baker islands",183187.093511299
+"766","Palmyra Atoll",83437.2609378513
+"767","Hawaii",76792.6325914657
+"768","Tuvalu",68038.6049507748
+"769","Wake Island",96334.0023777349
+"770","French Polynesia",169824.245705348
+"771","Indonesia",27391.2306147318
+"772","Gilbert Islands",81951.2347516511
+"773","Tuvalu",23651.824887826
+"774","Micronesia",40291.2961684625
+"775","Cook Islands",13040.0934764009
+"776","Phoenix Group",90713.8499673616
+"777","Cook Islands",24368.3933215244
+"778","Micronesia",133999.428423736
+"779","Palmyra Atoll",124433.660983983
+"780","Howland and Baker islands",112856.504972744
+"781","Hawaii",110576.406445157
+"782","Hawaii",67766.9016791634
+"783","Philippines",23765.018739138
+"784","Solomon Islands",4002.83374994719
+"785","Line Group",47734.87599026
+"786","Jarvis Island",125183.925312653
+"787","Howland and Baker islands",32487.384641628
+"788","Cook Islands",26933.1997937995
+"789","Micronesia",21372.324919567
+"790","Johnston Atoll",118812.663574976
+"791","French Polynesia",151202.777728664
+"792","Northern Mariana Islands",140144.235089185
+"793","French Polynesia",51204.8764665941
+"794","Hawaii",146091.04473017
+"795","Johnston Atoll",153566.406937815
+"796","Micronesia",88741.1497590608
+"797","Indonesia",81830.4046193365
+"798","Northern Mariana Islands",106524.256689005
+"799","Marshall Islands",54692.7252179718
+"800","Line Group",143813.571694106
+"801","Howland and Baker islands",46913.863813774
+"802","Cook Islands",78706.9520511037
+"803","Johnston Atoll",113615.148279302
+"804","Line Group",178285.564102561
+"805","French Polynesia",179794.506815733
+"806","Phoenix Group",178014.063198004
+"807","Northern Mariana Islands",59659.3205518921
+"808","Howland and Baker islands",56093.1184621669
+"809","Palmyra Atoll",170582.554847258
+"810","Papua New Guinea",3623.12022262949
+"811","French Polynesia",175356.608404494
+"812","Gilbert Islands",70235.9314660471
+"813","Marshall Islands",147685.648308801
+"814","Johnston Atoll",114786.225961061
+"815","Hawaii",85132.9510931073
+"816","Line Group",153118.879355659
+"817","Wake Island",85248.7387840583
+"818","Line Group",62558.2956755828
+"819","Solomon Islands",71326.3795689934
+"820","Gilbert Islands",137513.220144316
+"821","Marshall Islands",6970.77567456343
+"822","Fiji",14181.0479246365
+"823","Jarvis Island",86402.0319586046
+"824","Johnston Atoll",46750.7897640039
+"825","Japan",162630.681120421
+"826","Papua New Guinea",69009.730705776
+"827","Marshall Islands",13026.8688509448
+"828","Phoenix Group",128320.512986633
+"829","Howland and Baker islands",12096.3165498622
+"830","Tokelau",20375.2459980319
+"831","Line Group",90659.1732217619
+"832","Japan",162458.465747148
+"833","Japan",184574.641399681
+"834","Indonesia",9349.07267763206
+"835","Line Group",30795.2296566409
+"836","Phoenix Group",111430.907427111
+"837","Papua New Guinea",81964.7077890326
+"838","Marshall Islands",96704.266406428
+"839","Micronesia",151227.960712686
+"840","French Polynesia",24104.0263915306
+"841","Line Group",132808.0481901
+"842","Johnston Atoll",56260.4356765045
+"843","Line Group",69988.278696914
+"844","Line Group",89283.322754632
+"845","Northern Mariana Islands",26229.5415636945
+"846","Jarvis Island",115564.338990034
+"847","Papua New Guinea",78496.6112265707
+"848","Japan",34787.1345841619
+"849","Marshall Islands",71796.0619992666
+"850","Tokelau",65349.4401565943
+"851","Line Group",165430.673637824
+"852","Gilbert Islands",129863.718865061
+"853","Line Group",158393.486958382
+"854","Line Group",180354.36627012
+"855","Philippines",87847.7752229722
+"856","Fiji",56787.959578838
+"857","French Polynesia",4960.21477430929
+"858","Solomon Islands",27929.3798211765
+"859","Hawaii",105566.384979163
+"860","Jarvis Island",26474.1475671798
+"861","Japan",159932.905908817
+"862","Palmyra Atoll",8253.48468485054
+"863","Johnston Atoll",58355.8837386928
+"864","Johnston Atoll",179725.497186643
+"865","Gilbert Islands",27999.4768290794
+"866","Cook Islands",126694.690543173
+"867","Line Group",36244.0217798421
+"868","Howland and Baker islands",23898.9669714826
+"869","Marshall Islands",168213.517015407
+"870","Micronesia",7177.5788957227
+"871","Japan",137624.265638538
+"872","Micronesia",59632.3361946565
+"873","Micronesia",30133.4240776111
+"874","Howland and Baker islands",21193.4934714059
+"875","French Polynesia",179182.534490142
+"876","Tuvalu",68957.9912620779
+"877","Marshall Islands",133659.028611758
+"878","Micronesia",93344.6698224017
+"879","Northern Mariana Islands",64352.04633262
+"880","Micronesia",88675.6611751865
+"881","Line Group",166972.420512246
+"882","Hawaii",182003.128102029
+"883","Line Group",21828.1621361351
+"884","Hawaii",98683.7130950733
+"885","Philippines",28475.6847035733
+"886","Solomon Islands",24263.0907572087
+"887","Nauru",98775.9463939037
+"888","Palmyra Atoll",105923.696695016
+"889","Phoenix Group",29775.7153944037
+"890","Hawaii",177155.973444599
+"891","Marshall Islands",60728.9949821799
+"892","Hawaii",163117.157746295
+"893","Hawaii",52111.7246542628
+"894","Northern Mariana Islands",24668.7311025195
+"895","Palau",415.240726768298
+"896","Howland and Baker islands",77293.2531301884
+"897","Japan",173461.370543022
+"898","Marshall Islands",126296.902070924
+"899","Solomon Islands",69993.9979210215
+"900","Jarvis Island",549.293740866739
+"901","Jarvis Island",12383.1486543804
+"902","Japan",84834.6051459333
+"903","Line Group",16024.2371876327
+"904","Northern Mariana Islands",34214.4424142147
+"905","Phoenix Group",77263.1738831998
+"906","Wake Island",175753.750201165
+"907","Line Group",47971.5153237925
+"908","Micronesia",16167.2030213693
+"909","Phoenix Group",166475.644518627
+"910","Gilbert Islands",129985.59499473
+"911","Marshall Islands",132702.866573671
+"912","Jarvis Island",159322.789237285
+"913","Howland and Baker islands",8800.27709602381
+"914","French Polynesia",51358.2388450871
+"915","Marshall Islands",160169.576236672
+"916","Phoenix Group",31349.6057821476
+"917","French Polynesia",90538.6540270229
+"918","Cook Islands",30790.4393840935
+"919","Palmyra Atoll",25215.2036706971
+"920","Wake Island",165290.118076689
+"921","Micronesia",62895.5007013281
+"922","Johnston Atoll",26467.8548296591
+"923","Japan",54691.957180818
+"924","Nauru",106705.442033301
+"925","Micronesia",56901.3053332861
+"926","Gilbert Islands",31910.3117175405
+"927","Marshall Islands",68575.4293835091
+"928","Line Group",172978.293165125
+"929","Micronesia",41.1314373087539
+"930","Palmyra Atoll",62136.6488287516
+"931","Jarvis Island",176705.034038411
+"932","Palmyra Atoll",77111.7273521343
+"933","Philippines",92877.952023659
+"934","Johnston Atoll",184699.826525043
+"935","Solomon Islands",50013.4616153668
+"936","French Polynesia",141286.141664031
+"937","Marshall Islands",23324.3252993537
+"938","Nauru",38423.388338777
+"939","Palmyra Atoll",93318.5600413211
+"940","Johnston Atoll",24064.5989774006
+"941","Cook Islands",79638.3872125728
+"942","Micronesia",37659.3948439102
+"943","Micronesia",119141.176245868
+"944","Japan",37500.1577381969
+"945","Indonesia",109664.473273873
+"946","Marshall Islands",63445.8856728929
+"947","Jarvis Island",67203.0118888273
+"948","Johnston Atoll",162517.416221285
+"949","Guam",110801.208033191
+"950","Line Group",123764.963183544
+"951","Cook Islands",33931.4331398001
+"952","Palmyra Atoll",114977.986389975
+"953","Hawaii",90793.0650928718
+"954","Johnston Atoll",85917.1777517225
+"955","Philippines",19084.6559551382
+"956","Line Group",47657.9996471283
+"957","French Polynesia",32288.0737019238
+"958","Palmyra Atoll",90848.5511403774
+"959","Marshall Islands",155177.610846362
+"960","Marshall Islands",132855.337578176
+"961","Johnston Atoll",81422.1198473354
+"962","French Polynesia",73682.9515803321
+"963","French Polynesia",170450.952230217
+"964","Indonesia",129483.119036613
+"965","Phoenix Group",40947.5526758795
+"966","Cook Islands",158938.886541918
+"967","Johnston Atoll",3499.57043648767
+"968","Philippines",141832.079725008
+"969","Jarvis Island",143931.656005884
+"970","Marshall Islands",166308.466165839
+"971","Phoenix Group",115808.56893774
+"972","French Polynesia",70469.5870175887
+"973","Howland and Baker islands",12682.1750295825
+"974","Palau",89041.4765356202
+"975","Gilbert Islands",48019.586757838
+"976","Palmyra Atoll",170104.553277787
+"977","Johnston Atoll",78846.4480544833
+"978","French Polynesia",62086.0028720891
+"979","Line Group",28020.882763686
+"980","French Polynesia",107452.276717049

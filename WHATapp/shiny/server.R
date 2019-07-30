@@ -97,6 +97,20 @@ server <- function(input, output) {
   
   aa <- reactive({
     
+    if(input$variable == 'Purse'){
+      if(input$HSPinc == "InHSP"){
+        
+        datrel <- datrel
+        
+      } else {
+        
+        datrel <- datalt
+        
+      }
+    } else {
+      datrel <- datrel
+    }
+    
     sumfnc <- function(x) sum(cbind(datrel[, -c(1,2)], histfish())[x,] * as.numeric(wgtVec()))/sum(as.numeric(wgtVec()))
     
     aaa <- sapply(1:dim(datrel)[1], sumfnc)
@@ -109,7 +123,20 @@ server <- function(input, output) {
   
   
   datpl <- reactive({
-    #   test <- data.frame(CCM=datrel$CCM, Res=aa()) %>% mutate(Resrnd=round(Res*100,0), pos=cumsum(Res)-Res/2, Allocate=Res*input$num1)
+    
+    if(input$variable == 'Purse'){
+      if(input$HSPinc == "InHSP"){
+
+        datrel <- datrel
+
+      } else {
+
+        datrel <- datalt
+
+      }
+    } else {
+      datrel <- datrel
+    }
     
     
     if(input$figtype == 1){
@@ -152,6 +179,21 @@ server <- function(input, output) {
   })
   
   dattab <- reactive({
+    
+    if(input$variable == 'Purse'){
+    if(input$HSPinc == "InHSP"){
+
+      datrel <- datrel
+
+    } else {
+
+      datrel <- datalt
+
+    }
+    } else {
+      datrel <- datrel
+    }
+    
     test <- data.frame(CCM=datrel$CCM, Percent=round(aa()*100, 0), Allocate=round(aa()*input$num1,0)) %>% arrange(desc(Allocate))
     
     if(input$variable == 'Purse'){
@@ -168,8 +210,8 @@ server <- function(input, output) {
       test <- test
     } else{
       test <- data.frame(CCM=datrel$CCM, Regn=datrel$Regnl, Res=aa()) %>% group_by(Regn) %>% summarise(Res=sum(Res)) %>%
-        mutate(Percent=round(Res*100, 0), Allocate=round(Res*input$num1,0)) %>% rename(CCM=Regn) %>%
-        select(-Res) %>% arrange(desc(Allocate))
+                         mutate(Percent=round(Res*100, 0), Allocate=round(Res*input$num1,0)) %>% rename(CCM=Regn) %>%
+                         select(-Res) %>% arrange(desc(Allocate))
     }
     
   })
@@ -183,11 +225,12 @@ server <- function(input, output) {
   #   
   #   
   output$IndPlot <- renderPlotly({
+    
     plot_ly(datpl(), labels=~CCM, values=~Resrnd, type="pie", marker=list(colors=CCM_cols), sort=FALSE,
             textposition="inside", textinfo="label+value", width=700, height=700) %>% config(displayModeBar = F) %>%
-      layout(title = "CCM - Allocations (Percentages)", plot_bgcolor='transparent', paper_bgcolor='transparent',
-             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+            layout(title = "CCM - Allocations (Percentages)", plot_bgcolor='transparent', paper_bgcolor='transparent',
+                   xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                   yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
     
     
   })

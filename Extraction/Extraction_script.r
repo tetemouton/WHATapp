@@ -34,14 +34,14 @@ library(magrittr)
 #dat <- read.csv(paste0(getwd(), "/shiny/Data/Data_Matrix.csv"), header=TRUE)
 
 
-  anncat <- read.table(file=paste0(dirpth, "/PS_ANNCATEST_EEZ_WCPFC.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  anncat <- read.table(file=paste0(dirpth, "/Extraction/PS_ANNCATEST_EEZ_WCPFC.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
 
   
 #____________________________________________________________________________________________________________  
 # With all the HS included between 20N and 20S
 
 # Summarise and output PS effort by year and flag for direct export to the app
-  dat <- anncat %>% filter(eez %in% HSind, eez != "I6", eez != "I7", yy > 2001, yy < 2018) %>% mutate(tunmt=bet_mt+skj_mt+yft_mt) %>% group_by(yy, Flag=flag) %>%
+  dat <- anncat %>% filter(eez %in% HSind, eez != "I6", eez != "I7", yy > 2002, yy < 2019) %>% mutate(tunmt=bet_mt+skj_mt+yft_mt) %>% group_by(yy, Flag=flag) %>%
                     summarise(Days=sum(days), betmt=sum(bet_mt), skjmt=sum(skj_mt), yftmt=sum(yft_mt), tunmt=sum(tunmt))
 
   flag.ind <- match(dat$Flag, cnt.switches$old)
@@ -50,7 +50,7 @@ library(magrittr)
 
   dat %<>% filter(Flag %in% cnt.codes$cnt)
 
-  exp.dat <- expand.grid(yy=2002:2017, Flag=cnt.codes$cnt)
+  exp.dat <- expand.grid(yy=2003:2018, Flag=cnt.codes$cnt)
 
   Ind.flg <- match(paste(exp.dat$yy, exp.dat$Flag), paste(dat$yy, dat$Flag))
 
@@ -71,7 +71,7 @@ library(magrittr)
 # With all the HS between 20N and 20S except for I1, I2, I8 and I9 which are removed as PSing has largely been banned there
 
   # Summarise and output PS effort by year and flag for direct export to the app
-  dat <- anncat %>% filter(eez %in% HSind, !(eez %in% c("I1","I2","I6","I7","I8","I9")), yy > 2001, yy < 2018) %>% mutate(tunmt=bet_mt+skj_mt+yft_mt) %>% group_by(yy, Flag=flag) %>%
+  dat <- anncat %>% filter(eez %in% HSind, !(eez %in% c("I1","I2","I6","I7","I8","I9")), yy > 2002, yy < 2019) %>% mutate(tunmt=bet_mt+skj_mt+yft_mt) %>% group_by(yy, Flag=flag) %>%
                     summarise(Days=sum(days), betmt=sum(bet_mt), skjmt=sum(skj_mt), yftmt=sum(yft_mt), tunmt=sum(tunmt))
   
   flag.ind <- match(dat$Flag, cnt.switches$old)
@@ -80,7 +80,7 @@ library(magrittr)
   
   dat %<>% filter(Flag %in% cnt.codes$cnt)
   
-  exp.dat <- expand.grid(yy=2002:2017, Flag=cnt.codes$cnt)
+  exp.dat <- expand.grid(yy=2003:2018, Flag=cnt.codes$cnt)
   
   Ind.flg <- match(paste(exp.dat$yy, exp.dat$Flag), paste(dat$yy, dat$Flag))
   
@@ -96,21 +96,30 @@ library(magrittr)
   
   
 #____________________________________________________________________________________________________________
+# Longline catch in the high seas scenario
+  
+  anncat.ll <- read.table(file=paste0(dirpth, "/Extraction/LL_ANNCATEST_EEZ_WCPFC.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  # Summarise and output LL catch by year and flag for direct export to the app
+  dat <- anncat.ll %>% filter(eez %in% HSind, yy > 2002, yy < 2019) %>% group_by(yy, Flag=flag) %>%
+                       summarise(betmt=sum(bet_mt))
+  
+  flag.ind <- match(dat$Flag, cnt.switches$old)
+  
+  dat$Flag <- ifelse(dat$Flag %in% cnt.switches$old, cnt.switches$new[flag.ind], dat$Flag)
+  
+  dat %<>% filter(Flag %in% cnt.codes$cnt)
+  
+  exp.dat <- expand.grid(yy=2003:2018, Flag=cnt.codes$cnt)
+  
+  Ind.flg <- match(paste(exp.dat$yy, exp.dat$Flag), paste(dat$yy, dat$Flag))
+  
+  exp.dat$Catch <- dat$betmt[Ind.flg]
+  exp.dat[is.na(exp.dat)] <- 0
+  
+  tmp <- exp.dat %>% spread(key=Flag, value=Catch)
+  write.table(t(tmp), file=paste0(dirpth, "/WHATapp/shiny/Data/Annual_LL_Catch.csv"), sep=",", col.names=FALSE)
+  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#____________________________________________________________________________________________________________
 

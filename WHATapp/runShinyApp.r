@@ -13,19 +13,20 @@ CCM_cols <- c("dodgerblue2","firebrick3","darkorchid","darkred","lightskyblue","
 
 dat <- read.csv(paste0(getwd(), "/shiny/Data/Data_Matrix.csv"), header=TRUE)
 
-datsum <- apply(dat[, -c(1,2)], 2, sum)
-
 datrel <- dat
-datrel[, -c(1,2)] <- dat[, -c(1,2)]/datsum
+datrel[, -c(1,2)] <- as.data.frame(prop.table(as.matrix(datrel[, -c(1,2)]), 2))
 
+datalt <- datrel
+datalt[23,3] <- 0   # Allow removal of PH HS allocation from CMM
+datalt[, -c(1,2)] <- as.data.frame(prop.table(as.matrix(datalt[, -c(1,2)]), 2)) 
 
 effrt <- read.csv(paste0(getwd(), "/shiny/Data/Annual_PS_Effort.csv"), header=TRUE)
 effrthsp <- read.csv(paste0(getwd(), "/shiny/Data/Annual_PS_Effort-I1.csv"), header=TRUE)
 
 catch <- read.csv(paste0(getwd(), "/shiny/Data/Annual_LL_Catch.csv"), header=TRUE)
 
-minyr <- 2002
-maxyr <- 2016
+minyr <- 2003
+maxyr <- 2018
 
 message('library paths:\n', paste('... ', .libPaths(), sep='', collapse='\n'))
 

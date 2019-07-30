@@ -5,7 +5,7 @@ ui <- fluidPage(
   ),
   
   #titlePanel("CATGIRL - a catch/effort allocation tool"),
-  titlePanel(title=div(img(height=120, width=1500, src="HeaderBar.png")), windowTitle="Mmmmeeeeeoooowwwww"),
+  titlePanel(title=div(img(height=120, width=1500, src="HeaderBar1.png")), windowTitle="Mmmmeeeeeoooowwwww"),
   #titlePanel(title=div(img(height=150, width=100, src="cat.jpg"), "CATGIRL - Catch Allocation Tool Generalised to Include Regional Longlining"), windowTitle="Mmmmeeeeeoooowwwww"),
   #headerPanel( title=div(img(height=150, width=100, src="cat.jpg"),
   #                       h3("CATGIRL - Catch Allocation Tool Generalised to Include Regional Longlining", align="center", style="bold")
@@ -14,7 +14,7 @@ ui <- fluidPage(
   #setBackgroundColor("blue"),
   
   setBackgroundColor(
-    color = c("white", "lightgrey"),
+    color = c("white", "white"),
     gradient = "linear",
     direction = c("bottom","left")
   ),
@@ -88,18 +88,18 @@ ui <- fluidPage(
            
            
            conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen25", "Adjacency", FALSE)),
+                            checkboxInput("Scen17", "EEZ size in CA", FALSE)),
            
-           conditionalPanel(condition="input.Scen25 == true & input.variable == 'LongL'",
-                            sliderInput("slider25", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           conditionalPanel(condition="input.Scen17 == true & input.variable == 'LongL'",
+                            sliderInput("slider17", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
            #__________________  
            
            conditionalPanel(condition="input.variable == 'Purse'",
-                            checkboxInput("Scen26", "Adjacency", FALSE)),
+                            checkboxInput("Scen8", "EEZ size in CA", FALSE)),
            
-           conditionalPanel(condition="input.Scen26 == true & input.variable == 'Purse'",
-                            sliderInput("slider26", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           conditionalPanel(condition="input.Scen8 == true & input.variable == 'Purse'",
+                            sliderInput("slider8", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
            
            conditionalPanel(condition="input.variable == 'LongL'",
@@ -110,27 +110,27 @@ ui <- fluidPage(
            
            #__________________          
            
-
-           
            conditionalPanel(condition="input.variable == 'Purse'",
                             checkboxInput("Scen7", "Biomass SKJ in zones", FALSE)),
            
            conditionalPanel(condition="input.Scen7 == true & input.variable == 'Purse'",
                             sliderInput("slider7", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
-           conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen17", "EEZ size in CA", FALSE)),
            
-           conditionalPanel(condition="input.Scen17 == true & input.variable == 'LongL'",
-                            sliderInput("slider17", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           conditionalPanel(condition="input.variable == 'LongL'",
+                            checkboxInput("Scen25", "Adjacency", FALSE)),
+           
+           conditionalPanel(condition="input.Scen25 == true & input.variable == 'LongL'",
+                            sliderInput("slider25", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
            
            #__________________
            
            conditionalPanel(condition="input.variable == 'Purse'",
-                            checkboxInput("Scen8", "EEZ size in CA", FALSE)),
+                            checkboxInput("Scen26", "Adjacency", FALSE)),
            
-           conditionalPanel(condition="input.Scen8 == true & input.variable == 'Purse'",
-                            sliderInput("slider8", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           conditionalPanel(condition="input.Scen26 == true & input.variable == 'Purse'",
+                            sliderInput("slider26", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
            
            conditionalPanel(condition="input.variable == 'LongL'",
                             checkboxInput("Scen19", "Equal split", FALSE)),
@@ -160,6 +160,7 @@ ui <- fluidPage(
            
            conditionalPanel(condition="input.Scen1 == true & input.variable == 'Purse'",
                             sliderInput("slider1", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),
+           
            
            conditionalPanel(condition="input.variable == 'LongL'",#condition = "input.ScenChoice.includes('Eff1')",
                             checkboxInput("Scen11", "Historical catch", TRUE)),
