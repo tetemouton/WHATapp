@@ -24,11 +24,12 @@ x dplyr::lag()    masks stats::lag()
 library paths:
 ... C:/GitHub/WHATapp/WHATapp/R-Portable/App/R-Portable/library
 
-Listening on http://127.0.0.1:5528
+Listening on http://127.0.0.1:3249
 Browser path: C:\GitHub\WHATapp\WHATapp\GoogleChromePortable\App\Chrome-bin\chrome.exe
-[73812:82096:0730/143129.552:ERROR:install_util.cc(629)] Failed to read HKLM\SOFTWARE\Policies\Google\Chrome\MachineLevelUserCloudPolicyEnrollmentToken: The system cannot find the file specified. (0x2)
-[73812:83456:0730/143129.697:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
-[73812:83456:0730/143129.697:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
-[73812:83456:0730/143129.697:ERROR:disk_cache.cc(168)] Unable to create cache
-[73812:83456:0730/143129.697:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
+[52316:15948:1024/174045.596:ERROR:install_util.cc(629)] Failed to read HKLM\SOFTWARE\Policies\Google\Chrome\MachineLevelUserCloudPolicyEnrollmentToken: The system cannot find the file specified. (0x2)
+[52316:48600:1024/174045.712:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
+[52316:48600:1024/174045.712:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
+[52316:48600:1024/174045.712:ERROR:disk_cache.cc(168)] Unable to create cache
+[52316:48600:1024/174045.712:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
 Created new window in existing browser session.
+^C^C

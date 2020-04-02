@@ -348,7 +348,7 @@ library(R4MFCL)
 #____________________________________________________________________________________________________________    
 # Calculate adjacency based on actual sets available from operational database
    
-   yrs.keep <- 2014:2018
+   yrs.keep <- 2016:2018
    
    
    # Read in the logsheet data

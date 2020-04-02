@@ -42,7 +42,7 @@ ui <- fluidPage(
            
            
            conditionalPanel(condition="input.variable == 'LongL'",
-                            checkboxInput("Scen15", "Current HS allocation Att Tab 1", FALSE)),
+                            checkboxInput("Scen15", "Current bigeye limits Att Tab 3", FALSE)),
            
            conditionalPanel(condition="input.Scen15 == true & input.variable == 'LongL'",
                             sliderInput("slider15", NULL,  min=1, max=10, value=1, width="150px", ticks=TRUE)),

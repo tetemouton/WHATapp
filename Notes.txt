@@ -10,4 +10,6 @@
 10. What about Pitcairn?
 11. For biomass scenarios - how to handle CCMs with eez area in CA but outside assessment regions?
 12. What to do about Russia, Alaska etc. for LL?
-12. What to do about Timor Leste?
+13. What to do about Timor Leste?
+14. Biomass for LL - at the moment I use just BET?
+15. IMF has article IV reports for countries that have fishing contributions to revenue.

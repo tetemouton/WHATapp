@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6800 64-bit) (preloaded format=pdflatex 2018.9.7)  25 JUL 2019 08:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6800 64-bit) (preloaded format=pdflatex 2018.9.7)  16 OCT 2019 10:22
 entering extended mode
 **./WHATapp_Report.tex
 (WHATapp_Report.tex
@@ -926,11 +926,7 @@ LaTeX Font Info:    Try loading font information for T1+aer on input line 105.
 ("C:\Users\SamM\AppData\Local\Programs\MiKTeX 2.9\tex\latex\ae\t1aer.fd"
 File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
 ))))
-(WHATapp_Report.aux
-
-LaTeX Warning: Label `fig:areaLL' multiply defined.
-
-)
+(WHATapp_Report.aux)
 \openout1 = `WHATapp_Report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 53.
@@ -949,7 +945,8 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 53.
 LaTeX Font Info:    ... okay on input line 53.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 53.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 53.
- ("C:\Users\SamM\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ts1cmr.fd"
+
+("C:\Users\SamM\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ts1cmr.fd"
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 53.
@@ -1114,22 +1111,37 @@ pt>
 File: C:/GitHub/WHATapp/Writing/Explorer_Folder_1.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/Explorer_Folder_1.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/Explorer_Folder_1.png  used 
-on input line 122.
+on input line 124.
 (pdftex.def)             Requested size: 452.9679pt x 177.03798pt.
 <C:/GitHub/WHATapp/Writing/Bat_Screenshot.png, id=66, 995.97093pt x 508.14844pt
 >
 File: C:/GitHub/WHATapp/Writing/Bat_Screenshot.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/Bat_Screenshot.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/Bat_Screenshot.png  used on 
-input line 130.
+input line 132.
 (pdftex.def)             Requested size: 452.9679pt x 231.1071pt.
 <C:/GitHub/WHATapp/Writing/App_Front_Page.png, id=67, 1151.05031pt x 711.4078pt
 >
 File: C:/GitHub/WHATapp/Writing/App_Front_Page.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/App_Front_Page.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/App_Front_Page.png  used on 
-input line 138.
+input line 140.
 (pdftex.def)             Requested size: 452.9679pt x 279.95547pt.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 141.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 141.
+LaTeX Font Info:    Try loading font information for TS1+aer on input line 141.
+
+ (C:/Users/SamM/DOCUME~1/R/R-35~1.1/share/texmf/tex/latex\ts1aer.fd
+File: ts1aer.fd 
+)
+LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <10> not available
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 141.
+LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <7> not available
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 141.
+LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <5> not available
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 141.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
@@ -1138,180 +1150,244 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 File: C:/GitHub/WHATapp/Writing/Features_Fig.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/Features_Fig.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/Features_Fig.png  used on in
-put line 146.
+put line 148.
 (pdftex.def)             Requested size: 362.37569pt x 393.10608pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [2 <C:/GitHub/WHATapp/Writing/Explorer_Folder_1.png> <C:/GitHub/WHATapp/Writing
 /Bat_Screenshot.png>]
-LaTeX Font Info:    Try loading font information for TS1+aer on input line 156.
-
-
-(C:/Users/SamM/DOCUME~1/R/R-35~1.1/share/texmf/tex/latex\ts1aer.fd
-File: ts1aer.fd 
-)
 LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <10.95> not available
-(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 156.
- [3 <C:/GitHub/WHATapp/Writing/App_Front_Page.png>] [4 <C:/GitHub/WHATapp/Writi
-ng/Features_Fig.png>]
-<C:/GitHub/WHATapp/Writing/WCPFC_HS.png, id=91, 945.5325pt x 614.295pt>
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 158.
+ [3 <C:/GitHub/WHATapp/Writing/App_Front_Page.png>]
+[4 <C:/GitHub/WHATapp/Writing/Features_Fig.png>]
+<C:/GitHub/WHATapp/Writing/WCPFC_HS.png, id=95, 945.5325pt x 614.295pt>
 File: C:/GitHub/WHATapp/Writing/WCPFC_HS.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/WCPFC_HS.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/WCPFC_HS.png  used on input 
-line 167.
+line 169.
 (pdftex.def)             Requested size: 430.31812pt x 279.57027pt.
  [5 <C:/GitHub/WHATapp/Writing/WCPFC_HS.png>]
-<C:/GitHub/WHATapp/Writing/Output_Figure.png, id=100, 769.37437pt x 598.48593pt
+<C:/GitHub/WHATapp/Writing/Output_Figure.png, id=103, 769.37437pt x 598.48593pt
 >
 File: C:/GitHub/WHATapp/Writing/Output_Figure.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/Output_Figure.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/Output_Figure.png  used on i
-nput line 177.
+nput line 179.
 (pdftex.def)             Requested size: 430.31812pt x 334.74802pt.
  [6 <C:/GitHub/WHATapp/Writing/Output_Figure.png>] [7]
 LaTeX Font Info:    Font shape `TS1/aer/bx/n' in size <10.95> not available
-(Font)              Font shape `TS1/cmr/bx/n' tried instead on input line 225.
- [8]
+(Font)              Font shape `TS1/cmr/bx/n' tried instead on input line 231.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 242.
+(Font)              <10.95> on input line 235.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 242.
+(Font)              <8> on input line 235.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 242.
+(Font)              <6> on input line 235.
 LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <8> not available
-(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 242.
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 235.
 LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <6> not available
-(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 242.
- [9]
-<C:/GitHub/WHATapp/Writing/Historical_Options.png, id=136, 395.22656pt x 256.70
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 235.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 235.
+LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <9> not available
+(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 235.
+ [8]
+[9]
+<C:/GitHub/WHATapp/Writing/Historical_Options.png, id=148, 395.22656pt x 256.70
 906pt>
 File: C:/GitHub/WHATapp/Writing/Historical_Options.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/Historical_Options.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/Historical_Options.png  used
- on input line 248.
+ on input line 252.
 (pdftex.def)             Requested size: 271.7835pt x 176.53012pt.
  [10 <C:/GitHub/WHATapp/Writing/Historical_Options.png>]
-<C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png, id=
-141, 1344.02126pt x 896.34875pt>
-File: C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png
- Graphic file (type png)
-<use C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png>
+<C:/GitHub/WHATapp/Writing/Worked_Example.png, id=167, 618.05907pt x 726.46407p
+t>
+File: C:/GitHub/WHATapp/Writing/Worked_Example.png Graphic file (type png)
+<use C:/GitHub/WHATapp/Writing/Worked_Example.png>
+Package pdftex.def Info: C:/GitHub/WHATapp/Writing/Worked_Example.png  used on 
+input line 278.
+(pdftex.def)             Requested size: 362.37569pt x 425.9497pt.
+ [11 <C:/GitHub/WHATapp/Writing/Worked_Example.png>] [12]
+! Undefined control sequence.
+l.292    \subfloat
+                  {%
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPn
-ts-In-Out_Close.png  used on input line 266.
-(pdftex.def)             Requested size: 452.9679pt x 302.0875pt.
- [11 <C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png
->]
-<C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.png, 
-id=148, 1344.02126pt x 896.34875pt>
-File: C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.
-png Graphic file (type png)
-<use C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.p
-ng>
-Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_Al
-lPnts-In-Out_Close.png  used on input line 274.
-(pdftex.def)             Requested size: 452.9679pt x 302.0875pt.
- [12 <C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.
-png>]
-<C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png, id=156, 
-1344.02126pt x 896.34875pt>
-File: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png Grap
-hic file (type png)
-<use C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png>
-Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch
-_NoOverlap.png  used on input line 286.
-(pdftex.def)             Requested size: 452.9679pt x 302.0875pt.
- [13 <C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png>]
-<C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png, id=162, 896
-.34875pt x 896.34875pt>
-File: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png Graphic
- file (type png)
-<use C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png>
-Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_No
-Overlap.png  used on input line 294.
-(pdftex.def)             Requested size: 452.9679pt x 452.96028pt.
- [14 <C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png>]
-<C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png, id=168, 1344.02126pt x 8
+<C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png, id=179, 1344.02126pt x 8
 96.34875pt>
 File: C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png Graphic file (type p
 ng)
 <use C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png  
-used on input line 305.
-(pdftex.def)             Requested size: 452.9679pt x 302.0875pt.
- [15 <C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png>]
-<C:/GitHub/WHATapp/EEZs/Plots/HSareas_LL_Areas_JustHS.png, id=175, 1344.02126pt
+used on input line 293.
+(pdftex.def)             Requested size: 407.66833pt x 271.87465pt.
+! Undefined control sequence.
+l.294    \subfloat
+                  {%
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+<C:/GitHub/WHATapp/EEZs/Plots/HSareas_LL_Areas_JustHS.png, id=180, 1344.02126pt
  x 896.34875pt>
 File: C:/GitHub/WHATapp/EEZs/Plots/HSareas_LL_Areas_JustHS.png Graphic file (ty
 pe png)
 <use C:/GitHub/WHATapp/EEZs/Plots/HSareas_LL_Areas_JustHS.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/HSareas_LL_Areas_JustHS.p
-ng  used on input line 314.
-(pdftex.def)             Requested size: 452.9679pt x 302.0875pt.
+ng  used on input line 295.
+(pdftex.def)             Requested size: 407.66833pt x 271.87465pt.
+! Undefined control sequence.
+l.303    \subfloat
+                  {%
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-[16 <C:/GitHub/WHATapp/EEZs/Plots/HSareas_LL_Areas_JustHS.png>]
-<C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png, id=182, 563.10374pt x 598.485
-93pt>
-File: C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png Graphic file (type png)
-<use C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png>
-Package pdftex.def Info: C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png  used 
-on input line 330.
-(pdftex.def)             Requested size: 452.9679pt x 481.42859pt.
- [17 <C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png>]
-<C:/GitHub/WHATapp/Writing/CMM_PS_HS_Limits.png, id=187, 819.06pt x 584.93532pt
+<C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png, id=181, 
+1344.02126pt x 896.34875pt>
+File: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png Grap
+hic file (type png)
+<use C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png>
+Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch
+_NoOverlap.png  used on input line 304.
+(pdftex.def)             Requested size: 407.66833pt x 271.87465pt.
+! Undefined control sequence.
+l.305    \subfloat
+                  {%
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+<C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png, id=182, 896
+.34875pt x 896.34875pt>
+File: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png Graphic
+ file (type png)
+<use C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png>
+Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_No
+Overlap.png  used on input line 306.
+(pdftex.def)             Requested size: 407.66833pt x 407.66151pt.
+
+LaTeX Warning: Float too large for page by 14.0293pt on input line 308.
+
+! Undefined control sequence.
+l.314    \subfloat
+                  {%
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+<C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png, id=
+183, 1344.02126pt x 896.34875pt>
+File: C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png
+ Graphic file (type png)
+<use C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png>
+
+Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPn
+ts-In-Out_Close.png  used on input line 315.
+(pdftex.def)             Requested size: 407.66833pt x 271.87465pt.
+! Undefined control sequence.
+l.316    \subfloat
+                  {%
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+<C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.png, 
+id=184, 1344.02126pt x 896.34875pt>
+File: C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.
+png Graphic file (type png)
+<use C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.p
+ng>
+Package pdftex.def Info: C:/GitHub/WHATapp/EEZs/Plots/HSareas_Longline_Areas_Al
+lPnts-In-Out_Close.png  used on input line 317.
+(pdftex.def)             Requested size: 407.66833pt x 271.87465pt.
+[13
+
+ <C:/GitHub/WHATapp/EEZs/Plots/HSareas_20-20_Areas.png> <C:/GitHub/WHATapp/EEZs
+/Plots/HSareas_LL_Areas_JustHS.png>]
+<C:/GitHub/WHATapp/Writing/CMM_PS_HS_Limits.png, id=191, 819.06pt x 584.93532pt
 >
 File: C:/GitHub/WHATapp/Writing/CMM_PS_HS_Limits.png Graphic file (type png)
 <use C:/GitHub/WHATapp/Writing/CMM_PS_HS_Limits.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/CMM_PS_HS_Limits.png  used o
-n input line 339.
+n input line 325.
 (pdftex.def)             Requested size: 452.9679pt x 323.49156pt.
- [18 <C:/GitHub/WHATapp/Writing/CMM_PS_HS_Limits.png>]
+<C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png, id=192, 563.10374pt x 598.485
+93pt>
+File: C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png Graphic file (type png)
+<use C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png>
+Package pdftex.def Info: C:/GitHub/WHATapp/Writing/CMM_PS_EEZ_Limits.png  used 
+on input line 334.
+(pdftex.def)             Requested size: 452.9679pt x 481.42859pt.
 <C:/GitHub/WHATapp/Writing/CMM_Bigeye_Flag_Limits.png, id=193, 764.8575pt x 472
 .76625pt>
 File: C:/GitHub/WHATapp/Writing/CMM_Bigeye_Flag_Limits.png Graphic file (type p
 ng)
 <use C:/GitHub/WHATapp/Writing/CMM_Bigeye_Flag_Limits.png>
 Package pdftex.def Info: C:/GitHub/WHATapp/Writing/CMM_Bigeye_Flag_Limits.png  
-used on input line 348.
+used on input line 343.
 (pdftex.def)             Requested size: 452.9679pt x 279.98288pt.
- [19 <C:/GitHub/WHATapp/Writing/CMM_Bigeye_Flag_Limits.png>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 368.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 368.
-
-(WHATapp_Report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 368.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 368.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 349.
+ [14 <C:/GitHub/WHATapp/EEZs/Plots/EEZareas_20-20_Areas-Arch_NoOverlap.png> <C:
+/GitHub/WHATapp/EEZs/Plots/EEZareas_LL_Areas-Arch_NoOverlap.png>] [15 <C:/GitHu
+b/WHATapp/EEZs/Plots/HSareas_20-20_Areas_AllPnts-In-Out_Close.png> <C:/GitHub/W
+HATapp/EEZs/Plots/HSareas_Longline_Areas_AllPnts-In-Out_Close.png>] [16 <C:/Git
+Hub/WHATapp/Writing/CMM_PS_HS_Limits.png>] [17 <C:/GitHub/WHATapp/Writing/CMM_P
+S_EEZ_Limits.png>] [18 <C:/GitHub/WHATapp/Writing/CMM_Bigeye_Flag_Limits.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 349.
+ (WHATapp_Report.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 349.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 349.
 Package rerunfilecheck Info: File `WHATapp_Report.out' has not changed.
 (rerunfilecheck)             Checksum: 083545EC007B0C35DB5BCFCE5E8D60F4;494.
-
-
-LaTeX Warning: There were multiply-defined labels.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 368.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 349.
  ) 
 Here is how much of TeX's memory you used:
- 20811 strings out of 492973
- 389422 string characters out of 3127136
- 569579 words of memory out of 3000000
- 24206 multiletter control sequences out of 15000+200000
- 39271 words of font info for 76 fonts, out of 3000000 for 9000
+ 20867 strings out of 492973
+ 390063 string characters out of 3127136
+ 571854 words of memory out of 3000000
+ 24230 multiletter control sequences out of 15000+200000
+ 53616 words of font info for 101 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 54i,6n,54p,1521b,573s stack positions out of 5000i,500n,10000p,200000b,50000s
- <C:\Users\SamM\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\t
-cbx1095.pk> <C:\Users\SamM\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec
-\dpi600\tcrm1095.pk><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type
-1/public/amsfonts/cm/cmbx10.pfb><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.
-9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/SamM/AppData/Local/Progra
-ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/SamM/AppDat
-a/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/
-SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb
-><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/c
-m/cmssbx10.pfb><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pub
-lic/amsfonts/cm/cmsy10.pfb>
-Output written on WHATapp_Report.pdf (20 pages, 2247891 bytes).
+ 54i,7n,54p,1516b,573s stack positions out of 5000i,500n,10000p,200000b,50000s
+pdfTeX warning (dest): name{Hfootnote.1} has been referenced but does not exi
+st, replaced by a fixed one
+
+ <C:\Users\SamM\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\dpi600\tcb
+x1095.pk> <C:\Users\SamM\AppData\Local\MiKTeX\2.9\fonts\pk\ljfour\jknappen\ec\d
+pi600\tcrm1095.pk><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/
+public/amsfonts/cm/cmbx10.pfb><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/
+fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/SamM/AppData/Local/Programs
+/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Users/SamM/AppData/Loc
+al/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/Sa
+mM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
+cmr12.pfb><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/a
+msfonts/cm/cmr6.pfb><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/fonts/type
+1/public/amsfonts/cm/cmr8.pfb><C:/Users/SamM/AppData/Local/Programs/MiKTeX 2.9/
+fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/SamM/AppData/Local/Programs/M
+iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/Users/SamM/AppData/Lo
+cal/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Sam
+M/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on WHATapp_Report.pdf (19 pages, 2373711 bytes).
 PDF statistics:
- 243 PDF objects out of 1000 (max. 8388607)
- 45 named destinations out of 1000 (max. 500000)
- 176 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 280 PDF objects out of 1000 (max. 8388607)
+ 51 named destinations out of 1000 (max. 500000)
+ 181 words of extra memory for PDF output out of 10000 (max. 10000000)
 
