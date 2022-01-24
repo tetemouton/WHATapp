@@ -24,12 +24,8 @@ x dplyr::lag()    masks stats::lag()
 library paths:
 ... C:/GitHub/WHATapp/WHATapp/R-Portable/App/R-Portable/library
 
-Listening on http://127.0.0.1:5011
+Listening on http://127.0.0.1:4898
 Browser path: C:\GitHub\WHATapp\WHATapp\GoogleChromePortable\App\Chrome-bin\chrome.exe
-[48968:69212:0403/113809.453:ERROR:install_util.cc(629)] Failed to read HKLM\SOFTWARE\Policies\Google\Chrome\MachineLevelUserCloudPolicyEnrollmentToken: The system cannot find the file specified. (0x2)
-[48968:52236:0403/113809.548:ERROR:cache_util_win.cc(19)] Unable to move the cache: 5
-[48968:52236:0403/113809.549:ERROR:cache_util.cc(140)] Unable to move cache folder C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache to C:\Users\SamM\AppData\Local\Google\Chrome\User Data\ShaderCache\old_GPUCache_000
-[48968:52236:0403/113809.549:ERROR:disk_cache.cc(168)] Unable to create cache
-[48968:52236:0403/113809.549:ERROR:shader_disk_cache.cc(620)] Shader Cache Creation failed: -2
+[26732:18732:0204/090145.503:ERROR:install_util.cc(629)] Failed to read HKLM\SOFTWARE\Policies\Google\Chrome\MachineLevelUserCloudPolicyEnrollmentToken: The system cannot find the file specified. (0x2)
 Created new window in existing browser session.
 ^C^C

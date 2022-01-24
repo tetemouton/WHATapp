@@ -1,0 +1,40 @@
+library(RODBC)
+
+#____________________________________________________________________________________________________________  
+# OPPS
+
+channel <- odbcDriverConnect("DSN=Visual FoxPro Database;UID=;PWD=;
+                               SourceDB=\\\\corp.spc.int\\shared\\FAME\\NC_NOU\\OFP\\db1\\tuna_dbs\\Log_dbs\\DBF\\logsheet.dbc;
+                               SourceType=DBC;Exclusive=No;BackgroundFetch=Yes;Collate=Machine;Null=Yes;Deleted=Yes;")
+#sqlTables(channel)
+
+opdat <- sqlQuery(channel, "SELECT * FROM s_raw WHERE not dup_r AND year(logdate) <= 2019 AND year(logdate) >= 2000", max=0)
+save(opdat, file="C:/HighSeas_Allocation_2020/Data/OPPS_EEZ_DATA.RData")
+
+
+# Get the trip level fields to merge later on in R
+opdat_trip <- sqlQuery(channel, "SELECT * FROM s_trip", max=0)
+save(opdat_trip, file="C:/HighSeas_Allocation_2020/Data/OPPS_EEZ_TRIP-DATA.RData")
+
+
+#____________________________________________________________________________________________________________
+
+
+opdat <- sqlQuery(channel, "SELECT  st.flag_id, 
+            YEAR(logdate) as yy, 
+            count(distinct STR(boat_id,7)+DTOS(logdate)) as days 
+FROM g:/tuna_dbs/log_dbs/dbf/s_trip st, g:/tuna_dbs/log_dbs/dbf/s_raw sr 
+WHERE st.trip_id = sr.trip_id 
+  AND YEAR(logdate) >= 2001 
+  AND INLIST(ez_id,'I1','I2','I3','I4','I5','I8','I9','H4','H5') 
+  AND (RIGHT(lon_long,1) = 'W' AND LEFT(lon_long,3) < '150') 
+  AND INLIST(st.flag_id,'EC','SV','ES')  
+  AND INLIST(s_act_id,1,2)   
+  AND NOT dup_r 
+GROUP BY 1,2 ", max=0)
+
+
+
+
+
+

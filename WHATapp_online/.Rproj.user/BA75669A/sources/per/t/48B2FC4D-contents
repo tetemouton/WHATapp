@@ -1,0 +1,1095 @@
+library(RODBC)
+## Most important function for getting data out of CES
+#########################################################################
+#########################################################################
+get.logdata <- function(sqlcall) {
+  library(RODBC)
+  channellog <- odbcDriverConnect("DSN=Visual FoxPro Database;UID=;PWD=;
+                                  SourceDB=\\\\corp.spc.int\\shared\\FAME\\NC_NOU\\OFP\\db1\\tuna_dbs\\Log_dbs\\DBF\\logsheet.dbc;SourceType=DBC;Exclusive=No;
+                                  BackgroundFetch=Yes;Collate=Machine;Null=Yes;Deleted=Yes;")
+  #alternate version - can switch between C: (if have recently made local copy of CES
+  #channellog <- odbcDriverConnect("DSN=Visual FoxPro Database;UID=;PWD=;
+  #                                SourceDB=C:\\tuna_dbs\\Log_dbs\\DBF\\logsheet.dbc;SourceType=DBC;Exclusive=No;
+  #                                BackgroundFetch=Yes;Collate=Machine;Null=Yes;Deleted=Yes;")
+  #
+   ayr <- sqlQuery(channellog, sqlcall, max=0, stringsAsFactors=FALSE)
+  odbcCloseAll()
+  return(ayr)
+}
+
+#########################################################################
+#########################################################################
+
+
+library(Cairo)
+my.fun <- function(x="bet",rsum=T,yrs=list(a="2012",b="2011",d=as.character(c(2007:2011))),rd=0)
+{
+# kludge to do some summaries - compares variable to recent years
+#browser()
+x2dim <- dimnames(x)[[length(dimnames(x))]]
+if(is.null(x2dim)) x2dim <- "var"
+
+if(rsum) x <- cbind(x,apply(x,1,sum))
+if(rsum) x2dim <- c(x2dim,"TOT") 
+Ncol <- 1
+if(rsum) Ncol <- ncol(x)
+output <- matrix(NA,nrow=3,ncol=Ncol)
+
+    if(rsum)
+    {
+    output[1,] <- round(x[yrs$a,],rd)
+    output[2,] <- round(((x[yrs$a,]-x[yrs$b,])/x[yrs$b,])*100)
+    tmp <- apply(x[yrs$d,],2,mean)
+    output[3,] <- round(((x[yrs$a,]-tmp)/tmp)*100)
+    dimnames(output) <- list(c(paste(yrs$a,"value"),paste("Change from",yrs$b),paste("Change from ",min(as.numeric(yrs$d)),"-",max(as.numeric(yrs$d)),sep="")),x2dim)
+    }else{
+    if(length(dim(x))>1)
+    {
+    output[1,] <- round(x[yrs$a,1],rd)
+    output[2,] <- round(((x[yrs$a,1]-x[yrs$b,1])/x[yrs$b,1])*100)
+    tmp <- mean(x[yrs$d,1])
+    output[3,] <- round(((x[yrs$a,1]-tmp)/tmp)*100)
+    }else{
+    output[1,] <- round(x[yrs$a],rd)
+    output[2,] <- round(((x[yrs$a]-x[yrs$b])/x[yrs$b])*100)
+    tmp <- mean(x[yrs$d])
+    output[3,] <- round(((x[yrs$a]-tmp)/tmp)*100)
+    }
+dimnames(output) <- list(c(paste(yrs$a,"value"),paste("Change from",yrs$b),paste("Change from ",min(as.numeric(yrs$d)),"-",max(as.numeric(yrs$d)),sep="")))
+    }
+
+#dimnames(output) <- list(c(paste(yrs$a,"catch"),paste("Change from",yrs$b),paste("Change from ",min(as.numeric(yrs$d)),"-",max(as.numeric(yrs$d)),sep="")),x2dim)
+return(output)
+} # end my.fun
+
+#########################################################################
+#########################################################################
+
+add.datCE <- function(dat,effvar,catvar,latvar,lonvar,Xlim=c(150,230),Ylim=c(-50,0),fudge=c(0.01,1),top=0.9,highlight=F,highprob=0.85)
+{
+# get the object ready for graphing
+# sjh 5/28/2013 3:06:13 PM
+  mat <- aggregate.data.frame(dat[,effvar],list(dat[,lonvar],dat[,latvar]),sum)    #Aggregate by over all but areas
+  mata <- aggregate.data.frame(dat[,catvar],list(dat[,lonvar],dat[,latvar]),sum)    #Aggregate by over all but areas
+
+names(mat) <- c(lonvar,latvar,effvar)
+names(mata) <- c(lonvar,latvar,catvar)
+mat1 <- mat[(mat[,lonvar] >= Xlim[1] & mat[,lonvar] < Xlim[2]) & (mat[,latvar] >= Ylim[1] & mat[,latvar] < Ylim[2]),]
+mat1a <- mata[(mata[,lonvar] >= Xlim[1] & mata[,lonvar] < Xlim[2]) & (mata[,latvar] >= Ylim[1] & mata[,latvar] < Ylim[2]),]
+
+maxsize <- quantile(mat1[,effvar],prob=top)
+maxsizea <- quantile(mat1a[,catvar],prob=top)
+
+mat1[,effvar][mat1[,effvar]>maxsize] <- maxsize
+mat1a[,catvar][mat1a[,catvar]>maxsizea] <- maxsizea
+# circles for effort and '+' for catch
+symbols(mat1[,lonvar],mat1[,latvar],circles=sqrt(mat1[,effvar]/pi)/max(sqrt(mat1[,effvar]/pi)),add=T,bg="white",fg="firebrick3",inches=fudge[1])
+points(mat1a[,lonvar],mat1a[,latvar],pch=3,cex=((sqrt(mat1a[,catvar]/pi))/max(sqrt(mat1a[,catvar]/pi)))*fudge[2],col="dodgerblue2")
+legend("bottomright",legend=c("Effort","Catch"),pch=c(1,3),pt.cex=1.7,cex=1,col=c("firebrick3","dodgerblue2"),bty="n")
+  # point out the high catch areas
+  if(highlight)
+  {
+  xxx <- mat1a[mat1a[,catvar] > quantile(mat1a[,catvar],prob=highprob),]
+  points(xxx[,lonvar],xxx[,latvar],pch=3,cex=((sqrt(xxx[,catvar]/pi))/max(sqrt(xxx[,catvar]/pi)))*fudge[2],col="darkblue",lwd=2)
+  }
+} # end add.datCE
+
+#########################################################################
+#########################################################################
+
+plot.pacific <- function(lims=c(100,260,-45,45),add.reg=T,eez = ez,bckgr="lightblue1")
+{
+# Plots the MFCL regions assummed in the 2009 stock assessments
+# By Adam Langley
+# Modified by Simon Hoyle
+#modified by Steven Hare
+Pac_countries<-read.csv(paste("P:\\OFPSAM\\EEZ files\\2019 areas\\EEZs\\Country Codes for Pacific.csv",sep=""))
+plot(1,1, yaxt="n", xaxt="n", type="n", xlim=c(lims[1]+10,lims[2]-10), ylim=c(lims[3]+5,lims[4]-5), ylab="", xlab="", bg="lightblue")
+polygon(c(lims[1],lims[2],lims[2],lims[1]), c(lims[3],lims[3],lims[4],lims[4]), col=bckgr)
+polygon(eez[,1], eez[,2], lwd=1, col="white")
+lines(eez[,1], eez[,2], lwd=1, col="slate grey")
+map('world2Hires',  yaxt="n", xaxt="n", add=T, resolution=1)
+map('world2Hires',  region = Pac_countries$Country, fill=T, add=T, yaxt="n", xaxt="n", col="gray90")
+box(lwd=2)
+
+axis(1, at=seq(lims[1],lims[2],by=10), labels=F)
+axis(2, at=seq(lims[3],lims[4],by=5), labels=F)
+latseq <- seq(lims[3]+10,lims[4]-10,by=10) ;latseq2 <- as.character(latseq)
+lonseq <- seq(lims[1]+20,lims[2]-20,by=20) ;lonseq2 <- as.character(lonseq)
+latseq2[latseq < 0] <- paste(abs(latseq[latseq < 0]),"?S",sep="")
+latseq2[latseq > 0] <- paste(latseq[latseq > 0],"?N",sep="")
+latseq2[latseq == 0] <- paste(latseq[latseq == 0],"?",sep="")
+lonseq2[lonseq < 180] <- paste(lonseq2[lonseq < 180],"?E",sep="")
+lonseq2[lonseq > 180] <- paste(360-lonseq[lonseq > 180],"?W",sep="")
+lonseq2[lonseq == 180] <- paste(360-lonseq[lonseq == 180],"?",sep="")
+axis(2, at=latseq, labels=latseq2, cex.axis=1.25,las=1)
+axis(1, at=lonseq, labels=lonseq2, cex.axis=1.25)
+} #end plot.pacific
+
+#########################################################################
+######################################################################### - copied over from old albfunctions.r
+do.map.albsum <- function(DATA=agg[agg$yy>1959,],SP="skj",lonvar =c("lond"),latvar=c("latd"),LIMS=c(100,260,-50,5),WH=c(1200,800),pname="figs/Fig6m-map",fudge=0.15)
+{
+#postscript(file=paste(pname,lang,".eps",sep=""),width=WH[1],height=WH[2])
+#
+png(filename = paste(pname,".png",sep=""),
+    width = WH[1], height = WH[2], units = "px", pointsize = 12,
+    bg = "white")
+plot.pacific(lims=LIMS,add.reg=F,bckgr="lightblue1")
+mat <- aggregate(DATA[,SP],list(DATA[,lonvar],DATA[,latvar]),sum)
+scalar <- max(mat$x)/maxsize
+jnk <- mat[mat$x>0,]
+title(main=i,cex.main = 2)
+symbols(jnk[,1]+0.5,jnk[,2]+0.5,circles=sqrt(jnk$x/pi),add=T,bg="blue",inches=fudge*scalar)         #inches = 0.25*scalar
+dev.off()
+}
+
+#########################################################################
+#########################################################################
+
+add.catch <- function(alb=aggpo,lonvar =c("lon5"), latvar=c("lat5"),sp="bet",groupvar="gear",
+		gspec=gearspecs,fspec=fishspecs,RSCALE=NULL,add.leg=F,RADIUS=2.5, head_cex=1)
+{
+# adds pies of catch by gear to a plot of the model regions
+alb$GEAR <- substring(as.character(alb[,groupvar]),1,1)
+
+#if(agg5) 
+
+
+alb$index <- paste(alb[,lonvar], alb[,latvar])
+sp_code <- paste(sp,"_mt",sep="")
+
+mat <- tapply(alb[,sp_code], list(alb$index, alb$GEAR), sum,na.rm=T)
+mat <- ifelse(is.na(mat) == T, 0, mat)
+mat <- ifelse(mat == 0, 0.01, mat)
+index <- sort(unique(alb$index))
+x <- alb[,lonvar][match(index,alb$index)]
+y <- alb[,latvar][match(index,alb$index)]
+
+maxc <- floor(max(apply(mat,1,sum))/1000)*1000
+RSCALE <- sqrt(maxc/pi) 
+
+#get labels and cols
+ind <- match(dimnames(mat)[[2]],gspec$code)
+COLS <- gspec$cls[ind]
+LEG <- gspec$gear[ind]
+    for (i in 1:length(x)){
+    addpie(mat[i,], lat=y[i], long=x[i], rscale = RSCALE, col = COLS, labels = NA, Radius=RADIUS,edges=400)
+    #addpie(mat[i,], lat=y[i], long=x[i], rscale = 0.03, col = c("blue", "lightgray", "darkorange"), labels = NA, edges=400)
+    }
+    if(add.leg) 
+    {
+    legend("bottomright",legend=c(LEG,paste("max = ",formatC(maxc, format="d", big.mark=','),"mt",sep="")),border=NA,fill=c(COLS,NA),bty="n")
+    Title <- fspec$full[fspec$code==sp]
+      if((range(alb$yy)[2]-range(alb$yy)[1])>0){
+         Title2 <- paste(as.character(range(alb[alb$yy>0,"yy"])[1]),"-",as.character(range(alb$yy)[2]))  #catch any rogue date entry
+        } else {
+          Title2 <- range(alb$yy)[2]
+       }
+#    Title2 <- range(alb$yy)
+    mtext(3,outer=F,text=paste(Title2,sep=" "),cex=head_cex,line=1)
+    }
+} # end add.catch
+
+#########################################################################
+######################################################################### some titling differences
+
+add.catch2 <- function(alb=aggpo,lonvar =c("lon5"), latvar=c("lat5"),sp="bet",groupvar="gear",gspec=gearspecs,
+                       fspec=fishspecs,RSCALE=NULL,add.leg=F,RADIUS=2.5, head_cex=1)
+{
+  # adds pies of catch by gear to a plot of the model regions
+  alb$GEAR <- substring(as.character(alb[,groupvar]),1,1)
+  
+  #if(agg5) 
+  
+  
+  alb$index <- paste(alb[,lonvar], alb[,latvar])
+  sp_code <- paste(sp,"_mt",sep="")
+  
+  mat <- tapply(alb[,sp_code], list(alb$index, alb$GEAR), sum,na.rm=T)
+  mat <- ifelse(is.na(mat) == T, 0, mat)
+  mat <- ifelse(mat == 0, 0.01, mat)
+  index <- sort(unique(alb$index))
+  x <- alb[,lonvar][match(index,alb$index)]
+  y <- alb[,latvar][match(index,alb$index)]
+  
+  maxc <- floor(max(apply(mat,1,sum))/1000)*1000
+  RSCALE <- sqrt(maxc/pi) 
+  
+  #get labels and cols
+  ind <- match(dimnames(mat)[[2]],gspec$code)
+  COLS <- gspec$cls[ind]
+  LEG <- gspec$gear[ind]
+  for (i in 1:length(x)){
+    addpie(mat[i,], lat=y[i], long=x[i], rscale = RSCALE, col = COLS, labels = NA, Radius=RADIUS,edges=400)
+    #addpie(mat[i,], lat=y[i], long=x[i], rscale = 0.03, col = c("blue", "lightgray", "darkorange"), labels = NA, edges=400)
+  }
+  if(add.leg) 
+  {
+    legend("bottomright",legend=c(LEG,paste("max = ",formatC(maxc, format="d", big.mark=','),"mt",sep="")),bg = "white",border=NA,fill=c(COLS,NA))
+    Title <- fspec$full[fspec$code==sp]
+    Title2 <- range(alb$yy)
+    ifelse(Title2[1]==Title2[2],mtext(3,outer=F,text=paste(Title2[1],sep=" "),cex=head_cex,line=1),mtext(3,outer=F,text=paste(Title2[1],"-",Title2[2],sep=" "),cex=head_cex,line=1))
+   # mtext(3,outer=F,text=paste(Title,Title2[1],"-",Title2[2],sep=" "),cex=1.5,line=1)
+  }
+} # end add.catch2
+
+#########################################################################
+#########################################################################
+
+addpie <- function (x, labels = names(x), edges = 200, Radius = RADIUS, density = NULL,
+    angle = 45, col = NULL, border = NULL, lty = NULL, main = NULL, lat = 0, long =0, rscale = 1,
+    ...)
+{
+#    if (!is.numeric(x) || any(is.na(x) | x <= 0))
+#        stop("pie: `x' values must be positive.")
+#    if (is.null(labels))
+#        labels <- as.character(1:length(x))
+#    radius <- sqrt((sqrt(sum(x)/3.148)/rscale)) * Radius
+    radius <- (sqrt(sum(x)/3.148)/rscale) * Radius
+    x <- c(0, cumsum(x)/sum(x))
+     dx <- diff(x)
+#    pin <- par("pin")
+#    xlim <- ylim <- c(-1, 1)
+#    if (pin[1] > pin[2])
+#        xlim <- (pin[1]/pin[2]) * xlim
+#    else ylim <- (pin[2]/pin[1]) * ylim
+#    plot.new()
+#    plot.window(xlim, ylim, "", asp = 1)
+    nx <- length(dx)
+    if (is.null(col))
+        col <- if (is.null(density))
+            c("white", "lightblue", "mistyrose", "lightcyan",
+                "lavender", "cornsilk")
+        else par("fg")
+    col <- rep(col, length = nx)
+    angle <- rep(angle, length = nx)
+    if (!is.null(border)) border <- rep(border, length = nx)
+    if (!is.null(lty)) lty <- rep(lty, length = nx)
+    if (!is.null(density)) density <- rep(density, length = nx)
+    for (i in 1:nx) {
+        n <- max(2, floor(edges * dx[i]))
+        t2p <- 2 * pi * seq(x[i], x[i + 1], length = n)
+        xc <- c(cos(t2p), 0) * radius
+        yc <- c(sin(t2p), 0) * radius
+        polygon(xc + long, yc + lat, density = density[i], angle = angle[i],
+            border = border[i], col = col[i], lty = lty[i])
+        t2p <- 2 * pi * mean(x[i + 0:1])
+        xc <- cos(t2p) * radius
+        yc <- sin(t2p) * radius
+        if (!is.na(lab <- labels[i]) && lab != "") {
+#            lines(c(1, 1.05) * xc, c(1, 1.05) * yc)
+            text(1 * (xc+long), 1 * (yc+lat), lab, cex=0.75, xpd = TRUE, adj = ifelse(xc <
+                0, 1, 0), ...)
+        }
+    }
+#    title(main = main, ...)
+    invisible(NULL)
+} # end addpie
+
+
+#########################################################################
+#########################################################################
+
+plot.squares <- function(gears=c("S","L"),sp="bet",gspec=gearspecs,plotype="png",xlim_def=F,xrange=c(1950,2016))
+{
+# PLOT D
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+  par(mfrow=c(1,1),oma=c(1,3,0,3), mar=c(2,2,2,2))
+  
+dat <- list(get(paste(sp,gears[1],"sq",sep="")),get(paste(sp,gears[2],"sq",sep="")))
+names(dat) <- gears
+ind <- match(gears,gspec$code)
+#browser()
+if (xlim_def==F){
+xlims <- range(as.numeric(dimnames(dat[[1]])[[1]]),as.numeric(dimnames(dat[[2]])[[1]]))
+} else {
+xlims <- xrange
+}
+
+plot(dat[[1]],type="n",xlim=xlims,xlab="",ylab="",ylim=range(0,max(dat[[1]],na.rm=T)),las=1, cex.axis=1.25)
+lines(as.numeric(dimnames(dat[[1]])[[1]]),dat[[1]],lwd=2,type="b",col=gspec$cls[ind[1]],pch=gspec$pchs[ind[1]])
+par(new=T)
+plot(dat[[2]],type="n",axes=F,xlim=xlims,xlab="",ylab="",ylim=range(0,max(dat[[2]],na.rm=T)), cex.axis=1.25)
+lines(as.numeric(dimnames(dat[[2]])[[1]]),dat[[2]],lwd=2,type="b",col=gspec$cls[ind[2]],pch=gspec$pchs[ind[2]])
+axis(4,las=1, cex.axis=1.25)
+legend("topleft",legend=gspec$gear[ind],col=gspec$cls[ind],pch=gspec$pchs[ind],lwd=2,bty="n", cex=1.25)
+
+#mtext(1,outer=T,text="Years",line=-2.5)
+mtext(2,outer=T,text=paste(gspec$gear[ind[1]],gspec$res[ind[1]],"cells containing 90% of the catch",sep=" "),line=1.25, cex=1.25)
+mtext(4,outer=T,text=paste(gspec$gear[ind[2]],gspec$res[ind[2]],"cells containing 90% of the catch",sep=" "),line=1.25, cex=1.25)
+#make a table of data to export
+x<-data.frame(rownames(dat[[1]]),dat[[1]] ); colnames(x)<-c("yy","dat")
+y<-data.frame(rownames(dat[[2]]),dat[[2]] ); colnames(y)<-c("yy","dat")
+tab_dat<-merge(x,y,by="yy")
+savePlot(paste("figs/","sq",sp,sep=""),type=plotype)
+write.csv(tab_dat,paste("tabs/","sq",sp,".csv",sep=""), row.names = FALSE)
+#dev.off()
+} #plot.squares
+
+
+#########################################################################
+#########################################################################
+
+plot.squares.alb <- function(gears=c("T","L"),sp="alb",gspec=gearspecs,plotype="png")
+{
+# PLOT D
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+  par(mfrow=c(1,1),oma=c(1,3,0,0), mar=c(2,2,2,2))
+dat <- list(get(paste(sp,gears[1],"sq",sep="")))
+names(dat) <- gears
+ind <- match(gears,gspec$code)
+#browser()
+xlims <- range(as.numeric(dimnames(dat[[1]])[[1]]))
+
+plot(dat[[1]],type="n",xlim=xlims,xlab="",ylab="",ylim=range(0,max(dat[[1]],na.rm=T)),las=1, cex.axis=1.25)
+lines(as.numeric(dimnames(dat[[1]])[[1]]),dat[[1]],lwd=2,type="b",col=gspec$cls[ind[1]],pch=gspec$pchs[ind[1]])
+#par(new=T)
+#plot(dat[[2]],type="n",axes=F,xlim=xlims,xlab="",ylab="",ylim=range(0,max(dat[[2]],na.rm=T)))
+#lines(as.numeric(dimnames(dat[[2]])[[1]]),dat[[2]],lwd=2,type="b",col=gspec$cls[ind[2]],pch=gspec$pchs[ind[2]])
+#axis(4,las=1)
+legend("topleft",legend=gspec$gear[ind],col=gspec$cls[ind],pch=gspec$pchs[ind],lwd=2,bty="n",cex=1.5)
+
+#mtext(1,outer=T,text="Years",line=-2.5)
+mtext(2,outer=T,text=paste(gspec$gear[ind[1]],gspec$res[ind[1]],"cells containing 90% of the catch",sep=" "),line=1.25, cex=1.25)
+#mtext(4,outer=T,text=paste(gspec$gear[ind[2]],gspec$res[ind[2]],"cells containing 90% of the catch",sep=" "),line=0.5)
+
+savePlot(paste("figs/","sq",sp,sep=""),type=plotype)
+tab_dat<-data.frame(rownames(dat[[1]]),dat[[1]] ); colnames(tab_dat)<-c("yy","dat")
+write.csv(tab_dat,paste("tabs/","sq",sp,".csv",sep=""), row.names = FALSE)
+
+} # end plot.squares.alb
+
+
+#########################################################################
+#########################################################################
+number.squares <- function(Data=aggllwc,gear="S",cu=0.9,sp="bet",latvar="lat1",lonvar="lon1")
+{
+#browser()
+Data$latlon <- paste(Data[,lonvar],Data[,latvar])
+yrs <- sort(unique(Data$yy))
+out <- matrix(NA,ncol=1,nrow=length(yrs),dimnames=list(yrs))
+  for(j in 1:length(yrs))
+  {
+  #print(yrs[j])
+  dat <- Data[Data$yy==yrs[j],]
+  tmp <- aggregate(dat[,paste(sp,"_mt",sep="")],list(dat$latlon),sum,na.rm=T)$x
+  #rank and find the first one after the cuttoff
+  y <-cumsum(rev(sort(tmp)))
+  ncu <- y[length(y)]*cu
+  out[j,] <- match(min(y[y>ncu]),y)
+  }
+return(out)
+} #end number.squares
+
+#
+
+#########################################################################
+#########################################################################
+
+plot.ll.cpue <-function(Data=aggllwc,area="all",sp="skj",lonvar =c("lon5"), latvar=c("lat5"),plotype="png",
+fspec=fishspecs,flspec=flspecs,sts=c("JP"),xlimits=c(1950,2016),legpos="topright", KR_tidy ="TRUE")
+{
+# PLOT Biii - nominal CPUE by flag for JP/SB
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+  par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,4,4,1))
+  
+# If we are only dealing with 20N/10S - in the WCP-CA
+if(area=="trop") Data <- Data[Data[,latvar]<20.5 & Data[,latvar] > -10.5,]
+#if(area=="trop") Data <- Data[abs(Data[,latvar])<20.5,]
+if(area=="south") Data <- Data[Data[,latvar]<0.5,]
+print(area)
+
+#match flags now
+ind <- match(sts,flspec[[1]])
+
+# get catch / effort and divide
+objc <- tapply(Data[,paste(sp,"_no",sep="")],list(Data$yy,Data$flag),sum,na.rm=T)
+obje <- tapply(Data[,"hhooks"],list(Data$yy,Data$flag),sum,na.rm=T)
+obj <- objc/obje
+ind2 <- match(sts,dimnames(obj)[[2]])
+
+## tidy up KR data
+if(KR_tidy=="TRUE"){
+ obj[as.character(c(1950:1974)),"KR"] <- NA
+}
+
+ ##Fix the Japan coastal fleet fuckup ## added to exclude the coastal fleet 
+ if("JP" %in% sts) { 
+   Data2 <- subset(Data, Data$fleet_id=="JP")
+   objc_x <- tapply(Data2[,paste(sp,"_no",sep="")],list(Data2$yy,Data2$flag),sum,na.rm=T)
+   obje_x <- tapply(Data2[,"hhooks"],list(Data2$yy,Data2$flag),sum,na.rm=T)
+   obj_x <- objc_x/obje_x
+   obj[,"JP"]<-obj_x
+ }
+
+ #browser()
+plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=xlimits,xlab="", cex.axis=1.5)
+#plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=c(1950,2013),xlab="")
+# lines for each set type
+    for(j in 1:length(sts))
+    {
+    lines(as.numeric(dimnames(obj)[[1]]),obj[,ind2[j]],lwd=2,type="b",col=flspec[[3]][ind[j]],pch=flspec[[4]][ind[j]])
+    }
+mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (no. per 100 hooks)",sep=""),line=2, cex=1.5)
+legend(legpos,legend=flspec[[2]][ind],col=flspec[[3]][ind],pch=flspec[[4]][ind],lwd=2,bty="n", cex=1.5)
+mtext(3, outer=T, text="Longline", cex=1.75, line=1)
+savePlot(paste("figs/llcpue",sp,sep=""),type=plotype)
+write.csv(obj, paste("tabs/llcpue",sp,".csv",sep=""))
+#dev.off()
+return(obj[,ind2])
+
+} # end plot.ll.cpue
+
+#########################################################################
+#########################################################################
+### for SWO
+plot.ll.cpue_swo <-function(Data=agg_swo[agg_swo$gear=="L" & substring(agg_swo$area,1,1)=="W",],area="south",sp="swo",lonvar =c("lon5"), latvar=c("lat5"),plotype="png",
+                            fspec=fishspecs,flspec=flspecs,sts=c("JP","ES","AU"),xlimits=c(1950,2017),legpos="topleft", KR_tidy ="TRUE")
+{
+  # PLOT Biii - nominal CPUE by flag for JP/SB
+  {
+    if (dev.cur()!=1) dev.off()
+    windows(16, 7)
+    par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,4,4,1))
+    
+    # If we are only dealing with 20N/10S - in the WCP-CA
+    if(area=="trop") Data <- Data[Data[,latvar]<20.5 & Data[,latvar] > -10.5,]
+    #if(area=="trop") Data <- Data[abs(Data[,latvar])<20.5,]
+    if(area=="south") Data <- Data[Data[,latvar]<0.5,]
+    print(area)
+    
+    #match flags now
+    ind <- match(sts,flspec[[1]])
+    
+    # get catch / effort and divide
+    objc <- tapply(Data[,paste(sp,"_no",sep="")],list(Data$yy,Data$flag),sum,na.rm=T)
+    obje <- tapply(Data[,"hhooks"],list(Data$yy,Data$flag),sum,na.rm=T)
+    obj <- objc/obje
+    ind2 <- match(sts,dimnames(obj)[[2]])
+    
+  }
+  #browser()
+  plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=xlimits,xlab="", cex.axis=1.5)
+  #plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=c(1950,2013),xlab="")
+  # lines for each set type
+  for(j in 1:length(sts))
+  {
+    lines(as.numeric(dimnames(obj)[[1]]),obj[,ind2[j]],lwd=2,type="b",col=flspec[[3]][ind[j]],pch=flspec[[4]][ind[j]])
+  }
+  mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (no. per 100 hooks)",sep=""),line=2, cex=1.5)
+  legend(legpos,legend=flspec[[2]][ind],col=flspec[[3]][ind],pch=flspec[[4]][ind],lwd=2,bty="n", cex=1.5)
+  mtext(3, outer=T, text="Longine", cex=1.75, line=1)
+  savePlot(paste("figs/llcpue",sp,sep=""),type=plotype)
+  write.csv(obj, paste("tabs/llcpue",sp,".csv",sep=""))
+  #dev.off()
+  return(obj[,ind2])
+} # end plot.ll.cpue_swo
+
+##########################################################################
+##########################################################################
+# Special SPA version
+##########################################################################
+#########################################################################
+plot.ll.cpue.spa <-function(Data=aggllwc,area="all",sp="skj",lonvar =c("lon5"), latvar=c("lat5"),plotype="png",
+fspec=fishspecs,flspec=flspecs,sts=c("JP","KR"),xlimits=c(1950,2012),legpos="topright", CNadj="TRUE")
+{
+# PLOT Biii - nominal CPUE by flag for JP/SB
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+  par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,4,4,1))
+  
+# If we are only dealing with 20/20
+if(area=="trop") Data <- Data[abs(Data[,latvar]) < 20.5,]
+if(area=="south") Data <- Data[Data[,latvar]< -9.5,]             #all data south of 10degS
+print(area)
+
+#match flags now
+ind <- match(sts,flspec[[1]])
+
+# get catch / effort and divide
+objc <- tapply(Data[,paste(sp,"_no",sep="")],list(Data$yy,Data$flag),sum,na.rm=T)
+obje <- tapply(Data[,"hhooks"],list(Data$yy,Data$flag),sum,na.rm=T)
+obj <- objc/obje
+objcsum<-rowSums(objc,na.rm=T)
+objesum<-rowSums(obje,na.rm=T)
+objsum<-objcsum/objesum
+ind2 <- match(sts,dimnames(obj)[[2]])
+
+## adjustment for very strange CPUE for CN in 2001
+if(CNadj == "TRUE"){
+obj["2001","CN"] <- NA
+}
+#browser()
+plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=xlimits,xlab="", cex.axis=1.5)
+#plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=c(1950,2013),xlab="")
+# lines for each set type
+    for(j in 1:length(sts))
+    {
+    lines(as.numeric(dimnames(obj)[[1]]),obj[,ind2[j]],lwd=2,type="b",col=flspec[[3]][ind[j]],pch=flspec[[4]][ind[j]])
+    }
+lines(as.numeric(dimnames(obj)[[1]]),objsum,lwd=3,type="l",col="black")
+
+mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (no. per 100 hooks)",sep=""),line=2, cex=1.5)
+legend(legpos,legend=c(flspec[[2]][ind],"Combined"),col=c(flspec[[3]][ind],"black"),pch=c(flspec[[4]][ind],NA),lwd=c(2,2,2,2,3),bty="n", cex=1.5)
+mtext(3, outer=T, text="Longline (1952-2019)", cex=1.75, line=1)
+savePlot(paste("figs/llcpue",sp,sep=""),type=plotype)
+write.csv(obj, paste("tabs/llcpue",sp,".csv",sep=""))
+#dev.off()
+return(obj[,ind2])
+
+} # end plot.ll.cpue.spa
+
+
+##########################################################################
+##########################################################################
+# Special SPA version for ALB trends
+##########################################################################
+#########################################################################
+
+plot.ll.cpue.spa_mt <-function(Data=aggllwc,area="all",sp="skj",lonvar =c("lon5"), latvar=c("lat5"),plotype="png",
+                            fspec=fishspecs,flspec=flspecs,sts=c("JP","KR"),xlimits=c(1950,2012),legpos="topright", CNadj="TRUE")
+{
+  # PLOT Biii - nominal CPUE by flag for JP/SB
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+    par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,4,4,1))
+  
+  # If we are only dealing with 20/20
+  if(area=="trop") Data <- Data[abs(Data[,latvar]) < 20.5,]
+  if(area=="south") Data <- Data[Data[,latvar]< -9.5,]             #all data south of 10degS
+  print(area)
+  
+  #match flags now
+  ind <- match(sts,flspec[[1]])
+  
+  # get catch / effort and divide
+  objc <- tapply(Data[,paste(sp,"_mt",sep="")],list(Data$yy,Data$flag),sum,na.rm=T)
+  obje <- tapply(Data[,"hhooks"],list(Data$yy,Data$flag),sum,na.rm=T)
+  obj <- objc/obje
+  objcsum<-rowSums(objc,na.rm=T)
+  objesum<-rowSums(obje,na.rm=T)
+  objsum<-objcsum/objesum
+
+  ind2 <- match(sts,dimnames(obj)[[2]])
+  
+  ## adjustment for very strange CPUE for CN in 2001
+  if(CNadj == "TRUE"){
+    obj["2001","CN"] <- NA
+  }
+  #browser()
+  plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=xlimits,xlab="", cex.axis=1.5)
+  #plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=c(1950,2013),xlab="")
+  # lines for each set type
+  for(j in 1:length(sts))
+  {
+    lines(as.numeric(dimnames(obj)[[1]]),obj[,ind2[j]],lwd=2,type="b",col=flspec[[3]][ind[j]],pch=flspec[[4]][ind[j]])
+  }
+  lines(as.numeric(dimnames(obj)[[1]]),objsum,lwd=3,type="l",col="black")
+  mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (kg per 100 hooks)",sep=""),line=2, cex=1.5)
+  legend(legpos,legend=c(flspec[[2]][ind],"Combined"),col=c(flspec[[3]][ind],"black"),pch=c(flspec[[4]][ind],NA),lwd=c(2,2,2,2,3),bty="n", cex=1.5)
+  mtext(3, outer=T, text="Longline (1952-2019)", cex=1.75, line=1)
+  savePlot(paste("figs/llcpue_10south",sp,"_mt",sep=""),type=plotype)
+  #dev.off()
+  #return(obj[,ind2])
+  cpue_tab<-as.data.frame(obj[,ind2])
+  save(cpue_tab, file = "data/cpe.RData")
+} # end plot.ll.cpue.spa_mt
+
+
+#########################################################################
+#########################################################################
+#########################################################################
+plot.pl.cpue <-function(Data=aggplwc,trop=T,sp="skj",lonvar =c("lon1"), latvar=c("lat1"),plotype="png",fspec=fishspecs,flspec=flspecs,sts=c("JP","SB"),xlimits=c(1950,2012), legpos="topleft")
+{
+# PLOT Bii - nominal CPUE by flag for JP/SB
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+  par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,5,4,1))
+  
+# If we are only dealing with 20/20
+if(trop) Data <- Data[abs(Data[,latvar])<20.5,]
+
+#match flags now for info
+ind <- match(sts,flspec[[1]])
+
+# get catch / effort and divide
+objc <- tapply(Data[,paste(sp,"_mt",sep="")],list(Data$yy,Data$flag),sum,na.rm=T)
+obje <- tapply(Data[,"days"],list(Data$yy,Data$flag),sum,na.rm=T)
+obj <- objc/obje
+ind2 <- match(sts,dimnames(obj)[[2]])  #match for data object
+#if(sp=="skj") browser()
+plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=xlimits,xlab="", cex.axis=1.5)
+#plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj[,ind2],na.rm=T)),xlim=c(1980,2013),xlab="")
+# lines for each set type
+    for(j in 1:length(sts))
+    {
+    lines(as.numeric(dimnames(obj)[[1]]),obj[,ind2[j]],lwd=2,type="b",col=flspec[[3]][ind[j]],pch=flspec[[4]][ind[j]])
+    }
+mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (mt per day)",sep=""),line=3, cex=1.5)
+legend(legpos,legend=flspec[[2]][ind],col=flspec[[3]][ind],pch=flspec[[4]][ind],lwd=2,bty="n" , cex=1.5)
+mtext(3, outer=T, text="Pole and line", cex=1.75, line=1)
+savePlot(paste("figs/plcpue",sp,sep=""),type=plotype)
+write.csv(obj, paste("tabs/plcpue",sp,".csv",sep=""))
+#dev.off()
+return(obj[,ind2])
+
+} #end plot.pl.cpue
+
+#########################################################################
+#########################################################################
+
+plot.ps.cpue <-function(Data=aggpswc,trop=T,sp="skj",lonvar =c("lon1"), latvar=c("lat1"),plotype="png",fspec=fishspecs,sspec=setspecs,sts=c(1,3,4,5),xlimits=c(1950,2012),legpos="topleft")
+{
+# PLOT Bi - nominal CPUE by settype
+  if (dev.cur()!=1) dev.off()
+  windows(16, 7)
+  par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,4,4,1))
+  
+# If we are only dealing with 20/20
+if(trop) Data <- Data[abs(Data[,latvar])<20.5,]
+
+# get catch / effort and divide
+objc <- tapply(Data[,paste(sp,"_mt",sep="")],list(Data$yy,Data$school),sum,na.rm=T)
+obje <- tapply(Data[,"stdeff"],list(Data$yy,Data$school),sum,na.rm=T)
+obju <- objc/obje
+#if(sp=="skj") browser()
+obj <- obju[,as.character(sts)]
+ind <- match(sts,sspec$code)
+plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj,na.rm=T)),xlim=xlimits,xlab="", cex.axis=1.5)
+#plot(1,1,type="n",ylab="",las=1,ylim=c(0,max(obj,na.rm=T)),xlim=c(1980,2013),xlab="")
+# lines for each set type
+    for(i in 1:length(sts))
+    {
+    lines(as.numeric(dimnames(obj)[[1]]),obj[,as.character(sts[i])],lwd=2,type="b",col=sspec[[3]][ind[i]],pch=sspec[[4]][ind[i]])
+    }
+mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (mt per day)",sep=""),line=2, cex=1.5)
+mtext(3, outer=T, text="Purse seine", cex=1.75, line=1)
+legend(legpos,legend=sspec[[2]][ind],col=sspec[[3]][ind],pch=sspec[[4]][ind],lwd=2,bty="n", cex=1.5)
+savePlot(paste("figs/pscpue",sp,sep=""),type=plotype)
+write.csv(obj, paste("tabs/pscpue",sp,".csv",sep=""))
+#dev.off()
+return(obj)
+
+} # end plot.ps.cpue
+
+
+#########################################################################
+#########################################################################
+plot.temporal.catgear <- function(Data=aggwc,sp="skj",
+plotype="png",fspec=fishspecs,gspec=gearspecs,pspec=plotspecs,reg="w", box="y")
+{
+# Plot A in the indicators paper
+if (dev.cur()!=1) dev.off()
+windows(16, 8)
+par(mfrow=c(1,1),oma=c(3,5,0,0), mar=c(2,2,2,0))
+# get object for bar plot
+obj <- tapply(Data[,paste(sp,"_mt",sep="")],list(Data$yy,Data$gear),sum,na.rm=T)
+obj[is.na(obj)] <- 0
+#browser()
+axp <- seq(0,pspec[[sp]][2],by=pspec[[sp]][1])
+mxy <- pspec[[sp]][2] 
+if(reg=="s"){
+axp <- seq(0,pspec[[paste(sp,"S",sep="")]][2],by=pspec[[paste(sp,"S",sep="")]][1])
+mxy <- pspec[[paste(sp,"S",sep="")]][2] 
+}
+if(reg=="swpc"){
+axp <- seq(0,pspec[[paste(sp,"S",sep="")]][2],by=pspec[[paste(sp,"Swcpca",sep="")]][1])
+mxy <- pspec[[paste(sp,"S",sep="")]][2] 
+}
+
+  # If south use the other settings
+axl <- formatC(axp, format="d", big.mark=',')
+
+
+barplot(height=t(obj),legend.text=gspec$gear,beside=F,col=gspec$cls, ylim=c(0,mxy),
+las=1,args.legend=list(x="topleft",bty="n"),axes=F,xpd=F)
+axis(2,at=axp,labels=axl,las=1, cex=1.5)
+if(box=="y"){                                       # GP: added this as in 2016 it results in a weird extension of the x axis if left on
+box(bty="l")
+}
+mtext(1,outer=T,text="Years",line=1, cex=1.5)
+mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," catch (mt)",sep=""),line=3, cex=1.5)
+if(reg=="s") savePlot(paste("figs/catchbygear",sp,"S",sep=""),type=plotype)
+if(reg=="w") savePlot(paste("figs/catchbygear",sp,sep=""),type=plotype)
+if(reg=="swpc") savePlot(paste("figs/catchbygear",sp,"SWCPA",sep=""),type=plotype)
+#dev.off()
+if(reg=="s") write.csv(obj, paste("tabs/catchbygear",sp,"S",".csv",sep=""))
+if(reg=="w") write.csv(obj, paste("tabs/catchbygear",sp,".csv",sep=""))
+if(reg=="swpc") write.csv(obj, paste("tabs/catchbygear",sp,"SWCPA",".csv",sep=""))
+return(obj)
+
+} # end plot.temporal.catgear
+
+#########################################################################
+#########################################################################
+plot.temporal.catgear.tfar <- function(Data=aggwc,sp="skj",
+plotype="png",fspec=fishspecs,gspec=gearspecs,pspec=plotspecs,reg="w",pname="figs/Fig2a-catchbygear",lang="E")
+{
+# Plot A in the indicators paper
+if(plotype!="eps") windows(16, 8)
+if(plotype=="eps") postscript(file=paste(pname,lang,".eps",sep=""),width=16,height=8)
+
+par(mfrow=c(1,1),oma=c(2,3,2,2))
+# get object for bar plot
+obj <- tapply(Data[,paste(sp,"_mt",sep="")],list(Data$yy,Data$gear),sum,na.rm=T)
+obj[is.na(obj)] <- 0
+# French versus english labels
+    if(lang=="E"){
+    axesT <- c("Years","Catch (t)")
+    gears <- gspec$gearEN } else{
+    axesT <- c("Ann?es","Prises (tonnes)")
+    gears <- gspec$gearFR
+    }
+
+axp <- seq(0,pspec[[sp]][2],by=pspec[[sp]][1])
+mxy <- pspec[[sp]][2] 
+    if(reg=="s"){
+    axp <- seq(0,pspec[[paste(sp,"S",sep="")]][2],by=pspec[[paste(sp,"S",sep="")]][1])
+    mxy <- pspec[[paste(sp,"S",sep="")]][2] 
+    }
+  # If south use the other settings
+    if(lang=="E") axl <- formatC(axp, format="d", big.mark=',')
+    if(lang=="F") axl <- formatC(axp, format="d", big.mark=' ')
+
+
+barplot(height=t(obj),legend.text=gears,beside=F,col=gspec$cls, ylim=c(0,mxy),
+las=1,args.legend=list(x="topleft",bty="n"),axes=F,xpd=F)
+axis(2,at=axp,labels=axl,las=1)
+box(bty="l")
+mtext(1,outer=T,text=axesT[1],line=-2.5, cex=1.5)
+mtext(2,outer=T,text=axesT[2],line=1, cex=1.5)
+if(plotype!="eps") savePlot(paste("figs/",pname,lang,sep=""),type=plotype)
+dev.off()
+return(obj)
+
+} # end plot.temporal.catgear.tfar
+
+
+#########################################################################
+#########################################################################
+get.catchatsize <- function(file="data/tfar_bet_frq_2000s.csv",type="xls")
+{
+# Reads in PWs csv file and creates a data frame which I then convert to an array
+# SJH 1/06/2012 11:11:19 AM
+if(type=="xls") jnk <- read.xls(file,colNames=T)
+if(type=="csv") jnk <- read.csv(file,header=T)
+
+#browser()
+jnk.gears <- substring(names(jnk)[-1],1,nchar(names(jnk)[-1])-5)
+jnk.years <- substring(names(jnk)[-1],nchar(names(jnk)[-1])-3,10)
+jnk.out <- data.frame(
+yr=rep(jnk.years,each=nrow(jnk)),
+gr=rep(jnk.gears,each=nrow(jnk)),
+len=rep(jnk[,1],ncol(jnk)-1),
+n=as.vector(unlist(jnk[,-1])))
+#now into an array
+output <- tapply(jnk.out$n,list(jnk.out$len,jnk.out$gr,jnk.out$yr),sum)
+return(output)
+}
+
+get.catchatsize2 <- function(file="data/tfar_bet_frq_2000s.csv",type="xls")
+{
+  if(type=="xls") jnk <- read.xls(file,colNames=T)
+  if(type=="csv") jnk <- read.csv(file,header=T)
+  
+  jnk.gears <- substring(names(jnk)[-1],1,nchar(names(jnk)[-1])-5)
+  jnk.years <- substring(names(jnk)[-1],nchar(names(jnk)[-1])-3,10)
+  jnk.out <- data.frame(
+    yr=rep(jnk.years,each=nrow(jnk)),
+    gr=rep(jnk.gears,each=nrow(jnk)),
+    len=rep(jnk[,1],ncol(jnk)-1),
+    n=as.vector(unlist(jnk[,-1])))
+  yr<-unique(as.numeric(jnk.years))
+  yr2<- as.character(c((max(yr)-6):max(yr)))
+  #now into an array
+  output <- tapply(jnk.out$n,list(jnk.out$len,jnk.out$gr,jnk.out$yr),sum)
+  output <- output[,,c(as.character(yr2))] #get only the last few years
+  return(output)
+} # end get.catchatsize
+
+
+#########################################################################
+#########################################################################
+plot.catchatsize <- function(Data=list(l=betlfq,w=betwtq),sp="bet",plotype="png",fspec=fishspecs,szspec=sizespecs)
+# 
+{
+# has a kludge for SW
+windows(4,10)
+par(mfrow=c(7,1),mar=c(1,5,1,1),oma=c(1,1,0,1))
+specs <- szspec[[sp]]
+
+    for(j in 1:length(Data))
+    {
+    Tmp <- Data[[j]]
+    Tmp <- Tmp[dimnames(Tmp)[[1]] %in% as.character(seq(from=2,to=specs$maxsz,by=2)),,]
+    
+          for(k in 1:dim(Tmp)[3])
+          {
+          tmp <- Tmp[,,k]
+          if(sp=="swo") tmp <- tmp/1000
+          barplot(t(tmp),beside=F,las=1,col=specs$cols,space=0,border=NA,ylab="",axes=F,ylim=range(specs$yax[[j]]))
+          if(sp!="swo") axis(2,at=specs$yax[[j]],labels=formatC(specs$yax[[j]], format="d", big.mark=','),las=1)
+          if(sp=="swo") axis(2,at=specs$yax[[j]],labels=specs$yax[[j]],las=1)
+          if(j==1) rev(legend("top",legend=dimnames(Tmp)[[3]][k],bty="n"))
+          if(j==2) rev(legend("topright",legend=dimnames(Tmp)[[3]][k],bty="n") )
+          if(j==1 & k==dim(Tmp)[3]) legend("topright",legend=specs$gears,fill=specs$cols,bty="n",border=NA)
+          }
+    mtext(side=2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp],szspec$Ylab[j],sep=" "),line=-0.8)
+    mtext(side=1,outer=T,text="Length (cm)",line=-0.5)
+    savePlot(file=paste("figs/size",sp,names(Data)[j],sep=""),type=plotype)
+    write.csv(tmp,paste("tabs/size",sp,names(Data)[j],sep=""))
+    }
+dev.off()
+
+} # end plot.catchatsize
+
+#########################################################################
+#########################################################################
+plot.catchatsizev2 <- function(Data=list(l=betlfq,w=betwtq),sp="bet",plotype="png",fspec=fishspecs,szspec=sizespecs)
+#
+{
+# has a kludge for SW
+# SJH 7/5/2012 3:48:26 PM This version does length and weight on the same plot
+# Only plot the last five years - for the moment, done by changing "k" dimension
+if (dev.cur()!=1) dev.off()
+windows(8,10)
+par(mfcol=c(6,2),mar=c(1,1,0,1),oma=c(3,5,0,2))
+specs <- szspec[[sp]]
+
+    for(j in 1:length(Data))
+    {
+    Tmp <- Data[[j]]
+    Tmp <- Tmp[dimnames(Tmp)[[1]] %in% as.character(seq(from=2,to=specs$maxsz,by=2)),,]
+
+          for(k in 2:dim(Tmp)[3])
+          {
+          
+          # have legend in the first row and exclude first year
+              if(k==2)
+              {
+              #don't do a plot just a legend
+              plot(1,1,axes=F,xlab="",ylab="",type="n")
+              if(j==1) legend("right",legend=rev(specs$gears),fill=rev(specs$cols),bty="n",border=NA, cex=1.75)
+              }else{
+              tmp <- Tmp[,,k]
+              if(sp=="swo") tmp <- tmp/1000
+              x<-barplot(t(tmp),beside=F,las=1,col=specs$cols,space=0,border=NA,ylab="",axes=F,ylim=range(specs$yax[[j]]),names.arg=rep("",dim(tmp)[1]))
+              if(sp!="swo") axis(2,at=specs$yax[[j]],labels=formatC(specs$yax[[j]], format="d", big.mark=','),las=1,cex.axis=1.0)
+              if(sp=="swo") axis(2,at=specs$yax[[j]],labels=specs$yax[[j]],las=1,cex.axis=1.0)
+              if(k==dim(Tmp)[3]) axis(1,at=szspec[[sp]]$xlabs,labels=dimnames(tmp)[[1]][szspec[[sp]]$xlabs],cex.axis=1.0)
+              if(j==2) legend("topright",legend=rev(dimnames(Tmp)[[3]][k]),bty="n", cex=1.5, xpd=TRUE)
+              segments(szspec[[sp]]$xlabs, rep(0,length(szspec[[sp]]$xlabs)), szspec[[sp]]$xlabs,rep(max(specs$yax[[j]]),length(szspec[[sp]]$xlabs)), col="grey")
+              }
+          }
+    mtext(side=2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp],szspec$Ylab[1],sep=" "),line=3.0, cex=1.25) #0.9
+    mtext(side=4,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp],szspec$Ylab[2],sep=" "),line=0, cex=1.25)
+    mtext(side=1,outer=T,text="Length (cm)",line=1.3,cex=1.25)
+    }
+#savePlot(file=paste("figs/size",sp,sep=""),type=plotype, res=600)
+dev.copy(CairoPNG,file=paste("figs/size",sp,".png",sep=""), 
+         width = 8, height = 10, units = "in", res=300) # this is a better was to get a high res plot
+write.csv(Tmp, paste("tabs/size",sp,".csv",sep=""))
+dev.off()
+
+} # end plot.catchatsizev2
+
+#########################################################################
+#########################################################################
+plot.catchatsizev3 <- function(Data=list(l=betlfq,w=betwtq),sp="bet",plotype="png",fspec=fishspecs,szspec=sizespecs)
+{
+  
+  windows(width = 5, height = 7)
+  par(mfcol=c(7,2),mar=c(1,5,0,2),oma=c(2.5,2,2,2))
+  specs <- szspec[[sp]]
+  
+  for(j in 1:length(Data))
+  {
+    Tmp <- Data[[j]]
+    Tmp <- Tmp[dimnames(Tmp)[[1]] %in% as.character(seq(from=2,to=specs$maxsz,by=2)),,]
+    
+    for(k in 1:dim(Tmp)[3])
+    {
+      
+      # have legend in the first row and exclude first year
+      if(k==1)
+      {
+        #don't do a plot just a legend
+        plot(1,1,axes=F,xlab="",ylab="",type="n")
+        if(j==1) legend("right",legend=rev(specs$gears),fill=rev(specs$cols),bty="n",border=NA, cex=0.6)
+      }else{
+        tmp <- Tmp[,,k]
+        if(sp=="swo") tmp <- tmp/1000
+        barplot(t(tmp),beside=F,las=1,col=specs$cols,space=0,border=NA,ylab="",axes=F,ylim=range(specs$yax[[j]]),names.arg=rep("",dim(tmp)[1]))
+        if(sp!="swo") axis(2,at=specs$yax[[j]],labels=formatC(specs$yax[[j]], format="d", big.mark=','),las=1,cex.axis=0.7)
+        if(sp=="swo") axis(2,at=specs$yax[[j]],labels=specs$yax[[j]],las=1,cex.axis=0.7)
+        if(k==dim(Tmp)[3]) axis(1,at=szspec[[sp]]$xlabs,labels=dimnames(tmp)[[1]][szspec[[sp]]$xlabs],cex.axis=0.8)
+        if(j==2) legend("topright",legend=rev(dimnames(Tmp)[[3]][k]),bty="n")
+      }
+    }
+    mtext(side=2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp],szspec$Ylab[1],sep=" "),line=-1.8, cex=0.9) #0.9
+    mtext(side=4,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp],szspec$Ylab[2],sep=" "),line=0, cex=0.9)
+    mtext(side=1,outer=T,text="Length (cm)",line=1.3,cex=0.9)
+  }
+  #savePlot(file=paste("figs/size_long_",sp,sep=""),type=plotype, res=600)
+  dev.copy(CairoPNG,file=paste("figs/size_long_",sp,".png",sep=""), 
+           width = 5, height = 7, units = "in", res=600) # this is a better was to get a high res plot
+  write.csv(Tmp, paste("tabs/size_long_",sp,".csv",sep=""))
+  dev.off()
+
+} # end plot.catchatsizev3
+
+#########################################################################
+#########################################################################
+get.meanweight <- function(Data="lfq",sp=i,szspec=sizespecs)
+{
+# Creates a mean weight by fishery and year object based on the catch at length data and lw parameters
+specs <- szspec[[sp]]
+lw <- c(specs$lwta,specs$lwtb)
+x <- get(paste(i,Data,sep=""))
+# add on an extra column for the totals
+tmp <- dim(x)
+tmp <- tmp+c(0,1,0)
+tmp.dim <- dimnames(x)
+tmp.dim[[2]] <- c(tmp.dim[[2]],"T")
+tmp1 <- array(NA,dim=tmp,dimnames=tmp.dim)
+tmp1[,1:(tmp[2]-1),] <- x
+tmp1[,tmp[2],] <- apply(x,c(1,3),sum)
+x <- tmp1
+
+# get the weight bins
+w <- lw[1]*(as.numeric(dimnames(x)[[1]])^lw[2])
+# do all the math
+jnk <- w*x
+jnk <- apply(jnk,c(2,3),sum)
+output <- jnk/apply(x,c(2,3),sum)
+dimnames(output)[[1]] <- c(specs$gears,"Total")
+return(output)
+
+} # end get.meanweight
+
+
+#########################################################################
+#########################################################################
+plot.meanwt <- function(sp="bet",plotype="png",szspec=sizespecs,fspec=fishspecs)
+# 
+{
+Data <- get(paste(i,"mw",sep=""))
+if (dev.cur()!=1) dev.off()
+windows(16, 7)
+par(mfcol=c(1,1),mar=c(1,1,1,1),oma=c(2,4,1,1))
+
+specs <- szspec[[sp]]
+plot(1,1,type="n",las=1,ylim=c(0,max(Data,na.rm=T)),xlim=range(as.numeric(dimnames(Data)[[2]])),xlab="", cex.axis=1.5, cex=1.5)
+# lines for each set type
+    for(i in 1:(nrow(Data)-1))
+    {
+    lines(as.numeric(dimnames(Data)[[2]]),Data[i,],lwd=2,type="b",col=specs$col[i],pch=i)
+    }
+
+    ############### Do total separately
+    lines(as.numeric(dimnames(Data)[[2]]),Data[nrow(Data),],lwd=2,type="b",col="black",pch=i+1)
+
+mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp],"mean weight (kg)",sep=" "),line=2, cex=1.5)
+legend(szspec[[sp]]$leg,legend=dimnames(Data)[[1]],col=c(specs$col,"black"),lwd=2,pch=1:nrow(Data),bty="n", cex=1.5)
+savePlot(paste("figs/meanw",sp,sep=""),type=plotype)
+write.csv(Data, paste("tabs/meanw",sp,".csv",sep=""))
+
+
+} # end plot.meanwt
+
+#########################################################################
+#########################################################################
+plot.meanwt3 <- function(sp="bet",plotype="png",szspec=sizespecs,fspec=fishspecs)
+  # 
+{
+  Data <- get(paste(i,"mw",sep=""))
+  
+  windows(16, 8)
+  specs <- szspec[[sp]]
+  plot(1,1,type="n",ylab=paste(fspec[[2]][fspec[[1]]==sp],"mean weight (kg)",sep=" "),las=1,ylim=c(0,max(Data,na.rm=T)),xlim=range(as.numeric(dimnames(Data)[[2]])),xlab="", cex.axis=1.5, cex=1.5, cex.lab=1.5)
+  # lines for each set type
+  for(i in 1:(nrow(Data)-1))
+  {
+    lines(as.numeric(dimnames(Data)[[2]]),Data[i,],lwd=2,type="b",col=specs$col[i],pch=i)
+  }
+  
+  ############### Do total separately
+  lines(as.numeric(dimnames(Data)[[2]]),Data[nrow(Data),],lwd=2,type="b",col="black",pch=i+1)
+  
+  #mtext(2,outer=T,text=paste(fspec[[2]][fspec[[1]]==sp]," CPUE (mt per day)",sep=""),line=-1)
+  legend(szspec[[sp]]$leg,legend=dimnames(Data)[[1]],col=c(specs$col,"black"),lwd=2,pch=1:nrow(Data),bty="n", cex=1.5)
+  savePlot(paste("figs/meanw_long_",sp,sep=""),type=plotype)
+  write.csv(Data, paste("tabs/meanw_long_",sp,".csv",sep=""))
+  dev.off()
+
+} # end plot.meanwt3
+
+switch.coords <- function(lon, lat) { # first item is "lon", second is "lat"
+
+    # remove periods if needed
+    lon <- sub("[.]", "", lon)
+    lat <- sub("[.]", "", lat)
+
+    # test for precision of coordinate:
+    if(nchar(lon[1])==6) { lon.dec <-  100
+                           } else if(nchar(lon[1])==7) {lon.dec <- 100000
+                           } else if(nchar(lon[1])==9) {lon.dec <- 100000
+                           } else { lon.dec <- 1}
+
+    if(nchar(lat[1])==5) { lat.dec <-  100
+                           } else if(nchar(lat[1])==6) {lat.dec <- 100000
+                           } else if(nchar(lat[1])==8) {lat.dec <- 100000
+                           } else { lat.dec <- 1}
+
+    # convert to numeric type:
+    lon.out <- ifelse(gsub("\\d","",lon) == "W", 360*lon.dec - as.numeric(gsub("[a-zA-Z]","",lon)),as.numeric(gsub("[a-zA-Z]","",lon)))/lon.dec
+    lat.out <- ifelse(gsub("\\d","",lat) == "S", - as.numeric(gsub("[a-zA-Z]","",lat)),as.numeric(gsub("[a-zA-Z]","",lat)))/lat.dec
+
+    return(data.frame("lon"=lon.out, "lat"=lat.out))
+} # end switch.coords
+
+#########################################################################
+#########################################################################
+convert.latlon <- function(lon=x,lat=y,In=1,Out=1)
+{
+# Code from PW 
+#Where 'xlat' and 'xlon' are the latitude/longitude for 1?x1? at the south-west corner, the following produces the point (decimal) at the centre the 1?x1?
+
+    if(In==1)
+    {
+    NLat <-  (as.numeric(substring(lat,1,2))+ifelse(substring(lat,nchar(lat),nchar(lat))=='S',-0.5,0.5))*ifelse(substring(lat,nchar(lat),nchar(lat))=='S',-1,1)
+    NLon <-   abs(as.numeric(substring(lon,1,3))+ifelse(substring(lon,nchar(lon),nchar(lon))=='W',-0.5,0.5)+ifelse(substring(lon,nchar(lon),nchar(lon))=='W',-360,0))
+    }
+#Where 'xlat' and 'xlon' are the latitude/longitude for 5?x5? at the south-west corner, the following produces the point (decimal) at the centre the 5?x5?
+    if(In==5)
+    {
+    NLat <-  (as.numeric(substring(lat,1,2))+ifelse(substring(lat,nchar(lat),nchar(lat))=='S',-2.5,2.5))*ifelse(substring(lat,nchar(lat),nchar(lat))=='S',-1,1)
+    NLon <-   abs(as.numeric(substring(lon,1,3))+ifelse(substring(lon,nchar(lon),nchar(lon))=='W',-2.5,2.5)+ifelse(substring(lon,nchar(lon),nchar(lon))=='W',-360,0))
+    }
+
+#To get from NLat1 to NLat5
+     if(In==1 & Out==5)
+     {
+     NLat = floor( NLat / 5) * 5 +2.5
+     NLon = floor( NLon / 5) * 5 +2.5
+     }
+return(data.frame(lon=NLon,lat=NLat))
+
+} # end convert.latlon
+
+
+### Functions to properly plot lat and lons in ggplot
+scale_x_longitude <- function(xmin=-180, xmax=180, step=1, ...) {
+  xbreaks <- seq(xmin,xmax,step)
+  xlabels <- unlist(lapply(xbreaks, function(x) ifelse(x < 180, parse(text=paste0(abs(x),"^o", "*W")), ifelse(x > 180, parse(text=paste0(360-x,"^o", "*E")), parse(text=paste0(x,"^o"))))))
+  return(scale_x_continuous("Longitude", breaks = xbreaks, labels = xlabels, expand = c(0, 0), ...))
+}
+scale_y_latitude <- function(ymin=-90, ymax=90, step=0.5, ...) {
+  ybreaks <- seq(ymin,ymax,step)
+  ylabels <- unlist(lapply(ybreaks, function(x) ifelse(x < 0, parse(text=paste0(abs(x),"^o", "*S")), ifelse(x > 0, parse(text=paste0(x,"^o", "*N")),parse(text=paste0(x,"^o"))))))
+  return(scale_y_continuous("Latitude", breaks = ybreaks, labels = ylabels, expand = c(0, 0), ...))
+}    

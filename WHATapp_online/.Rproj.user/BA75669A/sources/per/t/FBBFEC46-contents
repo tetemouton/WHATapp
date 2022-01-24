@@ -1,0 +1,415 @@
+library(data.table)
+library(tidyverse)
+library(magrittr)
+
+
+  theme_set(theme_bw())
+
+  base.dir <- "C:/FAD_closure/2020_new/"
+  
+  source(paste0(base.dir, "read.ini.r"))
+  
+  
+  FADcls <- read.csv(paste0(base.dir, "Data/FAD_Closure_Timing.CSV"), header=TRUE, sep=",")
+  
+  start.yr <- 2000
+  fst.yr <- 2009
+  last.yr <- 2019
+  
+  
+  keep.ez <- c("CK","FM","KI","MH","NR","PG","SB","TK","TV") 
+
+  opdat <- read.table(paste0(base.dir, "Data/OP_PS_EEZ_FLEET.txt"), header = T, sep = ",") %>%
+                      mutate(EEZ = ifelse(eez %in% c("GL","LN","PX"), "KI", eez), fleet = ifelse(flag == EEZ, "Domestic", "Foreign"))
+  
+  agdat <- read.table(paste0(base.dir, "Data/AGG_BEST_FLG_EEZ.TXT"), header = T, sep = ",") %>%
+                      mutate(EEZ = ifelse(eez %in% c("GL","LN","PX"), "KI", eez), fleet = ifelse(flag == EEZ, "Domestic", "Foreign"))
+  
+  opdat_fleet <- opdat 
+
+
+# lf1 and lf2.CSV are made by Peter W and appear in  G:/Tuna_dbs/Analyses/FAD_CLOSURE/2018_09 - have to get him to run query each year
+
+  lf1 <- read.csv(paste0(base.dir, "Data/lf1.CSV"), header=TRUE, sep=",", stringsAsFactors=FALSE) %>%
+                  mutate(EEZ = ifelse(ez_id %in% c("GL","LN","PX"), "KI", ez_id),
+                         SchID = ifelse(sch_id_x %in% c("C","L","F"), "ASS", "OTH"),
+                         SchID = ifelse(sch_id_x == "U", "UNA", SchID))
+           
+           
+  lf2 <- read.csv(paste0(base.dir, "Data/lf2.CSV"), header=TRUE, sep=",", stringsAsFactors=FALSE)         
+
+
+  lf3 <- left_join(lf2, lf1, by = "s_alog_id")
+  
+  N.len <- lf3 %>% group_by(sp_id, EEZ, yy, mm, SchID, len) %>%
+                   summarise(N.uncor = sum(n_uncor, na.rm = TRUE), N.cor = sum(n_uncor, na.rm = TRUE)) %>%
+                   filter(between(len, 20, 200))
+  
+
+  # Process .ini's
+
+  extract.LW <- function(x){
+    
+    tmp <- readLines(paste0(base.dir, "Data/", x, ".ini"))
+    ind <- match("# Length-weight parameters", tmp)
+    
+    tmp1 <- data.frame(spp = x, par1 = tmp[(ind + 1)]) %>% separate(par1, into = c("par1","par2"), sep = " ") %>%
+                       mutate(par1 = as.numeric(par1), par2 = as.numeric(par2))
+    
+    return(tmp1)
+  } 
+  
+  extend.bins <- function(Bin.vec = 1:6, spp = "skj"){
+    
+    tmp <- data.frame(len = NA, Bin = NA, spp = NA)
+    
+    for(i in 1:(length(Bin.vec) - 1)){
+      tmp1 <- data.frame(len = ceiling(Bin.vec[i]):floor(Bin.vec[i + 1]), Bin = i, spp = spp)
+      tmp <- rbind(tmp, tmp1)
+    }
+    
+    return(tmp[-1,])
+  }
+  
+  LWpars <- rbindlist(lapply(c("bet","skj","yft"), extract.LW))
+  
+  
+  prc.bins <- read.csv(paste0(base.dir, "Data/price_bins.csv")) %>% pivot_longer(cols=-Bin, names_to="spp", values_to="Price") %>%
+                       arrange(spp, Bin)
+                  
+  Markbins <- c(0,3,4,7.5,20,400)/2.20456
+  
+  Markbins.lf <- data.frame(Bin = 1:6,
+                            Binlb = c(0,3,4,7.5,20,400),
+                            Binkg = round(Markbins, 2),
+                            bet = (Markbins / LWpars$par1[LWpars$spp == "bet"]) ^ (1 / LWpars$par2[LWpars$spp == "bet"]),
+                            skj = (Markbins / LWpars$par1[LWpars$spp == "skj"]) ^ (1 / LWpars$par2[LWpars$spp == "skj"]),
+                            yft = (Markbins / LWpars$par1[LWpars$spp == "yft"]) ^ (1 / LWpars$par2[LWpars$spp == "yft"]))
+  
+  
+  Bin.reference.tbl <- rbind(extend.bins(Markbins.lf$bet, spp = "bet"),
+                             extend.bins(Markbins.lf$skj, spp = "skj"),
+                             extend.bins(Markbins.lf$yft, spp = "yft"))
+  
+  write.csv(Bin.reference.tbl, paste0(base.dir, "Data/Bin.reference.tbl.csv"), row.names = FALSE)
+  
+  Bin.reference.tbl <- left_join(Bin.reference.tbl, prc.bins, by = c("Bin","spp"))
+  
+  N.len %<>% mutate(spp = tolower(sp_id))
+  N.len <- left_join(N.len, Bin.reference.tbl, by=c("len","spp")) %>% mutate(Species = recode(spp, bet = "Bigeye", skj = "Skipjack", yft = "Yellowfin"))
+  
+  
+  
+
+  all.comb <- expand.grid(EEZ = keep.ez, Species = c("Bigeye","Skipjack","Yellowfin"))
+  
+  cl.len <- N.len %>% filter(between(yy, fst.yr, last.yr), EEZ %in% keep.ez)
+  
+  
+  cl.len.gp <- cl.len %>% filter(SchID == "ASS") %>% group_by(Species, EEZ, Bin) %>%
+                          summarise(Nfish = sum(N.cor)) %>% mutate(Pfish = Nfish / sum(Nfish))
+  
+  sml.bin <- cl.len.gp %>% filter(Bin %in% 1:3) %>% group_by(Species, EEZ) %>% summarise(Nfish = sum(Nfish), Pfish = sum(Pfish))
+  
+  sml.bin <- left_join(all.comb, sml.bin, by = c("EEZ","Species"))
+  
+  
+  windows(3000,3000)
+    pl <- ggplot(cl.len.gp, aes(x = EEZ, y = Pfish, fill = factor(Bin))) + geom_bar(stat = "identity", position = "stack") +
+                 facet_wrap(~ Species, ncol = 1) + labs(fill = "Size bin")
+    print(pl)
+  dev.off()
+  
+  
+
+  plot_sml_proportions <- function(dat = agdat, sml.bin = sml.bin, type = "foreign-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                   EZplot = "FM", sv.name = "_SmlFishProp_Agdat_for-eez", Set.lim = 20){
+    
+    
+    if(type == "foreign-eez") dat %<>% filter(fleet == "Foreign", EEZ %in% keep.ez) %>% mutate(SelCol = EEZ)
+    if(type == "domestic-eez") dat %<>% filter(fleet == "Domestic", EEZ %in% keep.ez) %>% mutate(SelCol = EEZ)
+    if(type == "domestic-all") dat %<>% mutate(SelCol = flag)
+    
+    
+    cat.dat <- dat %>% filter(between(yy, 2009, 2019), SelCol %in% keep.ez, school != "OTH")
+    
+    
+    cat.gp <- cat.dat %>% group_by(EEZ = SelCol, school) %>%
+                          summarise(Sets = sum(sets), BET = sum(bet_mt), SKJ = sum(skj_mt), YFT = sum(yft_mt)) %>%
+                          mutate(TOT = BET + SKJ + YFT, Bigeye = BET / TOT, Skipjack = SKJ / TOT, Yellowfin = YFT / TOT)
+    
+    cat.gp.pl <- cat.gp %>% filter(school == "ASS", Sets > Set.lim) %>%
+                            pivot_longer(cols = c("Bigeye","Skipjack","Yellowfin"), names_to = "Species", values_to = "Pcaught")
+    
+    
+    cat.gp.pl <- left_join(sml.bin, cat.gp.pl, by = c("EEZ","Species")) %>% mutate(Psml = Pfish * Pcaught) %>%
+                           filter(Species != "Skipjack")
+    
+
+    cat.gp.pl$Species <- factor(cat.gp.pl$Species, levels = c("Yellowfin","Bigeye"))
+    cat.gp.pl$Xlbl <- ifelse(cat.gp.pl$EEZ == EZplot, EZplot, " ")
+
+    windows(3000,3000)
+      pl <- ggplot(cat.gp.pl, aes(x = reorder(EEZ, -Psml), y = Psml*100, fill = Species)) + geom_bar(stat = "identity", position = "stack", colour = "black") +
+                   xlab("") + ylab("%") +
+                   coord_flip() +
+                   scale_fill_manual(values = c("gold1","firebrick2")) +
+                   theme(legend.position = c(0.8,0.8), legend.title = element_blank(), legend.key.size = unit(1, "cm"),
+                         legend.text = element_text(size = 16), panel.border = element_blank(),
+                         axis.line = element_line(color = 'black'), panel.grid.major.y = NULL,
+                         axis.title = element_text(size = 14), axis.text = element_text(size = 14))
+      print(pl)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_mth_Late", ".png"), type = "png")
+    
+      
+    cat.gp.sum <- cat.gp.pl %>% group_by(EEZ) %>% summarise(Ptot = sum(Psml)) %>% mutate(Ptot = ifelse(is.na(Ptot), 0, Ptot), EEZ = ifelse(EEZ == EZplot, EZplot, " ")) %>% arrange(Ptot) 
+
+    pl <- pl + scale_x_discrete(label = rev(cat.gp.sum$EEZ))
+      print(pl)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_mth_Late_HiddenLbl.png"), type = "png")
+    dev.off()
+    
+  }
+  
+  
+  # Agregate data
+  for.eez.rel <- lapply(keep.ez, function(x) plot_sml_proportions(dat = agdat, sml.bin = sml.bin, type = "foreign-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                                  EZplot = x, sv.name = "_Psml_Agdat_for-eez", Set.lim = 20))
+  
+  for.eez.rel <- lapply(keep.ez, function(x) plot_sml_proportions(dat = agdat, sml.bin = sml.bin, type = "domestic-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                                  EZplot = x, sv.name = "_Psml_Agdat_dom-eez", Set.lim = 20))
+  
+  for.eez.rel <- lapply(keep.ez, function(x) plot_sml_proportions(dat = agdat, sml.bin = sml.bin, type = "domestic-all", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                                  EZplot = x, sv.name = "_Psml_Agdat_dom-all", Set.lim = 20))
+
+  
+  plot_FAD_reliance <- function(dat = agdat, type = "foreign-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                EZplot = "FM", sv.name = "_FAD_Reliance_Agdat_for-eez", Set.lim = 20){
+  
+  
+    if(type == "foreign-eez") dat %<>% filter(fleet == "Foreign", EEZ %in% keep.ez) %>% mutate(SelCol = EEZ)
+    if(type == "domestic-eez") dat %<>% filter(fleet == "Domestic", EEZ %in% keep.ez) %>% mutate(SelCol = EEZ)
+    if(type == "domestic-all") dat %<>% mutate(SelCol = flag)
+  
+
+    rel.dat <- dat %>% filter(between(yy, fst.yr, last.yr), SelCol %in% keep.ez, school != "OTH")
+  
+    rel.gp <- rel.dat %>% group_by(EEZ = SelCol, school) %>% summarise(Sets = sum(sets)) %>%
+                          mutate(Pfads = Sets / sum(Sets))
+  
+  
+    rel.gp.pl <- filter(rel.gp, school == "ASS", Sets > Set.lim)
+    
+    all.eez <- data.frame(EEZ = keep.ez)
+    
+    rel.gp.pl <- left_join(all.eez, rel.gp.pl, by = "EEZ")
+    rel.gp.pl[is.na(rel.gp.pl)] <- 0
+    rel.gp.pl$Xlbl <- ifelse(rel.gp.pl$EEZ == EZplot, EZplot, " ")
+    rel.gp.pl %<>% arrange(Pfads)
+  
+    windows(3000,3000)
+      pl <- ggplot(rel.gp.pl, aes(x = reorder(EEZ, -Pfads), y = Pfads*100)) + geom_bar(stat = "identity", fill = "wheat", colour = "black") +
+                   xlab("") + ylab("%") +
+                   coord_flip() +
+                   theme(panel.border = element_blank(),
+                         axis.line = element_line(color = 'black'), panel.grid.major.y = NULL,
+                         axis.title = element_text(size = 14), axis.text = element_text(size = 12))
+      print(pl)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_mth_Late.png"), type = "png")
+    
+  
+      pl <- pl + scale_x_discrete(label = rev(rel.gp.pl$Xlbl))
+      print(pl)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_mth_Late_HiddenLbl.png"), type = "png")
+    dev.off()
+    
+  }
+  
+  
+  # Agregate data
+  for.eez.rel <- lapply(keep.ez, function(x) plot_FAD_reliance(dat = agdat, type = "foreign-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                               EZplot = x, sv.name = "_FAD_Reliance_Agdat_for-eez", Set.lim = 20))
+  
+  for.eez.rel <- lapply(keep.ez, function(x) plot_FAD_reliance(dat = agdat, type = "domestic-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                               EZplot = x, sv.name = "_FAD_Reliance_Agdat_dom-eez", Set.lim = 20))
+  
+  for.eez.rel <- lapply(keep.ez, function(x) plot_FAD_reliance(dat = agdat, type = "domestic-all", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                               EZplot = x, sv.name = "_FAD_Reliance_Agdat_dom-all", Set.lim = 20))
+  
+  # Operational data
+  for.eez.rel <- lapply(keep.ez, function(x) plot_FAD_reliance(dat = opdat, type = "foreign-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                               EZplot = x, sv.name = "_FAD_Reliance_Opdat_for-eez", Set.lim = 20))
+  
+  for.eez.rel <- lapply(keep.ez, function(x) plot_FAD_reliance(dat = opdat, type = "domestic-eez", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                               EZplot = x, sv.name = "_FAD_Reliance_Opdat_dom-eez", Set.lim = 20))
+
+  for.eez.rel <- lapply(keep.ez, function(x) plot_FAD_reliance(dat = opdat, type = "domestic-all", fst.yr = 2009, last.yr = 2019, keep.ez = keep.ez,
+                                                               EZplot = x, sv.name = "_FAD_Reliance_Opdat_dom-all", Set.lim = 20))
+  
+
+
+  
+  
+  plot_effort_series <- function(dat = agdat, type = "foreign-eez", yr.range = c(2000,2009,2019), keep.ez = keep.ez,
+                                 FADcls = FADcls, EZplot = "FM", sv.name = "_Agdat_2000-19"){
+  
+    if(type == "foreign-eez") dat %<>% filter(fleet == "Foreign", EEZ %in% keep.ez) %>% mutate(SelCol = EEZ)
+    if(type == "domestic-eez") dat %<>% filter(fleet == "Domestic", EEZ %in% keep.ez) %>% mutate(SelCol = EEZ)
+    if(type == "domestic-all") dat %<>% mutate(SelCol = flag)
+    
+    all.yrmth <- expand.grid(yy = yr.range[1]:yr.range[3], mm = 1:12, school = c("ASS","UNA"))
+    
+    
+    eff.yrmth <- dat %>% filter(school %in% c("ASS","UNA")) %>% group_by(yy, mm, SelCol, school) %>%
+                         summarise(Sets = sum(sets), Catch = sum(sel_mt)) %>% filter(SelCol == EZplot)
+    
+    eff.yrmth <- left_join(all.yrmth, eff.yrmth, by = c("yy","mm","school")) %>% mutate(Yrmth = yy + (mm - 0.5)/12) 
+    
+    eff.yrmth <- left_join(eff.yrmth, FADcls, by = c("yy","mm")) %>%
+                           mutate(Grp = factor(paste(school, Status), levels = c("UNA Open","ASS Open","UNA Closure","ASS Closure")))
+
+    
+    cpue.yr <- eff.yrmth %>% mutate(Grp = as.character(Grp), Grp = ifelse(Grp %in% c("ASS Open", "ASS Closure"), "ASS", Grp)) %>%
+                                group_by(yy, Grp) %>% summarise(Sets = sum(Sets, na.rm = T), Catch = sum(Catch, na.rm = T)) %>%
+                                mutate(CPUE = Catch / Sets) %>% as.data.frame
+    
+    eff.pl <- eff.yrmth %>% filter(between(yy, yr.range[2], yr.range[3]))
+    if(nrow(eff.pl) == 0) return()
+  
+  
+    windows(9000,3000)
+      pl1 <- ggplot(eff.pl, aes(x = Yrmth, y = Sets, fill = Grp)) + geom_bar(stat = "identity", position = "stack", colour = "black", width = 1/12) +
+                    scale_fill_manual(values = c("steelblue1","firebrick2","royalblue4","darkred")) + xlab("") +
+                    scale_x_continuous(breaks = seq(min(eff.pl$yy), max(eff.pl$yy), 1), minor_breaks = NULL, expand = c(0.01,0.01)) +
+                    scale_y_continuous(limits = c(0,NA)) +
+                    theme(legend.title = element_blank(), legend.key.size = unit(0.7, "cm"),
+                          legend.text = element_text(size = 14), panel.border = element_blank(),
+                          axis.line = element_line(color = 'black'), panel.grid.major.y = NULL,
+                          panel.grid.major.x = element_line(size=.5, color="black", linetype = 2),
+                          axis.title = element_text(size = 14), axis.text = element_text(size = 14))
+      print(pl1)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_mth_Late", ".png"), type = "png")
+    dev.off()
+    
+    eff.mm <- eff.pl %>% group_by(yy, mm, Mon) %>% summarise(Sets = sum(Sets), Catch = sum(Catch))
+    eff.mm$Mon <- factor(eff.mm$Mon, levels = month.abb[1:12])
+    
+    
+    windows(9000,3000)
+      pltmp <- ggplot(eff.mm, aes(x = Mon, y = Sets)) + geom_boxplot(fill = "steelblue") + geom_jitter(width = .15, size = 3, colour = alpha("black", 0.5)) #+ geom_line(aes(colour = factor(yy))) 
+      print(pltmp)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_Effort_Calendar_Early", ".png"), type = "png")
+    dev.off()
+    
+    
+    windows(9000,3000)
+      pl2 <- ggplot(cpue.yr, aes(x = yy, y = CPUE, colour = Grp)) +
+                    geom_rect(aes(xmin=2008.5, xmax=Inf, ymin=0, ymax=Inf), colour=alpha("wheat1", 0.01), fill=alpha("wheat1", 0.01)) +
+                    geom_vline(xintercept = 2008.5, linetype = 2) +
+                    geom_line(size = 1.8) + geom_point(size = 4) +
+                              scale_colour_manual(values = c("firebrick2","royalblue4","steelblue1")) + xlab("") +
+                              scale_x_continuous(breaks = seq(min(cpue.yr$yy), max(cpue.yr$yy), 1), minor_breaks = NULL, expand = c(0.03,0.03)) +
+                              scale_y_continuous(limits = c(0,NA)) +
+                              theme(legend.title = element_blank(), legend.key.size = unit(0.7, "cm"),
+                                    legend.text = element_text(size = 14), panel.border = element_blank(), axis.line = element_line(color = 'black'),
+                                    axis.title = element_text(size = 14), axis.text = element_text(size = 13))
+      print(pl2)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_CPUE_Year", ".png"), type = "png")
+    dev.off()
+    
+    
+    eff.pl <- eff.yrmth %>% filter(between(yy, yr.range[1], yr.range[2] - 1), SelCol == EZplot)
+    if(nrow(eff.pl) == 0) return()
+    
+    windows(9000,3000)
+      pl3 <- ggplot(eff.pl, aes(x = Yrmth, y = Sets, fill = Grp)) + geom_bar(stat = "identity", position = "stack", colour = "black", width = 1/12) +
+                    scale_fill_manual(values = c("steelblue1","firebrick2","royalblue4","darkred")) + xlab("") +
+                    scale_x_continuous(breaks = seq(min(eff.pl$yy), max(eff.pl$yy), 1), minor_breaks = NULL, expand = c(0.01,0.01)) +
+                    scale_y_continuous(limits = c(0,NA)) +
+                    theme(legend.title = element_blank(), legend.key.size = unit(0.7, "cm"),
+                          legend.text = element_text(size = 14), panel.border = element_blank(),
+                          axis.line = element_line(color = 'black'), panel.grid.major.y = NULL,
+                          panel.grid.major.x = element_line(size=.5, color="black", linetype = 2),
+                          axis.title = element_text(size = 14), axis.text = element_text(size = 14))
+      print(pl3)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_mth_Early", ".png"), type = "png")
+    dev.off()
+    
+    eff.yr <- eff.yrmth %>% filter(between(yy, yr.range[1], yr.range[3]), SelCol == EZplot) %>% group_by(yy, Grp) %>%
+                            summarise(Sets = sum(Sets)) %>% mutate(Grp = factor(Grp, levels = c("UNA Closure","UNA Open","ASS Closure","ASS Open")))
+    
+    eff.mm <- eff.pl %>% group_by(yy, mm, Mon) %>% summarise(Sets = sum(Sets), Catch = sum(Catch))
+    eff.mm$Mon <- factor(eff.mm$Mon, levels = month.abb[1:12])
+    
+    
+    windows(9000,3000)
+      pltmp <- ggplot(eff.mm, aes(x = Mon, y = Sets)) + geom_boxplot(fill = "steelblue") + geom_jitter(width = .15, size = 3, colour = alpha("black", 0.5)) #+ geom_line(aes(colour = factor(yy))) 
+      print(pltmp)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_Effort_Calendar_Late", ".png"), type = "png")
+    dev.off()
+    
+    windows(9000,3000)
+      pl4 <- ggplot(eff.yr, aes(x = yy, y = Sets, fill = Grp)) +
+                    geom_rect(aes(xmin=2008.5, xmax=Inf, ymin=0, ymax=Inf), colour=alpha("wheat1", 0.01), fill=alpha("wheat1", 0.01)) +
+                    geom_vline(xintercept = 2008.5, linetype = 2) +
+                    geom_bar(stat = "identity", position = "stack", colour = "black", width = 0.85) +
+                    scale_fill_manual(values = c("royalblue4","steelblue1","darkred","firebrick2")) + xlab("") +
+                    scale_x_continuous(breaks = seq(min(eff.yr$yy), max(eff.yr$yy), 1), minor_breaks = NULL, expand = c(0.01,0.01)) +
+                    scale_y_continuous(limits = c(0,NA)) +
+                    theme(legend.title = element_blank(), legend.key.size = unit(0.7, "cm"),
+                          legend.text = element_text(size = 14), panel.border = element_blank(),
+                          axis.line = element_line(size=.5, color="black"),
+                          axis.title = element_text(size = 14), axis.text = element_text(size = 13))
+      print(pl4)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_yr_All", ".png"), type = "png")
+    dev.off()
+    
+    
+    eff.yr <- eff.yrmth %>% filter(between(yy, yr.range[1], yr.range[3]), SelCol == EZplot) %>% group_by(yy, school) %>%
+                            summarise(Sets = sum(Sets)) %>% mutate(school = factor(school, levels = c("UNA","ASS")))
+    
+    
+    windows(9000,3000)
+      pl5 <- ggplot(eff.yr, aes(x = yy, y = Sets, fill = school)) +
+                    #geom_rect(aes(xmin=2008.5, xmax=Inf, ymin=0, ymax=1.05), colour=alpha("wheat1", 0.01), fill=alpha("wheat1", 0.01)) +
+                    geom_vline(xintercept = 2008.5, linetype = 2) +
+                    geom_bar(stat = "identity", position = "fill", colour = "black", width = 0.85) +
+                    scale_fill_manual(values = c("royalblue4","firebrick2")) + xlab("") +
+                    scale_x_continuous(breaks = seq(min(eff.yr$yy), max(eff.yr$yy), 1), minor_breaks = NULL, expand = c(0.01,0.01)) +
+                    scale_y_continuous(limits = c(0,NA)) +
+                    theme(legend.title = element_blank(), legend.key.size = unit(0.7, "cm"),
+                          legend.text = element_text(size = 14), panel.border = element_blank(),
+                          axis.line = element_line(size=.5, color="black"),
+                          axis.title = element_text(size = 14), axis.text = element_text(size = 13))
+      print(pl5)
+      savePlot(paste0(base.dir, "Plots/", EZplot, "/", EZplot, sv.name, "_yr_All_Prop", ".png"), type = "png")
+    dev.off()
+    
+    
+    return(list(pl1, pl2, pl3, pl4, pl5))
+  }
+  
+  
+  # Aggregate data
+  for.eez <- lapply(keep.ez, function(x) plot_effort_series(dat = agdat, type = "foreign-eez", yr.range = c(start.yr,fst.yr,last.yr), keep.ez = keep.ez,
+                                                            FADcls = FADcls, EZplot = x, sv.name = "_Agdat_for-eez_2000-Current"))
+  
+  dom.eez <- lapply(keep.ez, function(x) plot_effort_series(dat = agdat, type = "domestic-eez", yr.range = c(start.yr,fst.yr,last.yr), keep.ez = keep.ez,
+                                                            FADcls = FADcls, EZplot = x, sv.name = "_Agdat_dom-eez_2000-Current"))
+  
+  dom.all <- lapply(keep.ez, function(x) plot_effort_series(dat = agdat, type = "domestic-all", yr.range = c(start.yr,fst.yr,last.yr), keep.ez = keep.ez,
+                                                            FADcls = FADcls, EZplot = x, sv.name = "_Agdat_dom-all_2000-Current"))
+  
+
+  # Operational data
+  for.eez <- lapply(keep.ez, function(x) plot_effort_series(dat = opdat, type = "foreign-eez", yr.range = c(start.yr,fst.yr,last.yr), keep.ez = keep.ez,
+                                                            FADcls = FADcls, EZplot = x, sv.name = "_Opdat_for-eez_2000-Current"))
+  
+  dom.eez <- lapply(keep.ez, function(x) plot_effort_series(dat = opdat, type = "domestic-eez", yr.range = c(start.yr,fst.yr,last.yr), keep.ez = keep.ez,
+                                                            FADcls = FADcls, EZplot = x, sv.name = "_Opdat_dom-eez_2000-Current"))
+  
+  dom.all <- lapply(keep.ez, function(x) plot_effort_series(dat = opdat, type = "domestic-all", yr.range = c(start.yr,fst.yr,last.yr), keep.ez = keep.ez,
+                                                            FADcls = FADcls, EZplot = x, sv.name = "_Opdat_dom-all_2000-Current"))
+  
+  
+  

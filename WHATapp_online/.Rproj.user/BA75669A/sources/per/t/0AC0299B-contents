@@ -1,0 +1,1882 @@
+library(ggplot2)
+library(data.table)
+library(scales)
+library(reshape2)
+library(magrittr)
+library(dplyr) 
+library(xtable)
+library(tidyr)
+library(stringr)
+library(grid)
+library(gridExtra)
+library(lubridate)
+library(RColorBrewer)
+library(ggmap)
+library(maps)
+library(mapproj)
+library(colorspace)
+library(scatterpie)
+library(rgdal)
+library(tools)
+library(sf)
+library(readr)
+library(lubridate)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rgeos)
+
+
+  theme_set(theme_bw())
+
+  dirpth <- "C:/HighSeas_Allocation_2020"
+
+
+# Prepare a base map for later plotting
+  mp1 <- fortify(map(fill=TRUE, plot=FALSE))
+  mp2 <- mp1
+  mp2$long <- mp2$long + 360
+  mp2$group <- mp2$group + max(mp2$group) + 1
+  mp <- rbind(mp1, mp2)
+
+  eez <- read.csv(paste0(dirpth, "/Data/EEZ_2016.csv"), header=T)
+  eez <- read.table(file="C:/Phoenix_Isl_Analyses/2019/EZNEW2.txt", header=FALSE, col.names=c("lon","lat"))
+  eez$group <- 1
+  
+  world <- ne_countries(scale = "medium", returnclass = "sf")
+  
+  
+  # Set up country colours
+  cnt.cols <- setNames(c("#FFCC00","#330099","#000000","#FF00CC","#0066FF","#FFFF00","#FFFFCC","#99CC99","#33FF00","#FF6600","#3366FF","#663333","#6699FF","#9966CC","#990000","#CCFFCC","#003200","#CCFFFF","#3333FF","#666666","#FF6600","#99FF33","#CC00FF","#660000","#FF6699","#3300CC","#00CCFF","#00FF99","#CCCC33","#FFFF66","#9999FF","#330000","#6633FF","#FF99FF","#CCFF99","snow2","tan1"),
+                       c("AU", "BZ","CK","CN","EC","EP","ES","FJ","FM","ID","JP","KI","KR","MH","NC","NR","NU","NZ","PF","PG","PH","PT","PW","SB","SN","SU","SV","TO","TV","TW","US","VN","VU","WF","WS","AS","PA"))
+  
+  cnt.codes <- list(cnt=c("AS","AU","CN","CA","CK","EU","FM","FJ","PF","GU","ID","JP","KI","KR","MH","NR","NC","NZ","NU","MP","PW","PG","PH","WS","SB","TW","TK","TO","TV","US","VU","WF"),
+                    nm=c("American Samoa","Australia","China","Canada","Cook Islands","European Union","FSM","Fiji","French Polynesia","Guam","Indonesia","Japan","Kiribati","Korea","Marshall Islands","Nauru","New Caledonia","New Zealand","Niue","Northern Mariana Islands","Palau","Papua New Guinea","Philippines","Samoa","Solomon Islands","Taiwan","Tokelau","Tonga","Tuvalu","US","Vanuatu","Wallis and Futuna"))
+  
+  cnt.switches <- list(old=c("GL","PX","LN","NF","MA","HB","JT","JV","PY","WK","ES","PT"),
+                       new=c("KI","KI","KI","AU","NC","US","US","US","US","US","EU","EU"))
+  
+  HSind <- c("H4","H5","I1","I2","I3","I4","I5","I6","I7","I8","I9","IW")
+  
+  HScoord <- list(lon=c(181,197,140,165,155,185,215,165,195,173,202,130),
+                  lat=c(-4,-5,3.5,-4.5,15,15,-5,28,-25,-15,-14,-28))
+  
+
+#____________________________________________________________________________________________________________  
+# Maps
+  
+  # General map of EEZs
+  # windows(2000,1400)
+  # mapl = ggplot(data = mp, aes(x=long, y=lat, group=group)) +
+  #   scale_x_continuous(limits=c(120, 230)) + # + ggtitle(paste(flags, plotname, sep="   "))
+  #   scale_y_continuous(limits=c(-30, 30)) + coord_equal() +
+  #   #geom_polygon(bnds, mapping=aes(x=x, y=y, group=group), fill=alpha("black", 0.1)) +
+  #   #geom_polygon(bnds1, mapping=aes(x=x, y=y, group=group), fill=alpha("red", 0.1)) +
+  #   #geom_point(data = pl.dat, aes(x = lond, y = latd, group = group, size = Effort), colour=alpha("red", 0.5)) +
+  #   #                                                  colour = Fleet), position=position_jitter(width=2,height=2), alpha = 0.7) +
+  #   #scale_size_continuous(range = c(3, 10)) +
+  #   xlab('Longitude') + ylab('Latitude') + geom_polygon(aes(fill=group)) +
+  #   #geom_path(data=eez, aes(x=lon, y=lat, group=group), colour="blue") + #geom_hline(yintercept=-25, colour="red")
+  #   theme(panel.grid.major=element_blank(),
+  #         panel.grid.minor=element_blank(),
+  #         plot.margin=unit(c(0.2,0.2,0.2,0.2), "cm"))
+  # 
+  # print(mapl)
+  # savePlot(file=paste0(dirpth, "/Plots/Regional_EEZ_map.png"), type = "png")
+  # dev.off()
+  
+
+  windows(2000,1400)
+    mapl <- ggplot() + geom_polygon(data=eez, aes(x=lon, y=lat, group=group), colour="black", fill="grey92") +
+                   geom_sf(data = world, color = "black", fill = "wheat") + ggthemes::theme_few() +
+                   coord_sf(xlim = c(120, 230), ylim = c(-30, 30),  expand = FALSE) +
+                   #  colour = "black",fill = "steelblue",alpha = 0.1) +
+                   #geom_polygon(data = assreg[assreg$ID == regref, ],aes(x = lon,y = lat,group = ID,fill = ID),colour = "black",fill = "steelblue",alpha = 0.5) +
+                   theme(panel.border = element_blank(), axis.title = element_blank(),axis.text = element_blank(),axis.ticks = element_blank())
+    print(mapl)
+    savePlot(file=paste0(dirpth, "/Plots/Regional_EEZ_map.png"), type = "png")
+  dev.off()
+  
+  
+  # Maps of PS effort distribution
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_RAISED_1X1_PACIFIC.txt"), header=TRUE, sep=",")
+  dat <- dat[!(dat$lond > 210 & dat$lat > -4),]
+  
+  
+  plot.ps.eff.map = function(year=2016, rpnse="effort", lmts=c(0,1500), brks=c(10,100,500,1500)){
+    
+    if(rpnse == "effort"){
+      dat$rpnse <- dat$stdeff
+    } else {
+      dat$rpnse <- dat$bet_mt + dat$skj_mt + dat$yft_mt
+    }
+    
+    pl.dat <- dat %>% group_by(yy, lond, latd) %>% summarise(Res=sum(rpnse)) %>% filter(yy == year) %>% mutate(group=1)
+    
+    windows(2000,1400)
+      pl <- mapl + geom_point(data = pl.dat, aes(x = lond, y = latd, group = group, size = Res), colour=alpha("red", 0.5)) +
+                   scale_size_continuous(range=c(0.1,7), limits=lmts, breaks=brks) + ggtitle(paste("PS", rpnse, year))
+      print(pl)
+      savePlot(paste0(dirpth, "/Plots/PS_Regional_EEZ_map_", rpnse, "_", year, ".png"), type="png")
+    dev.off()
+    
+  }
+  
+  
+  lapply(2010:2019, function(x) plot.ps.eff.map(x, rpnse="effort", lmts=c(0,800), brks=c(10,50,200,500)))
+  lapply(2010:2019, function(x) plot.ps.eff.map(x, rpnse="catch", lmts=c(0,20000), brks=c(100,1000,5000,15000)))
+  
+  
+#____________________________________________________________________________________________________________  
+# High seas maps  
+
+  base.dir <- "C:/GitHub/WHATapp/EEZs"
+  
+  cnt.keep <- read.csv(file=paste0(base.dir, "/Data/PacCountries.csv"), header=TRUE)
+  
+  eez <- st_read(paste0(base.dir, "/Data/World_EEZ_Files/World_EEZ_v10_2018_0_360.shp"))
+  
+  area.df <- data.frame(Cnt=eez$Territory1, Area=eez$Area_km2)
+  write.csv(area.df, file=paste0(base.dir, "/Data/EEZ_areas.csv"), row.names=FALSE)
+  
+  arch <- st_read(paste0(base.dir, "/Data/World_Arch_Files/eez_archipelagic_waters_v2_2018_0_360.shp"))
+  
+  land <- st_read(paste0(base.dir, "/Data/EEZ_land_union/EEZ_land_v2_201410.shp"))
+  
+  wcarea <- c("POLYGON((114 35,210 35,210 -4,230 -4,230 -35,114 -35,114 35))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE)  
+  I1 <- c("POLYGON((135 0,135 7,155 7,155 0,135 0))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE)    
+  I2 <- c("POLYGON((153 -4,170 -12,178 -12,178 0,163 10,153 -4))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE)  
+  I3 <- c("POLYGON((124 20,175 20,175 7,168 15,160 12,158 8,144 10,135 10,129 6,124 20))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE)  
+  I4 <- c("POLYGON((175 20,190 20,190 0,175 0,175 20))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE)  
+  I5 <- c("POLYGON((190 20,200 20,205 18,208 20,210 20,210 -4,230 -4,230 -20,225 -20, 203 -7,203 0,190 0,190 20))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE) 
+  I6 <- c("POLYGON((124 20,127 24,140 35,210 35,210 20,124 20))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE) 
+  I7 <- c("POLYGON((155 -18,168 -25,180 -21,190 -18,200 -20,225 -20,230 -20,230 -35,155 -35,155 -18))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE) 
+  I8 <- c("POLYGON((170 -12,175 -12,175 -20,170 -20, 170 -12))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE) 
+  I9 <- c("POLYGON((198 -10,205 -10,205 -20,198 -20,198 -10))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE) 
+  H4 <- c("POLYGON((177 0,185 0,185 -12,177 -12,177 0))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE)  
+  H5 <- c("POLYGON((190 0,203 0,203 -10,190 -10,190 0))") %>% st_as_sfc(crs=st_crs(eez)) %>% st_sf(field=c('x','y'), geoms = ., stringsAsFactors=FALSE) 
+  
+  windows(2100,1400)
+    hspl <- ggplot()  + geom_sf(data=wcarea, fill=alpha("wheat", 0.7)) + geom_sf(data=I1, fill=alpha("dodgerblue", 0.6)) + geom_sf(data=I2, fill=alpha("firebrick2", 0.6)) +
+                   geom_sf(data=I3, fill=alpha("forestgreen", 0.6)) + geom_sf(data=I4, fill=alpha("orange1", 0.6)) +  geom_sf(data=I5, fill=alpha("magenta", 0.6)) +
+                   geom_sf(data=I6, fill=alpha("lightblue1", 0.6)) +  geom_sf(data=I7, fill=alpha("darkseagreen1", 0.6)) + geom_sf(data=I8, fill=alpha("mediumpurple1", 0.6)) + 
+                   geom_sf(data=I9, fill=alpha("yellow", 0.6)) + geom_sf(data=H4, fill=alpha("chocolate4", 0.6)) + geom_sf(data=H5, fill=alpha("chartreuse3", 0.6)) + 
+                   geom_sf(data=eez, fill=grey(0.9)) + xlab("") + ylab("") +
+                   annotate("text", x=HScoord$lon[1], y=HScoord$lat[1], label=HSind[1], size=7) + annotate("text", x=HScoord$lon[2], y=HScoord$lat[2], label=HSind[2], size=7) + annotate("text", x=HScoord$lon[3], y=HScoord$lat[3], label=HSind[3], size=7) + annotate("text", x=HScoord$lon[4], y=HScoord$lat[4], label=HSind[4], size=7) +
+                   annotate("text", x=HScoord$lon[5], y=HScoord$lat[5], label=HSind[5], size=7) + annotate("text", x=HScoord$lon[6], y=HScoord$lat[6], label=HSind[6], size=7) + annotate("text", x=HScoord$lon[7], y=HScoord$lat[7]-2, label=HSind[7], size=7) + annotate("text", x=HScoord$lon[8], y=HScoord$lat[8], label=HSind[8], size=7) +
+                   annotate("text", x=HScoord$lon[9], y=HScoord$lat[9]-5, label=HSind[9], size=7) + annotate("text", x=HScoord$lon[10], y=HScoord$lat[10], label=HSind[10], size=7) + annotate("text", x=HScoord$lon[11], y=HScoord$lat[11], label=HSind[11], size=7) +
+                   theme(legend.position="none", axis.text=element_text(size=14)) + coord_sf(xlim=c(120,230), ylim=c(-30,30))
+    print(hspl)
+    savePlot(file=paste0(dirpth, "/Plots/Pacific_EEZs.png"), type="png")
+  dev.off()
+  
+  
+#____________________________________________________________________________________________________________    
+  # Pie chart of HS effort for PS fisheries
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",")
+  year <- 2015:2019
+  
+  
+  # Construct map of effort by flag in each high seas zone
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Days=sum(days)) %>% filter(eez %in% HSind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HSind)
+  pl.dat$lond <- HScoord$lon[tmpmat]
+  pl.dat$latd <- HScoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Days)
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  hspl <- ggplot()  + geom_sf(data=wcarea, fill=alpha("wheat", 0.3)) + geom_sf(data=I1, fill=alpha("dodgerblue", 0.1)) + geom_sf(data=I2, fill=alpha("firebrick2", 0.1)) +
+                 geom_sf(data=I3, fill=alpha("forestgreen", 0.1)) + geom_sf(data=I4, fill=alpha("orange1", 0.1)) +  geom_sf(data=I5, fill=alpha("magenta", 0.1)) +
+                 geom_sf(data=I6, fill=alpha("lightblue1", 0.1)) +  geom_sf(data=I7, fill=alpha("darkseagreen1", 0.1)) + geom_sf(data=I8, fill=alpha("mediumpurple1", 0.1)) + 
+                 geom_sf(data=I9, fill=alpha("yellow", 0.1)) + geom_sf(data=H4, fill=alpha("chocolate4", 0.1)) + geom_sf(data=H5, fill=alpha("chartreuse3", 0.1)) + 
+                 geom_sf(data=eez, fill=grey(0.95)) + guides(fill=guide_legend(nrow=1)) +
+                 theme(legend.position="bottom") + coord_sf(xlim=c(120,230), ylim=c(-30,30))
+  
+
+  windows(2100,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/400), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("PS High seas effort per year (1,000's Days) by flag - mean 2015-2019") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 32)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/400, x=210, y=20, labeller=function(x) x/2.5)
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS_Piechart_PS_Days.png"), type="png")
+  dev.off()
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(sel_mt)) %>% filter(eez %in% HSind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HSind)
+  pl.dat$lond <- HScoord$lon[tmpmat]
+  pl.dat$latd <- HScoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp[is.na(pl.tmp)] <- 0.1
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/10000), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("PS High seas catch per year (10,000's mt) by flag - mean 2015-2019") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 32)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/10000, x=210, y=20, labeller=function(x) x)
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS_Piechart_PS_Catch.png"), type="png")
+  dev.off()
+  
+
+#____________________________________________________________________________________________________________    
+# Table of recent high seas effort in different areas by flag
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  
+  #___________________________________
+  # Days fished
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Days=sum(days))
+  
+  
+  windows(4000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Days, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal_AllZones.png"), type="png")
+  dev.off()
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Days=sum(days))
+  
+  
+  windows(5000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Days, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished") +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=1)) + scale_y_continuous(limits=c(0,10000)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=14), axis.title=element_text(size=16))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal_AllZonesAggregated.png"), type="png")
+  dev.off()
+  
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Days=sum(days))
+  dat.hs %<>% filter(Flag != "PH")
+  
+  windows(5000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Days, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished") +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=1)) + scale_y_continuous(limits=c(0,10000)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=14), axis.title=element_text(size=16))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal_AllZonesAggregated-PH.png"), type="png")
+  dev.off()
+  
+  
+  tmp.FFA <- c("CK","FM","KI","MH","NR","NZ","PG","SB","TV","VU")
+  
+  dat.hs %<>% mutate(Grp=ifelse(Flag %in% tmp.FFA, "FFA", "OTH")) %>% group_by(Year, Grp) %>% summarise(Days=sum(Days))
+  
+  windows(5000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Days, fill=Grp)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished") + geom_text(aes(label=round(Days)), size=5, position = position_stack(vjust = 0.5)) +
+                 scale_fill_manual(values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) + scale_y_continuous(limits=c(0,10000)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=14), axis.title=element_text(size=16))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal_AllZonesAggregated-PH-FFAvsOTH.png"), type="png")
+  dev.off()
+  
+  
+  # Now just the important ones
+  HS.tmp <- c("H4","H5","I1","I2","I4","I5","I6")   # Only keep the ones with any real fishing for the plot
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HS.tmp) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Days=sum(days))
+  
+  
+  windows(4000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Days, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal.png"), type="png")
+  dev.off()
+  
+  
+  # Tables
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Days=round(sum(days)))
+  
+  
+  print.ps.tab <- function(zne="H4", dat.tab=dat.hs){
+    
+    dat.tab %<>% filter(EEZ == zne) %>% as.data.frame %>% select(-EEZ)
+    
+    tab.hs <- dat.tab %>% spread(Year, Days)
+    tab.hs[is.na(tab.hs)] <- 0
+    tab.hs <- tab.hs[rowSums(tab.hs[,-1]) > 0,]
+    
+    pr.xtab <- xtable(tab.hs, align=rep("c", dim(tab.hs)[2] + 1), label=paste0("tab:", zne), digits=0,
+                      caption=paste0("Days fished by purse seining in high seas area ", zne, ", separated by flag of vessel."))
+    print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Days_HSzones_All_", zne,".tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="footnotesize", caption.placement="top")
+    
+    return(tab.hs)
+  }
+  
+  # Tables of days fished for each high seas zone separately
+  sil <- lapply(HSind[HSind != "IW"], function(x) print.ps.tab(x, dat.tab=dat.hs))
+  
+  
+  write.csv(sil[[3]], file=paste0(dirpth, "/Plots/PS_Days_HSP1_2010-byflag.csv"), row.names = FALSE)   # Save a .csv of the days fished in HSP1 by flag
+  
+  
+  # Now table for overall days fished - all high seas areas
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Days=round(sum(days)))
+  
+  tab.all <- dat.all %>% spread(Year, Days)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  
+  
+  pr.xtab <- xtable(tab.all, align=rep("c", dim(tab.all)[2] + 1), label="tab:1", digits=0,
+                    caption="Days fished by purse seining aggregated over all high seas areas, separated by flag of vessel.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Days_HSzones_All.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="footnotesize", caption.placement="top")
+
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/PS_Days_HSzones_All.csv"), row.names = FALSE)
+  
+  
+  # Now flag-based table for overall days fished - all high seas areas - but separated into by zone 20S-20N etc.
+  dat.20.N <- dat %>% filter(yy >= 2010, eez == "I6") %>% group_by(Year=yy, Flag=flag) %>% summarise(Days=round(sum(days)))
+  
+  tab.20.N <- dat.20.N %>% spread(Year, Days)
+  tab.20.N[is.na(tab.20.N)] <- 0
+  tab.20.N <- tab.20.N[rowSums(tab.20.N[,-1]) > 0,]
+  tab.20.N$Zone <- c("N of 20N", rep("", dim(tab.20.N)[1]-1))
+  tab.20.N %<>% select(Zone, everything())
+  
+  dat.20.S <- dat %>% filter(yy >= 2010, eez == "I7") %>% group_by(Year=yy, Flag=flag) %>% summarise(Days=round(sum(days))) #%>% expand(Year=2010:9, Flag)
+  #dat.20.S <- rbind(dat.20.S, data.frame(Year=c(2010,2013,2014,2016:2019), Flag=as.character("NZ"), Days=0))
+  
+  dat.20.S <- left_join(data.frame(Year=rep(2010:2019,2), Flag=rep(c("NZ","US"), c(10,10))), dat.20.S, by=c("Year","Flag"))
+  
+  tab.20.S <- dat.20.S %>% spread(Year, Days)
+  tab.20.S[is.na(tab.20.S)] <- 0
+  tab.20.S <- tab.20.S[rowSums(tab.20.S[,-1]) > 0,] 
+  tab.20.S$Zone <- c("S of 20S", rep("", dim(tab.20.S)[1]-1))
+  tab.20.S %<>% select(Zone, everything())
+  
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind[-match(c("I6","I7"), HSind)]) %>% group_by(Year=yy, Flag=flag) %>% summarise(Days=round(sum(days)))
+  
+  tab.all <- dat.all %>% spread(Year, Days)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  tab.all$Zone <- c("20S to 20N", rep("", dim(tab.all)[1]-1))
+  tab.all %<>% select(Zone, everything())
+  
+  tab.all.zn <- rbind(tab.20.N, tab.all, tab.20.S) %>% as.data.frame
+  
+  pr.xtab <- xtable(tab.all.zn, align=rep("c", dim(tab.all.zn)[2] + 1), label="tab:1", digits=0,
+                    caption="Days fished by purse seining aggregated over all high seas areas, in 3 zones (north of 20N, between 20S and 20N, south of 20S), separated by flag of vessel.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Days_HSzones_All_Zones.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="footnotesize", caption.placement="top")
+   
+  write.csv(tab.all.zn, file=paste0(dirpth, "/Plots/PS_Days_HSzones_All_Zones.csv"), row.names = FALSE)
+
+  
+  #___________________________________
+  # Catch
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(sel_mt))
+  
+  
+  windows(4000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Catch") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title = element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal_AllZones_Catch.png"), type="png")
+  dev.off()
+  
+  
+  # Now just the important ones
+  HS.tmp <- c("H4","H5","I1","I2","I4","I5","I6")   # Only keep the ones with any real fishing for the plot
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HS.tmp) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(sel_mt))
+  
+  
+  windows(4000,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Catch") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title = element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_HS_Temporal_Catch.png"), type="png")
+  dev.off()
+  
+  
+  # Tables
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=round(sum(sel_mt)))
+  
+  
+  print.ps.tab <- function(zne="H4", dat.tab=dat.hs){
+    
+    dat.tab %<>% filter(EEZ == zne) %>% as.data.frame %>% select(-EEZ)
+    
+    tab.hs <- dat.tab %>% spread(Year, Catch)
+    tab.hs[is.na(tab.hs)] <- 0
+    tab.hs <- tab.hs[rowSums(tab.hs[,-1]) > 0,]
+    
+    pr.xtab <- xtable(tab.hs, align=rep("c", dim(tab.hs)[2] + 1), label=paste0("tab:", zne), digits=0,
+                      caption=paste0("Purse seine catch in high seas area ", zne, ", separated by flag of vessel."))
+    print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All_", zne,".tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="footnotesize", caption.placement="top")
+    
+  }
+  
+  
+  # Tables of days fished for each high seas zone separately
+  sil <- lapply(HSind[HSind != "IW"], function(x) print.ps.tab(x, dat.tab=dat.hs))
+  
+  
+  
+  # Now table for overall catch - all high seas areas
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(sel_mt)))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  
+  
+  pr.xtab <- xtable(tab.all, align=rep("c", dim(tab.all)[2] + 1), label="tab:1", digits=0,
+                    caption="Purse seine catch aggregated over all high seas areas, separated by flag of vessel.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="footnotesize", caption.placement="top")
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All.csv"), row.names = FALSE)
+  
+
+  # Now flag-based table for overall catch - all high seas areas - but separated into by zone 20S-20N etc.
+  dat.20.N <- dat %>% filter(yy >= 2010, eez == "I6") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(sel_mt)))
+  
+  tab.20.N <- dat.20.N %>% spread(Year, Catch)
+  tab.20.N[is.na(tab.20.N)] <- 0
+  tab.20.N <- tab.20.N[rowSums(tab.20.N[,-1]) > 0,]
+  tab.20.N$Zone <- c("N of 20N", rep("", dim(tab.20.N)[1]-1))
+  tab.20.N %<>% select(Zone, everything())
+  
+  dat.20.S <- dat %>% filter(yy >= 2010, eez == "I7") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(sel_mt))) #%>% expand(Year=2010:2019, Flag)
+  #dat.20.S <- rbind(dat.20.S, data.frame(Year=c(2010,2013,2014,2016:2018), Flag=as.character("NZ"), Days=0))
+  
+  dat.20.S <- left_join(data.frame(Year=rep(2010:2019,2), Flag=rep(c("NZ","US"), c(10,10))), dat.20.S, by=c("Year","Flag"))
+  
+  tab.20.S <- dat.20.S %>% spread(Year, Catch)
+  tab.20.S[is.na(tab.20.S)] <- 0
+  tab.20.S <- tab.20.S[rowSums(tab.20.S[,-1]) > 0,] 
+  tab.20.S$Zone <- c("S of 20S", rep("", dim(tab.20.S)[1]-1))
+  tab.20.S %<>% select(Zone, everything())
+  
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind[-match(c("I6","I7"), HSind)]) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(sel_mt)))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  tab.all$Zone <- c("20S to 20N", rep("", dim(tab.all)[1]-1))
+  tab.all %<>% select(Zone, everything())
+  
+  tab.all.zn <- rbind(tab.20.N, tab.all, tab.20.S) %>% as.data.frame
+  
+  pr.xtab <- xtable(tab.all.zn, align=rep("c", dim(tab.all.zn)[2] + 1), label="tab:1", digits=0,
+                    caption="Total catch of tuna by purse seining aggregated over all high seas areas, in 3 zones (north of 20N, between 20S and 20N, south of 20S), separated by flag of vessel.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All_Zones.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="footnotesize", caption.placement="top")
+  
+  write.csv(tab.all.zn, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All_Zones.csv"), row.names = FALSE)
+  
+  
+  
+  
+  #___________________________________
+  # Separated by species
+  
+  # Skipjack
+  
+  # Now flag-based table for overall catch - all high seas areas - but separated into by zone 20S-20N etc.
+  dat.20.N <- dat %>% filter(yy >= 2010, eez == "I6") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(skj_mt)))
+  
+  tab.20.N <- dat.20.N %>% spread(Year, Catch)
+  tab.20.N[is.na(tab.20.N)] <- 0
+  tab.20.N <- tab.20.N[rowSums(tab.20.N[,-1]) > 0,]
+  tab.20.N$Zone <- c("N of 20N", rep("", dim(tab.20.N)[1]-1))
+  tab.20.N %<>% select(Zone, everything())
+  
+  dat.20.S <- dat %>% filter(yy >= 2010, eez == "I7") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(skj_mt))) #%>% expand(Year=2010:2019, Flag)
+  #dat.20.S <- rbind(dat.20.S, data.frame(Year=c(2010,2013,2014,2016:2018), Flag=as.character("NZ"), Days=0))
+  
+  dat.20.S <- left_join(data.frame(Year=rep(2010:2019,2), Flag=rep(c("NZ","US"), c(10,10))), dat.20.S, by=c("Year","Flag"))
+  
+  tab.20.S <- dat.20.S %>% spread(Year, Catch)
+  tab.20.S[is.na(tab.20.S)] <- 0
+  tab.20.S <- tab.20.S[rowSums(tab.20.S[,-1]) > 0,] 
+  tab.20.S$Zone <- c("S of 20S", rep("", dim(tab.20.S)[1]-1))
+  tab.20.S %<>% select(Zone, everything())
+  
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind[-match(c("I6","I7"), HSind)]) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(skj_mt)))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  tab.all$Zone <- c("20S to 20N", rep("", dim(tab.all)[1]-1))
+  tab.all %<>% select(Zone, everything())
+  
+  tab.all.zn <- rbind(tab.20.N, tab.all, tab.20.S) %>% as.data.frame
+  
+  write.csv(tab.all.zn, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All_Zones_SKJ.csv"), row.names = FALSE)
+  
+  
+  
+  # Bigeye
+  
+  # Now flag-based table for overall catch - all high seas areas - but separated into by zone 20S-20N etc.
+  dat.20.N <- dat %>% filter(yy >= 2010, eez == "I6") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(bet_mt)))
+  
+  tab.20.N <- dat.20.N %>% spread(Year, Catch)
+  tab.20.N[is.na(tab.20.N)] <- 0
+  tab.20.N <- tab.20.N[rowSums(tab.20.N[,-1]) > 0,]
+  tab.20.N$Zone <- c("N of 20N", rep("", dim(tab.20.N)[1]-1))
+  tab.20.N %<>% select(Zone, everything())
+  
+  dat.20.S <- dat %>% filter(yy >= 2010, eez == "I7") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(bet_mt))) #%>% expand(Year=2010:2019, Flag)
+  #dat.20.S <- rbind(dat.20.S, data.frame(Year=c(2010,2013,2014,2016:2018), Flag=as.character("NZ"), Days=0))
+  
+  dat.20.S <- left_join(data.frame(Year=rep(2010:2019,2), Flag=rep(c("NZ","US"), c(10,10))), dat.20.S, by=c("Year","Flag"))
+  
+  tab.20.S <- dat.20.S %>% spread(Year, Catch)
+  tab.20.S[is.na(tab.20.S)] <- 0
+  tab.20.S <- tab.20.S[rowSums(tab.20.S[,-1]) > 0,] 
+  tab.20.S$Zone <- c("S of 20S", rep("", dim(tab.20.S)[1]-1))
+  tab.20.S %<>% select(Zone, everything())
+  
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind[-match(c("I6","I7"), HSind)]) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(bet_mt)))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  tab.all$Zone <- c("20S to 20N", rep("", dim(tab.all)[1]-1))
+  tab.all %<>% select(Zone, everything())
+  
+  tab.all.zn <- rbind(tab.20.N, tab.all, tab.20.S) %>% as.data.frame
+  
+  write.csv(tab.all.zn, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All_Zones_BET.csv"), row.names = FALSE)
+  
+  
+  # Yellowfin
+  
+  # Now flag-based table for overall catch - all high seas areas - but separated into by zone 20S-20N etc.
+  dat.20.N <- dat %>% filter(yy >= 2010, eez == "I6") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(yft_mt)))
+  
+  tab.20.N <- dat.20.N %>% spread(Year, Catch)
+  tab.20.N[is.na(tab.20.N)] <- 0
+  tab.20.N <- tab.20.N[rowSums(tab.20.N[,-1]) > 0,]
+  tab.20.N$Zone <- c("N of 20N", rep("", dim(tab.20.N)[1]-1))
+  tab.20.N %<>% select(Zone, everything())
+  
+  dat.20.S <- dat %>% filter(yy >= 2010, eez == "I7") %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(yft_mt))) #%>% expand(Year=2010:2019, Flag)
+  #dat.20.S <- rbind(dat.20.S, data.frame(Year=c(2010,2013,2014,2016:2018), Flag=as.character("NZ"), Days=0))
+  
+  dat.20.S <- left_join(data.frame(Year=rep(2010:2019,2), Flag=rep(c("NZ","US"), c(10,10))), dat.20.S, by=c("Year","Flag"))
+  
+  tab.20.S <- dat.20.S %>% spread(Year, Catch)
+  tab.20.S[is.na(tab.20.S)] <- 0
+  tab.20.S <- tab.20.S[rowSums(tab.20.S[,-1]) > 0,] 
+  tab.20.S$Zone <- c("S of 20S", rep("", dim(tab.20.S)[1]-1))
+  tab.20.S %<>% select(Zone, everything())
+  
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind[-match(c("I6","I7"), HSind)]) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=round(sum(yft_mt)))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  tab.all$Zone <- c("20S to 20N", rep("", dim(tab.all)[1]-1))
+  tab.all %<>% select(Zone, everything())
+  
+  tab.all.zn <- rbind(tab.20.N, tab.all, tab.20.S) %>% as.data.frame
+  
+  write.csv(tab.all.zn, file=paste0(dirpth, "/Plots/PS_Catch_HSzones_All_Zones_YFT.csv"), row.names = FALSE)
+  
+  
+  
+  
+  
+  
+#____________________________________________________________________________________________________________    
+# Investigation of overlap area effort using raised PS data
+  
+  # dat <- read.table(file=paste0(dirpth, "/Data/PS_RAISED_OVERLAP-AREA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  # 
+  # dattab <- dat %>% filter(yy >= 2010, yy < 2020) %>% mutate(flag = ifelse(flag == "ES", "EU", flag)) %>% group_by(yy, flag) %>% summarise(Days = round(sum(days))) %>% pivot_wider(names_from = yy, values_from = Days)
+  # 
+  # dattab[is.na(dattab)] <- 0
+  # 
+  # write.csv(dattab, file=paste0(dirpth, "/Plots/PS_Days_OverlapArea_2010-19.csv"), row.names = FALSE)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+#____________________________________________________________________________________________________________    
+# Purse seine operational logsheet data    
+  
+  act.codes <- read.csv("C:/References/Database_Codes/Purse_Seine_Activity_codes.csv", header=TRUE, stringsAsFactors=FALSE)
+  
+  school.cds <- data.frame(sht = 0:9,
+                           lng = c("NoInfo","Unass","Baitfish","Log","DriftFAD","AnchFAD","Whale","WhlShk","Other","OldWhlorShk"))
+  
+  ASSvec <- c(3:7,9)
+  load(paste0(dirpth, "/Data/OPPS_EEZ_DATA.RData"), verbose=TRUE)      # Load set-level operational PS data
+  load(paste0(dirpth, "/Data/OPPS_EEZ_TRIP-DATA.RData"), verbose=TRUE) # Load trip-level operational PS data  
+  
+  
+  opdat %<>% mutate(latd=as.numeric(substring(lat_long, 1, 2)), latd=latd+as.numeric(substring(lat_long, 3, 8))/60, latd=ifelse(substring(lat_long, 9, 9) == "S", -1 * latd, latd),
+                    lond=as.numeric(substring(lon_long, 1, 3)), lond=lond+as.numeric(substring(lon_long, 4, 9))/60, lond=ifelse(substring(lon_long, 10, 10) == 'W', 360-lond, lond),
+                    lubdt=ymd(logdate), yy = year(lubdt), mm = month(lubdt), dd = day(lubdt), yrqtr = yy + (mm - .5)/12)
+  
+  opdat$school <- school.cds$lng[match(opdat$sch_id, school.cds$sht)]
+  
+  opps <- left_join(opdat, opdat_trip, by="trip_id", suffix=c("","y")) %>% mutate(ez_rep=ifelse(ez_id %in% c("GL","PX","LN"), "KI", as.character(ez_id)))
+  
+  opps$activity <- act.codes$Description[match(opps$s_act_id, act.codes$ID)]
+  
+  opps[] <- lapply(opps, function(x) if (is.factor(x)) as.character(x) else {x})
+  
+  
+  OVdat <- opps %>% filter(yy >= 2010, lond >= 210, lond < 230, latd < -4, latd > -50, activity %in% c("Fishing","Searching"), ez_id == "I5")
+  
+  OVdays <- OVdat %>% group_by(yy, flag_id, logdate, boat_id) %>% summarise(tmpDay = n()) %>% group_by(yy, flag_id) %>% summarise(Days = n()) %>%
+                      pivot_wider(names_from = yy, values_from = Days)
+  
+  OVdays[is.na(OVdays)] <- 0
+  
+  write.csv(OVdays, file=paste0(dirpth, "/Plots/PS_Days_OverlapArea_2010-19.csv"), row.names = FALSE)
+  
+  
+  
+  
+
+#____________________________________________________________________________________________________________    
+# 
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Days=sum(days), Catch=sum(sel_mt)) %>% mutate(Type=ifelse(EEZ %in% HSind, "HS", "EEZ"))
+  
+  EEZn <- c("CN","I6","JP","KR")
+  EEZe <- c("AS","CK","FJ","FM","GL","GU","H4","H5","HB","I1","I2","I3","I4","I5","I8","I9","ID","IW","JV","LN","MA","MH","MP","NC","NF","NR","NU","PF","PG","PH","PW","PX","PY","SB","TK","TO","TV","VN","VU","WF","WK","WS")
+  EEZs <- c("AU","I7","NZ")
+  
+  dat.hs$Zone <- ifelse(dat.hs$EEZ %in% EEZn, "North", "Equatorial")
+  dat.hs$Zone <- ifelse(dat.hs$EEZ %in% EEZs, "South", dat.hs$Zone)
+  
+  
+  # Now generic plots which just separate EEZs from HS areas
+  dat.sum <- dat.hs %>% group_by(Year, Type, Zone) %>% summarise(Days=sum(Days), Catch=sum(Catch))
+  dat.sum$Zone <- factor(dat.sum$Zone, levels=c("North","Equatorial","South"))
+  dat.sum$Type <- factor(dat.sum$Type, levels=c("HS","EEZ"))
+  
+  
+  # Days fished
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Days/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished (1,000's)") + facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_EEZvsHS_Days_Nofreey.png"), type="png")
+  dev.off()
+  
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Days/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Days fished (1,000's)") + facet_wrap(~ Zone, ncol=1, scales="free_y") +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_EEZvsHS_Days_Freey.png"), type="png")
+  dev.off()
+  
+  
+  # Catch
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Catch/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Catch (1,000's mt)") + facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_EEZvsHS_Catch_Nofreey.png"), type="png")
+  dev.off()
+  
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Catch/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Catch (1,000's mt)") + facet_wrap(~ Zone, ncol=1, scales="free_y") +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/PS_ANNCATEST_EEZvsHS_Catch_Freey.png"), type="png")
+  dev.off()
+  
+  
+  
+  
+  dat.tab <- dat.hs %>% group_by(Year, EEZ, Type, Zone) %>% summarise(Days=sum(Days), Catch=sum(Catch))
+  
+  # Days fished
+  # North of 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "North") %>% select(-Zone)
+  dat.days <- dat.tmp %>% select(-Catch) %>% spread(Year, Days) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.days, align=rep("c", dim(dat.days)[2] + 1), label="tab:1", digits=0,
+                    caption="Days fished in EEZs and high seas areas north of 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Days_By_EEZ_20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # 20S to 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "Equatorial") %>% select(-Zone)
+  dat.days <- dat.tmp %>% select(-Catch) %>% spread(Year, Days) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.days, align=rep("c", dim(dat.days)[2] + 1), label="tab:1", digits=0,
+                    caption="Days fished in EEZs and high seas areas between 20S and 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Days_By_EEZ_20S-20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # South of 20S
+  dat.tmp <- dat.tab %>% filter(Zone == "South") %>% select(-Zone)
+  dat.days <- dat.tmp %>% select(-Catch) %>% spread(Year, Days) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.days, align=rep("c", dim(dat.days)[2] + 1), label="tab:1", digits=0,
+                    caption="Days fished in EEZs and high seas areas south of 20S.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Days_By_EEZ_20S.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # Catch
+  # North of 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "North") %>% select(-Zone)
+  dat.cat <- dat.tmp %>% select(-Days) %>% spread(Year, Catch) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Catch in EEZs and high seas areas north of 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Catch_By_EEZ_20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # 20S to 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "Equatorial") %>% select(-Zone)
+  dat.cat <- dat.tmp %>% select(-Days) %>% spread(Year, Catch) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Catch in EEZs and high seas areas between 20S and 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Catch_By_EEZ_20S-20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # South of 20S
+  dat.tmp <- dat.tab %>% filter(Zone == "South") %>% select(-Zone)
+  dat.cat <- dat.tmp %>% select(-Days) %>% spread(Year, Catch) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Catch in EEZs and high seas areas south of 20S.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/PS_Catch_By_EEZ_20S.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+#____________________________________________________________________________________________________________    
+# CPUE analyses
+  
+  eez.keep <- c(HS.tmp,"CK","FM","GL","LN","MH","NR","PG","PW","PX","SB","TK","TV")
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  # Overall aggregate (2010-2019) CPUE plot
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% eez.keep) %>% group_by(EEZ=eez) %>% summarise(Days=sum(days), Catch=sum(sel_mt)) %>%
+                    mutate(CPUE=Catch/Days) %>% arrange(desc(CPUE))
+  
+  dat.hs$Type <- ifelse(dat.hs$EEZ %in% HS.tmp, "HS", "EEZ")
+  
+  dat.hs$EEZ <- factor(dat.hs$EEZ, levels=dat.hs$EEZ)
+  
+
+  windows(6000,4000)
+    plyrs <- ggplot(dat.hs, aes(x=EEZ, y=CPUE, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black", width=0.95) +
+                    xlab("EEZ") + ylab("CPUE (mt per day)") + scale_y_continuous(expand = c(0, 0, 0.1, 0), labels=comma, breaks=pretty_breaks(4)) +
+                    scale_fill_manual(name="Type", values=c("dodgerblue","firebrick2")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+                    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position=c(0.9,0.8), legend.text=element_text(size=10),
+                          axis.text=element_text(size=12), axis.title=element_text(size=14), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(plyrs)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_AllYrs.png"), type="png")
+  dev.off()
+  
+  
+  # Now individual years plot 2013-2019
+  dat.annual <- dat %>% filter(yy >= 2014, eez %in% eez.keep) %>% group_by(Year=yy, EEZ=eez) %>% summarise(Days=sum(days), Catch=sum(sel_mt)) %>%
+                        mutate(CPUE=Catch/Days) #%>% arrange(Year, desc(CPUE)) %>% mutate(ord=row_number())
+  
+  dat.annual$Type <- ifelse(dat.annual$EEZ %in% HS.tmp, "HS", "EEZ")
+  
+  dat.annual %<>% ungroup() %>% arrange(Year, desc(CPUE)) %>% mutate(ord=row_number())
+  
+  dat.annual$nm <- dat.annual$EEZ
+  
+  tmp.cols <- setNames(ifelse(dat.annual$EEZ %in% HS.tmp, "firebrick2", "dodgerblue"),
+                       dat.annual$nm)
+  
+  windows(6000,5000)
+    pl.an <- ggplot(dat.annual, aes(x=ord, y=CPUE, fill=nm)) + geom_bar(stat="identity", colour="black", width=1) +
+                    xlab("EEZ") + ylab("CPUE (mt per day)") + scale_y_continuous(expand = c(0, 0, 0.1, 0), labels=comma, breaks=pretty_breaks(4)) + facet_wrap(~ Year, ncol=2, scales="free") +
+                    #scale_fill_manual(name="Type", values=c("dodgerblue","firebrick2")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+      scale_fill_manual(name="nm", values=tmp.cols) + 
+      scale_x_continuous(breaks=dat.annual$ord, labels=dat.annual$nm, expand = c(0,0)) +              
+                    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="none",
+                    axis.text=element_text(size=9), axis.title=element_text(size=14))
+    print(pl.an)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_IndYrs.png"), type="png")
+  dev.off()
+  
+
+  plyrs <- plyrs + theme(panel.border=element_rect(size=2))
+  
+  lay.mat <- rbind(c(NA,1,1,1,1,1,1,NA),
+                   c(NA,1,1,1,1,1,1,NA),
+                   c(NA,1,1,1,1,1,1,NA),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2))
+  
+  
+  windows(8000,8000)
+    grid.newpage()
+    grid.arrange(plyrs, pl.an, layout_matrix=lay.mat, nrow=3)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_Combined.png"), type="png")
+  dev.off()  
+  
+  
+  # Now compare CPUE of HS and PNA (+ TK) aggregated
+  
+  eez.keep.ag <- c("H4","H5","I3","I4","I5","I8","I9","FM","GL","LN","MH","NR","PG","PW","PX","SB","TK","TV")
+  
+  dat.ag <- dat %>% filter(yy >= 2010, eez %in% eez.keep.ag) %>% mutate(typ=ifelse(eez %in% HS.tmp, "HS", "EEZ")) %>% group_by(Year=yy, Zone=typ) %>%
+                    summarise(Days=sum(days), Catch=sum(sel_mt)) %>% mutate(CPUE=Catch/Days) #%>% arrange(desc(CPUE))
+  
+  tmp.cols <- setNames(c("firebrick2", "dodgerblue"),
+                       c("HS","EEZ"))
+  
+  windows(8000,3500)
+    pl.an <- ggplot(dat.ag, aes(x=Zone, y=CPUE, fill=Zone)) + geom_bar(stat="identity", colour="black", width=1) +
+                    xlab("Zone") + ylab("CPUE (mt per day)") + scale_y_continuous(expand = c(0, 0, 0.1, 0), labels=comma, breaks=pretty_breaks(4)) + facet_wrap(~ Year, ncol=5, scales="free") +
+                    #scale_fill_manual(name="Type", values=c("dodgerblue","firebrick2")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+                    scale_fill_manual(name="Zone", values=tmp.cols) + 
+                    #scale_x_continuous(breaks=dat.annual$ord, labels=dat.annual$nm, expand = c(0,0)) +              
+                    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="none",
+                          axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl.an)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_IndYrs_HSvsEEZ.png"), type="png")
+  dev.off()
+  
+
+#____________________________________________________________________________________________________________    
+# Species composition analyses
+  
+  # Plot of species composition proportions
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% c(eez.keep,"AS","HB")) %>% group_by(EEZ=eez) %>% summarise(Cbet=sum(bet_mt), Cskj=sum(skj_mt), Cyft=sum(yft_mt)) %>%
+                    mutate(Ctot=Cbet+Cskj+Cyft, BET=Cbet/Ctot, SKJ=Cskj/Ctot, YFT=Cyft/Ctot) %>% arrange(desc(BET))
+  
+  dat.hs$Type <- ifelse(dat.hs$EEZ %in% HS.tmp, "HS", "EEZ")
+
+  dat.hs %<>% select(EEZ, Type, BET, SKJ, YFT) %>% gather(Species, Proportion, -EEZ, -Type)
+
+  dat.hs$EEZ <- factor(dat.hs$EEZ, levels=unique(dat.hs$EEZ))
+  
+
+  windows(6000,4000)
+    plcomp <- ggplot(dat.hs, aes(x=EEZ, y=Proportion, fill=Species, colour=Type)) + geom_bar(position="stack", stat="identity", width=0.8, size=1.2) +
+                     xlab("EEZ") + ylab("Species composition") + scale_y_continuous(expand = c(0, 0, 0, 0)) +
+                     scale_fill_manual(name="Species", values=c("firebrick1","dodgerblue1","goldenrod1")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+                     scale_colour_manual(name="Type", values=c(grey(0.8),"black")) +
+                     theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="top", legend.text=element_text(size=10),
+                     axis.text=element_text(size=12), axis.title=element_text(size=14), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(plcomp)
+    savePlot(paste0(dirpth, "/Plots/PS_SPPcomp_ACE_AllYrs.png"), type="png")
+  dev.off()
+  
+  
+  # Plot of bigeye CPUE by zone
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% c(eez.keep,"AS","HB")) %>% group_by(EEZ=eez) %>% summarise(Days=sum(days), Cbet=sum(bet_mt)) %>%
+                    mutate(CPUEbet=Cbet/Days) %>% arrange(desc(CPUEbet))
+  
+  dat.hs$Type <- ifelse(dat.hs$EEZ %in% HS.tmp, "HS", "EEZ")
+  
+  #dat.hs %<>% select(EEZ, Type, BET, SKJ, YFT) %>% gather(Species, Proportion, -EEZ, -Type)
+
+  dat.hs$EEZ <- factor(dat.hs$EEZ, levels=unique(dat.hs$EEZ))
+  
+  
+  windows(6000,4000)
+    plbet <- ggplot(dat.hs, aes(x=EEZ, y=CPUEbet, colour=Type)) + geom_bar(position="stack", stat="identity", width=0.8, size=1.2, fill="firebrick1") +
+                    xlab("EEZ") + ylab("Bigeye CPUE (mt/day)") + scale_y_continuous(expand = c(0, 0, 0.05, 0)) +
+                    #scale_fill_manual(name="Species", values=c("firebrick1","dodgerblue1","goldenrod1")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+                    scale_colour_manual(name="Type", values=c(grey(0.8),"black")) +
+                    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="top", legend.text=element_text(size=10),
+                          axis.text=element_text(size=12), axis.title=element_text(size=14), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(plbet)
+    savePlot(paste0(dirpth, "/Plots/PS_BETcpue_ACE_AllYrs.png"), type="png")
+  dev.off()
+  
+  
+  # Plot of yellowfin CPUE by zone
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% c(eez.keep,"AS","HB")) %>% group_by(EEZ=eez) %>% summarise(Days=sum(days), Cyft=sum(yft_mt)) %>%
+                    mutate(CPUEyft=Cyft/Days) %>% arrange(desc(CPUEyft))
+  
+  dat.hs$Type <- ifelse(dat.hs$EEZ %in% HS.tmp, "HS", "EEZ")
+  
+  #dat.hs %<>% select(EEZ, Type, BET, SKJ, YFT) %>% gather(Species, Proportion, -EEZ, -Type)
+  
+  dat.hs$EEZ <- factor(dat.hs$EEZ, levels=unique(dat.hs$EEZ))
+  
+  
+  windows(6000,4000)
+    plyft <- ggplot(dat.hs, aes(x=EEZ, y=CPUEyft, colour=Type)) + geom_bar(position="stack", stat="identity", width=0.8, size=1.2, fill="goldenrod1") +
+                    xlab("EEZ") + ylab("Yellowfin CPUE (mt/day)") + scale_y_continuous(expand = c(0, 0, 0.05, 0)) +
+                    #scale_fill_manual(name="Species", values=c("firebrick1","dodgerblue1","goldenrod1")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+                    scale_colour_manual(name="Type", values=c(grey(0.8),"black")) +
+                    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="top", legend.text=element_text(size=10),
+                          axis.text=element_text(size=12), axis.title=element_text(size=14), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(plyft)
+    savePlot(paste0(dirpth, "/Plots/PS_YFTcpue_ACE_AllYrs.png"), type="png")
+  dev.off()
+  
+  
+  # Plot of skipjack CPUE by zone
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% c(eez.keep,"AS","HB")) %>% group_by(EEZ=eez) %>% summarise(Days=sum(days), Cskj=sum(skj_mt)) %>%
+                    mutate(CPUEskj=Cskj/Days) %>% arrange(desc(CPUEskj))
+  
+  dat.hs$Type <- ifelse(dat.hs$EEZ %in% HS.tmp, "HS", "EEZ")
+  
+  #dat.hs %<>% select(EEZ, Type, BET, SKJ, YFT) %>% gather(Species, Proportion, -EEZ, -Type)
+  
+  dat.hs$EEZ <- factor(dat.hs$EEZ, levels=unique(dat.hs$EEZ))
+  
+  
+  windows(6000,4000)
+    plskj <- ggplot(dat.hs, aes(x=EEZ, y=CPUEskj, colour=Type)) + geom_bar(position="stack", stat="identity", width=0.8, size=1.2, fill="dodgerblue1") +
+                    xlab("EEZ") + ylab("Skipjack CPUE (mt/day)") + scale_y_continuous(expand = c(0, 0, 0.05, 0)) +
+                    #scale_fill_manual(name="Species", values=c("firebrick1","dodgerblue1","goldenrod1")) + #annotate("text",  x=length(unique(pldat$nm)) - 2, y=0.95*max(pldat$res), label=spp, size=8, vjust=1, hjust=1) +
+                    scale_colour_manual(name="Type", values=c(grey(0.8),"black")) +
+                    theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="top", legend.text=element_text(size=10),
+                    axis.text=element_text(size=12), axis.title=element_text(size=14), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(plskj)
+    savePlot(paste0(dirpth, "/Plots/PS_SKJcpue_ACE_AllYrs.png"), type="png")
+  dev.off()
+
+  
+  lay.mat <- rbind(c(1,2),
+                   c(3,4))
+
+  windows(12000,8000)
+    grid.newpage()
+    grid.arrange(plcomp, plbet, plyft, plskj, layout_matrix=lay.mat, nrow=2)
+    savePlot(paste0(dirpth, "/Plots/PS_Species_CPUE_ACE_Combined.png"), type="png")
+  dev.off()
+  
+
+#____________________________________________________________________________________________________________     
+# Investigation of PH PS fishing in HSP1 (I1)
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/PS_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  dat.PHI1 <- dat %>% filter(eez == "I1", flag == "PH", fleet == "PH", yy >= 2013) %>% mutate(CPUE=sel_mt/days) %>% rename(Year=yy) %>% as.data.frame
+  
+  dat.PNA <- dat %>% filter(eez %in% c("FM","GL","LN","MH","NR","PG","PX","PW","SB","TK","TV"), yy >= 2013) %>% group_by(Year=yy) %>% summarise(Catch=sum(sel_mt), Days=sum(days)) %>%
+                     mutate(CPUE=Catch/Days) %>% as.data.frame
+  
+  dat.HS <- dat %>% filter(eez %in% HSind[HSind != "I1"], yy >= 2013) %>% group_by(Year=yy) %>% summarise(Catch=sum(sel_mt), Days=sum(days)) %>%
+                    mutate(CPUE=Catch/Days) %>% as.data.frame
+  
+  
+  dat.comb <- data.frame(Year=dat.PHI1$Year, CPUE.ph=dat.PHI1$CPUE, CPUE.pna=dat.PNA$CPUE, CPUE.hs=dat.HS$CPUE) %>% mutate(Ratio.pna=CPUE.pna/CPUE.ph, Ratio.hs=CPUE.hs/CPUE.ph)
+  
+  dat.lng <- dat.comb %>% select(Year, PH=CPUE.ph, PNA=CPUE.pna, HS=CPUE.hs) %>% gather(Type, CPUE, -Year)
+  dat.lng$Type <- factor(dat.lng$Type, levels=unique(dat.lng$Type))
+  
+  
+  windows(3000,2000)
+    pl1 <- ggplot(dat.lng, aes(x=Year, y=CPUE, fill=Type)) + geom_bar(stat="identity", position=position_dodge(), colour="black") +
+                 scale_fill_manual(name="Type", values=c("darkorchid2","dodgerblue","firebrick2")) + 
+                 theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl1)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_PHvsPNAvsHS.png"), type="png")
+  dev.off()
+  
+  # Summaries for plots
+  muPNA.all <- mean(dat.comb$Ratio.pna)
+  muPNA.5 <- mean(dat.comb$Ratio.pna[-1])
+  muHS.all <- mean(dat.comb$Ratio.hs)
+  muHS.5 <- mean(dat.comb$Ratio.hs[-1])
+  
+  
+  windows(3000,2000)
+    pl2 <- ggplot(dat.comb, aes(x=Year, y=Ratio.pna)) + geom_bar(stat="identity", colour="black", fill="indianred2") +
+                  ylab("Conversion factor") + geom_hline(yintercept=muPNA.all, colour="royalblue4", size=1.5) + geom_hline(yintercept=muPNA.5, colour="darkred", size=1.5) +
+                  annotate("text", x=2017, y=muPNA.all+0.6, label=round(muPNA.all, 2), colour="royalblue4", size=5) +
+                  annotate("text", x=2017, y=muPNA.5+0.6, label=round(muPNA.5, 2), colour="darkred", size=5) +
+                  annotate("text", x=2017.5, y=8, label="PNA days", size=7) +
+                  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="none",
+                        axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl2)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_PHvsPNA_Ratio.png"), type="png")
+  dev.off()
+  
+  
+  
+  windows(3000,2000)
+    pl3 <- ggplot(dat.comb, aes(x=Year, y=Ratio.hs)) + geom_bar(stat="identity", colour="black", fill="khaki4") +
+                  ylab("Conversion factor") + geom_hline(yintercept=muHS.all, colour="royalblue4", size=1.5) + geom_hline(yintercept=muHS.5, colour="darkred", size=1.5) +
+                  annotate("text", x=2017, y=muHS.all+0.6, label=round(muHS.all, 2), colour="royalblue4", size=5) +
+                  annotate("text", x=2017, y=muHS.5+0.6, label=round(muHS.5, 2), colour="darkred", size=5) +
+                  annotate("text", x=2017.5, y=9, label="HS days", size=7) +
+                  theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), legend.position="none",
+                        axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl3)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_PHvsHS_Ratio.png"), type="png")
+  dev.off()
+  
+  
+  
+  lay.mat <- rbind(c(1),
+                   c(2),
+                   c(3))
+  
+  
+  windows(8000,12000)
+    grid.newpage()
+    grid.arrange(pl1, pl2, pl3, layout_matrix=lay.mat, nrow=3)
+    savePlot(paste0(dirpth, "/Plots/PS_CPUE_ACE_PHvsPNAvsHS_Ratio.png"), type="png")
+  dev.off()  
+  
+  
+#____________________________________________________________________________________________________________    
+###  
+  # Longline fishing analyses
+###  
+#____________________________________________________________________________________________________________    
+# Pie chart of HS effort for LL fisheries
+  dat <- read.table(file=paste0(dirpth, "/Data/LL_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",")
+  year <- 2015:2019
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(sel_mt)) %>% filter(eez %in% HSind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HSind)
+  pl.dat$lond <- HScoord$lon[tmpmat]
+  pl.dat$latd <- HScoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  hspl <- ggplot()  + geom_sf(data=wcarea, fill=alpha("wheat", 0.3)) + geom_sf(data=I1, fill=alpha("dodgerblue", 0.1)) + geom_sf(data=I2, fill=alpha("firebrick2", 0.1)) +
+                 geom_sf(data=I3, fill=alpha("forestgreen", 0.1)) + geom_sf(data=I4, fill=alpha("orange1", 0.1)) +  geom_sf(data=I5, fill=alpha("magenta", 0.1)) +
+                 geom_sf(data=I6, fill=alpha("lightblue1", 0.1)) +  geom_sf(data=I7, fill=alpha("darkseagreen1", 0.1)) + geom_sf(data=I8, fill=alpha("mediumpurple1", 0.1)) + 
+                 geom_sf(data=I9, fill=alpha("yellow", 0.1)) + geom_sf(data=H4, fill=alpha("chocolate4", 0.1)) + geom_sf(data=H5, fill=alpha("chartreuse3", 0.1)) + 
+                 geom_sf(data=eez, fill=grey(0.95)) + guides(fill=guide_legend(nrow=1)) +
+                 theme(legend.position="bottom") + coord_sf(xlim=c(120,230), ylim=c(-30,30))
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/4000), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas catch per year (10,000's mt) by flag - mean 2015-2019 - all species") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 33)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/4000, x=210, y=20, labeller=function(x) x/2.5) + guides(fill=guide_legend(nrow=2)) +
+      theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS_Piechart_LLCatch.png"), type="png")
+  dev.off()
+  
+
+  dat <- read.table(file=paste0(dirpth, "/Data/LL_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",")
+  year <- 2015:2019
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(bet_mt)) %>% filter(eez %in% HSind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HSind)
+  pl.dat$lond <- HScoord$lon[tmpmat]
+  pl.dat$latd <- HScoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/1428.571), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas catch per year (10,000's mt) by flag - mean 2015-2019 - just bigeye") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 33)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/1428.571, x=210, y=20, labeller=function(x) round(x/7,1))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS_Piechart_LLCatch_JustBET.png"), type="png")
+  dev.off()
+  
+  
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(alb_mt)) %>% filter(eez %in% HSind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HSind)
+  pl.dat$lond <- HScoord$lon[tmpmat]
+  pl.dat$latd <- HScoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp[is.na(pl.tmp)] <- 0.1
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  windows(2000,1500)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/2500), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas catch per year (10,000's mt) by flag - mean 2015-2019 - just albacore") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-33, 33)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/2500, x=210, y=20, labeller=function(x) x/4) + guides(fill=guide_legend(nrow=2)) +
+                 theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS_Piechart_LLCatch_JustALB.png"), type="png")
+  dev.off()
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(yft_mt)) %>% filter(eez %in% HSind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HSind)
+  pl.dat$lond <- HScoord$lon[tmpmat]
+  pl.dat$latd <- HScoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/800), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas catch per year (10,000's mt) by flag - mean 2015-2019 - just yellowfin") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-50, 40)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/800, x=210, y=20, labeller=function(x) round(x/12.5,1)) + guides(fill=guide_legend(nrow=2)) +
+      theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS_Piechart_LLCatch_JustYFT.png"), type="png")
+  dev.off()
+  
+  
+#____________________________________________________________________________________________________________    
+# Pie chart of HS effort for LL fisheries
+  dat <- read.table(file=paste0(dirpth, "/Data/LL_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",")
+  year <- 2015:2019
+  
+  HS.EEZ.ind <- c("H4","H5","I1","I2","I3","I4","I5","I6","I7","I8","I9","IW","AS","AU","CK","FJ","FM","GL","ID","LN","MH","NC","NR","NU","PF","PG","PH","PW","PX","SB","TK","TO","TV","US","VU","WS")
+  
+  HSEZcoord <- list(lon=c(181,197,140,165,155,185,215,165,195,173,202,130,191,150,195,178,155,170,130,205,170,165,165,190,210,150,125,135,187,161,187,185,178,190,170,187),
+                  lat=c(-4,-5,3.5,-4.5,15,15,-5,28,-25,-15,-14,-28,-14,-25,-11,-19,8,0,-5,-5,10,-20,0,-20,-20,-5,12,7,-3,-9,-8,-20,-8,25,-15,-12.5))
+  
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(sel_mt)) %>% filter(eez %in% HS.EEZ.ind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HS.EEZ.ind)
+  pl.dat$lond <- HSEZcoord$lon[tmpmat]
+  pl.dat$latd <- HSEZcoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  hspl <- ggplot()  + geom_sf(data=wcarea, fill=alpha("wheat", 0.3)) + geom_sf(data=I1, fill=alpha("dodgerblue", 0.1)) + geom_sf(data=I2, fill=alpha("firebrick2", 0.1)) +
+    geom_sf(data=I3, fill=alpha("forestgreen", 0.1)) + geom_sf(data=I4, fill=alpha("orange1", 0.1)) +  geom_sf(data=I5, fill=alpha("magenta", 0.1)) +
+    geom_sf(data=I6, fill=alpha("lightblue1", 0.1)) +  geom_sf(data=I7, fill=alpha("darkseagreen1", 0.1)) + geom_sf(data=I8, fill=alpha("mediumpurple1", 0.1)) + 
+    geom_sf(data=I9, fill=alpha("yellow", 0.1)) + geom_sf(data=H4, fill=alpha("chocolate4", 0.1)) + geom_sf(data=H5, fill=alpha("chartreuse3", 0.1)) + 
+    geom_sf(data=eez, fill=grey(0.95)) + guides(fill=guide_legend(nrow=1)) +
+    theme(legend.position="bottom") + coord_sf(xlim=c(120,230), ylim=c(-30,30))
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/5000), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas / EEZ catch per year (10,000's mt) by flag - mean 2015-2019 - all species") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 33)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/5000, x=210, y=20, labeller=function(x) x/2) + guides(fill=guide_legend(nrow=2)) +
+                 theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS-EEZ_Piechart_LLCatch.png"), type="png")
+  dev.off()
+  
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/LL_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",")
+  year <- 2015:2019
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(bet_mt)) %>% filter(eez %in% HS.EEZ.ind) %>% mutate(group=1, Flag=as.character(flag)) %>% as.data.frame
+  tmpmat <- match(pl.dat$eez, HS.EEZ.ind)
+  pl.dat$lond <- HSEZcoord$lon[tmpmat]
+  pl.dat$latd <- HSEZcoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/1428.571), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas / EEZ catch per year (10,000's mt) by flag - mean 2015-2019 - just bigeye") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 33)) + xlab("") + ylab("") +
+                 geom_scatterpie_legend(pl.tmp$Total/5/1428.571, x=210, y=20, labeller=function(x) round(x/7,1)) + guides(fill=guide_legend(nrow=2)) +
+                 theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS-EEZ_Piechart_LLCatch_JustBET.png"), type="png")
+  dev.off()
+  
+  
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(alb_mt)) %>% filter(eez %in% HS.EEZ.ind) %>% mutate(group=1, Flag=as.character(flag)) %>% as.data.frame
+  tmpmat <- match(pl.dat$eez, HS.EEZ.ind)
+  pl.dat$lond <- HSEZcoord$lon[tmpmat]
+  pl.dat$latd <- HSEZcoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp[is.na(pl.tmp)] <- 0.1
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/4000), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas / EEZ catch per year (10,000's mt) by flag - mean 2015-2019 - just albacore") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 33)) + xlab("") + ylab("") + guides(fill=guide_legend(nrow=2)) +
+                 geom_scatterpie_legend(pl.tmp$Total/5/4000, x=210, y=20, labeller=function(x) x/2.5) +
+                 theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS-EEZ_Piechart_LLCatch_JustALB.png"), type="png")
+  dev.off()
+  
+  
+  # Construct map of catch by flag in each high seas zone  
+  pl.dat <- dat %>% filter(yy %in% year) %>% group_by(eez, flag) %>% summarise(Catch=sum(yft_mt)) %>% filter(eez %in% HS.EEZ.ind) %>% mutate(group=1, Flag=as.character(flag))
+  tmpmat <- match(pl.dat$eez, HS.EEZ.ind)
+  pl.dat$lond <- HSEZcoord$lon[tmpmat]
+  pl.dat$latd <- HSEZcoord$lat[tmpmat]
+  pl.tmp <- pl.dat %>% select(-flag) %>% spread(Flag, Catch)
+  pl.tmp[is.na(pl.tmp)] <- 0.1
+  pl.tmp$Total <- apply(pl.tmp[,5:dim(pl.tmp)[2]], 1, sum, na.rm=TRUE)
+  pl.tmp$Total1 <- pl.tmp$Total*(8/max(pl.tmp$Total))
+  pl.tmp[is.na(pl.tmp)] <- 0
+  
+  
+  windows(2000,1400)
+    pl <- hspl + geom_scatterpie(data=pl.tmp, aes(x=lond, y=latd, group=group, r=Total/5/2000), cols=unique(pl.dat$Flag), alpha=0.9) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + ggtitle("LL High seas / EEZ catch per year (10,000's mt) by flag - mean 2015-2019 - just yellowfin") +
+                 scale_x_continuous(limits=c(120, 230)) + scale_y_continuous(limits=c(-30, 33)) + xlab("") + ylab("") + guides(fill=guide_legend(nrow=2)) +
+                 geom_scatterpie_legend(pl.tmp$Total/5/2000, x=210, y=20, labeller=function(x) x/5) +
+                 theme(legend.key.size=unit(0.5, "cm"))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/HS-EEZ_Piechart_LLCatch_JustYFT.png"), type="png")
+  dev.off()
+  
+  
+#____________________________________________________________________________________________________________    
+# Table of recent high seas LL effort in different areas by flag
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/LL_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+  # Albacore
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(alb_mt))
+  
+  
+  windows(4500,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Albacore catch (mt)") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_HS_Temporal_AllZones_ALB.png"), type="png")
+  dev.off()
+  
+  
+  # Bigeye
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(bet_mt))
+  
+  
+  windows(4500,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Bigeye catch (mt)") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_HS_Temporal_AllZones_BET.png"), type="png")
+  dev.off()
+  
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=sum(bet_mt))
+  
+  
+  windows(4500,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Bigeye catch (mt)") +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_HS_Temporal_AllZones_BET_Aggregated.png"), type="png")
+  dev.off()
+  
+  
+  tmp.FFA <- c("AU","CK","FJ","FM","KI","MH","NZ","PG","PW","SB","TO","TV","VU","WS")
+  
+  dat.hs %<>% mutate(Grp=ifelse(Flag %in% tmp.FFA, "FFA", "OTH")) %>% group_by(Year, Grp) %>% summarise(Catch=sum(Catch))
+  
+  windows(4500,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Grp)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Bigeye catch (mt)") +
+                 scale_fill_manual(values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_HS_Temporal_AllZones_BET_Aggregated_FFAvsOTH.png"), type="png")
+  dev.off()
+  
+  
+  # Now just the important ones
+  HS.tmp <- c("H4","H5","I1","I2","I3","I4","I5","I6","I7")   # Only keep the ones with any real fishing for the plot
+  
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HS.tmp) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(bet_mt))
+  
+  
+  windows(4500,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Bigeye catch (mt)") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_HS_Temporal_BET.png"), type="png")
+  dev.off()
+  
+  
+  # Yellowfin
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(yft_mt))
+  
+  
+  windows(4500,2800)
+    pl <- ggplot(dat.hs, aes(x=factor(Year), y=Catch, fill=Flag)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Yellowfin catch (mt)") + facet_wrap(~ EEZ, ncol=3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text.x=element_text(size=12, angle=90), axis.text.y=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_HS_Temporal_AllZones_YFT.png"), type="png")
+  dev.off()
+  
+  
+  # Tables
+  dat.hs <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(bet_mt))
+  
+  
+  print.ps.tab <- function(zne="H4", dat.tab=dat.hs){
+    
+    dat.tab %<>% filter(EEZ == zne) %>% as.data.frame %>% select(-EEZ)
+    
+    tab.hs <- dat.tab %>% spread(Year, Catch)
+    tab.hs[is.na(tab.hs)] <- 0
+    tab.hs <- tab.hs[rowSums(tab.hs[,-1]) > 0,]
+    
+    pr.xtab <- xtable(tab.hs, align=rep("c", dim(tab.hs)[2] + 1), label=paste0("tab:", zne), digits=0,
+                      caption=paste0("Catch of bigeye in high seas area ", zne, ", separated by flag."))
+    print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_Bigeye_Catch_HSzones_All_", zne,".tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="normalsize", caption.placement="top")
+    
+  }
+  
+  # Tables of days fished for each high seas zone separately
+  sil <- lapply(HSind, function(x) print.ps.tab(x, dat.tab=dat.hs))
+  
+  # Bigeye
+  # Now table for overall days fished - all high seas areas
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=sum(bet_mt))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  
+  
+  pr.xtab <- xtable(tab.all, align=rep("c", dim(tab.all)[2] + 1), label="tab:1", digits=0,
+                    caption="Catch of bigeye aggregated over all high seas areas, separated by flag.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_Bigeye_Catch_HSzones_All.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="normalsize", caption.placement="top")
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/LL_Bigeye_Catch_HSzones_All.csv"), row.names = FALSE)
+  
+  
+  # Albacore
+  # Now table for overall days fished - all high seas areas
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=sum(alb_mt))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  
+  
+  pr.xtab <- xtable(tab.all, align=rep("c", dim(tab.all)[2] + 1), label="tab:1", digits=0,
+                    caption="Catch of albacore aggregated over all high seas areas, separated by flag.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_Albacore_Catch_HSzones_All.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="normalsize", caption.placement="top")
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/LL_Albacore_Catch_HSzones_All.csv"), row.names = FALSE)
+  
+  
+  # Yellowfin
+  # Now table for overall days fished - all high seas areas
+  dat.all <- dat %>% filter(yy >= 2010, eez %in% HSind) %>% group_by(Year=yy, Flag=flag) %>% summarise(Catch=sum(yft_mt))
+  
+  tab.all <- dat.all %>% spread(Year, Catch)
+  tab.all[is.na(tab.all)] <- 0
+  tab.all <- tab.all[rowSums(tab.all[,-1]) > 0,]
+  
+  
+  pr.xtab <- xtable(tab.all, align=rep("c", dim(tab.all)[2] + 1), label="tab:1", digits=0,
+                    caption="Catch of yellowfin aggregated over all high seas areas, separated by flag.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_Yellowfin_Catch_HSzones_All.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="normalsize", caption.placement="top")
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/LL_Yellowfin_Catch_HSzones_All.csv"), row.names = FALSE)
+  
+  
+#____________________________________________________________________________________________________________    
+  
+  
+  dat <- read.table(file=paste0(dirpth, "/Data/LL_ACE_EEZ_WCPO-CA.txt"), header=TRUE, sep=",", stringsAsFactors=FALSE)
+  
+
+  # First a plot of all HS zones
+  dat.hs <- dat %>% filter(yy >= 2010) %>% group_by(Year=yy, EEZ=eez, Flag=flag) %>% summarise(Catch=sum(sel_mt), Catalb=sum(alb_mt), Catbet=sum(bet_mt), Catyft=sum(yft_mt)) %>% mutate(Type=ifelse(EEZ %in% HSind, "HS", "EEZ"))
+  
+  EEZn <- c("CN","HW","I6","JP","KR","TW","US")
+  EEZe <- c("AS","CK","FJ","FM","GL","H4","H5","HB","I1","I2","I3","I4","I5","I8","I9","ID","IW","JT","JV","KI","LN","MA","MH","MP","NC","NF","NR","NU","PF","PG","PH","PW","PX","PY","SB","TK","TO","TV","VN","VU","WF","WK","WS")
+  EEZs <- c("AU","I7","NZ")
+  
+  
+  dat.hs$Zone <- ifelse(dat.hs$EEZ %in% EEZn, "North", "Equatorial")
+  dat.hs$Zone <- ifelse(dat.hs$EEZ %in% EEZs, "South", dat.hs$Zone)
+  
+  
+  # Now generic plots which just separate EEZs from HS areas
+  dat.sum <- dat.hs %>% group_by(Year, Type, Zone) %>% summarise(Catch=sum(Catch), Catalb=sum(Catalb), Catbet=sum(Catbet), Catyft=sum(Catyft))
+  dat.sum$Zone <- factor(dat.sum$Zone, levels=c("North","Equatorial","South"))
+  dat.sum$Type <- factor(dat.sum$Type, levels=c("HS","EEZ"))
+  
+  
+  # Overall catch
+  # Three sectors
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Catch/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Catch - ALB+BET+YFT (1,000's mt)") + facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_TotCatch.png"), type="png")
+  dev.off()
+
+  # All sectors aggregated
+  dat.sum.ag <- dat.sum
+  yr.perc <- dat.sum.ag %>% group_by(Year, Type) %>% summarise(Catch=sum(Catch)) %>% mutate(perbet=round(Catch/sum(Catch), 2)) %>% filter(Type == "HS")
+  
+  
+  windows(8000,6000)
+    pl <- ggplot() + geom_bar(data=dat.sum.ag, aes(x=Year, y=Catch/1000, fill=Type), position="stack", stat="identity", colour="black") +
+                     xlab("Year") + ylab("Total (ALB+BET+YFT) catch (1,000's mt)") + #facet_wrap(~ Zone, ncol=1) +
+                     scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                     geom_label(data=yr.perc, aes(x=Year, y=205, label=perbet), size=7) +
+                     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                           axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_TOTCatch_AllSect.png"), type="png")
+  dev.off()
+  
+  
+    
+  # Albacore catch
+  # Three sectors
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Catalb/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Albacore catch (1,000's mt)") + facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_ALBCatch.png"), type="png")
+  dev.off()
+  
+  
+  # All sectors aggregated
+  dat.sum.ag <- filter(dat.sum, Zone != "North")
+  yr.perc <- dat.sum.ag %>% group_by(Year, Type) %>% summarise(Catalb=sum(Catalb)) %>% mutate(peralb=round(Catalb/sum(Catalb), 2)) %>% filter(Type == "HS")
+  
+  
+  windows(8000,6000)
+    pl <- ggplot() + geom_bar(data=dat.sum.ag, aes(x=Year, y=Catalb/1000, fill=Type), position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Albacore catch (1,000's mt)") + #facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 geom_label(data=yr.perc, aes(x=Year, y=46, label=peralb), size=7) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_ALBCatch_AllSect.png"), type="png")
+  dev.off()
+  
+  
+  # Bigeye catch
+  # Three sectors
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Catbet/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Bigeye catch (1,000's mt)") + facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_BETCatch.png"), type="png")
+  dev.off()
+  
+  # All sectors aggregated
+  dat.sum.ag <- dat.sum
+  yr.perc <- dat.sum.ag %>% group_by(Year, Type) %>% summarise(Catbet=sum(Catbet)) %>% mutate(perbet=round(Catbet/sum(Catbet), 2)) %>% filter(Type == "HS")
+  
+  
+  windows(8000,6000)
+    pl <- ggplot() + geom_bar(data=dat.sum.ag, aes(x=Year, y=Catbet/1000, fill=Type), position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Bigeye catch (1,000's mt)") + #facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 geom_label(data=yr.perc, aes(x=Year, y=55, label=perbet), size=7) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_BETCatch_AllSect.png"), type="png")
+  dev.off()
+  
+  
+  # Yellowfin catch
+  # Three sectors
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x=factor(Year), y=Catyft/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Yellowfin catch (1,000's mt)") + facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_YFTCatch.png"), type="png")
+  dev.off()
+  
+  
+  # All sectors aggregated
+  dat.sum.ag <- dat.sum
+  yr.perc <- dat.sum.ag %>% group_by(Year, Type) %>% summarise(Catyft=sum(Catyft)) %>% mutate(peryft=round(Catyft/sum(Catyft), 2)) %>% filter(Type == "HS")
+  
+  
+  windows(8000,6000)
+    pl <- ggplot() + geom_bar(data=dat.sum.ag, aes(x=Year, y=Catyft/1000, fill=Type), position="stack", stat="identity", colour="black") +
+                 xlab("Year") + ylab("Yellowfin catch (1,000's mt)") + #facet_wrap(~ Zone, ncol=1) +
+                 scale_fill_manual(name="Type", values=c("indianred1","palegreen3")) + guides(fill=guide_legend(nrow=1)) +
+                 geom_label(data=yr.perc, aes(x=Year, y=108, label=peryft), size=7) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="top",
+                       axis.text=element_text(size=12), axis.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_ANNCATEST_EEZvsHS_YFTCatch_AllSect.png"), type="png")
+  dev.off()
+  
+  
+  dat.tab <- dat.hs %>% group_by(Year, EEZ, Type, Zone) %>% summarise(Catch=sum(Catch), Catalb=sum(Catalb), Catbet=sum(Catbet), Catyft=sum(Catyft))
+
+  # Total catch (ALB+BET+YFT)
+  # North of 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "North") %>% select(-Zone, -Catalb, -Catbet, -Catyft)
+  dat.cat <- dat.tmp %>% spread(Year, Catch) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Total catch (albacore + bigeye + yellowfin) by longliners in EEZs and high seas areas north of 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_TotCat_By_EEZ_20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # 20S to 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "Equatorial") %>% select(-Zone, -Catalb, -Catbet, -Catyft)
+  dat.cat <- dat.tmp %>% spread(Year, Catch) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Total catch (albacore + bigeye + yellowfin) by longliners in EEZs and high seas areas between 20S and 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_TotCat_By_EEZ_20S-20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+
+  # South of 20S
+  dat.tmp <- dat.tab %>% filter(Zone == "South") %>% select(-Zone, -Catalb, -Catbet, -Catyft)
+  dat.cat <- dat.tmp %>% spread(Year, Catch) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Total catch (albacore + bigeye + yellowfin) by longliners in EEZs and high seas areas south of 20S.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_TotCat_By_EEZ_20S.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+
+  # Bigeye catch
+  # North of 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "North") %>% select(-Zone, -Catalb, -Catch, -Catyft)
+  dat.cat <- dat.tmp %>% spread(Year, Catbet) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Bigeye catch by longliners in EEZs and high seas areas north of 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_BETCat_By_EEZ_20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # 20S to 20N
+  dat.tmp <- dat.tab %>% filter(Zone == "Equatorial") %>% select(-Zone, -Catalb, -Catch, -Catyft)
+  dat.cat <- dat.tmp %>% spread(Year, Catbet) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Bigeye catch by longliners in EEZs and high seas areas between 20S and 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_BETCat_By_EEZ_20S-20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # South of 20S
+  dat.tmp <- dat.tab %>% filter(Zone == "South") %>% select(-Zone, -Catalb, -Catch, -Catyft)
+  dat.cat <- dat.tmp %>% spread(Year, Catbet) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.cat, align=rep("c", dim(dat.cat)[2] + 1), label="tab:1", digits=0,
+                    caption="Bigeye catch by longliners in EEZs and high seas areas south of 20S.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_BETCat_By_EEZ_20S.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+#____________________________________________________________________________________________________________      
+# Longline VMS data summaries
+  
+  
+  dat <- read.table(file = paste0(dirpth, "/Data/VMS_EEZ_DATA.TXT"), header = TRUE, sep = ",", stringsAsFactors = FALSE)
+  
+  remove.eez <- c("A1","IW","JO","KH","KP","MN","MY","PN","SG","TH","TL","X1","X2","X3","X4","X5")
+  
+  tab <- dat %>% filter(!eez %in% remove.eez, yy >= 2010) %>% group_by(yy, eez, flag) %>%
+                 summarise(Days = sum(days), VMSdays = sum(vms_days), Boats = sum(boats), Trips = sum(trips)) %>% mutate(Type = ifelse(eez %in% HSind, "HS", "EEZ")) %>%
+                 rename(EEZ = eez)
+  
+  EEZn <- c("CN","HW","I6","JP","KR","TW","US")
+  EEZe <- c("AS","CK","FJ","FM","GL","GU","H4","H5","HB","I1","I2","I3","I4","I5","I8","I9","ID","IW","JT","JV","KI","LN","MA","MH","MP","NC","NF","NR","NU","PF","PG","PH","PW","PX","PY","SB","TK","TO","TV","VN","VU","WF","WK","WS")
+  EEZs <- c("AU","I7","NZ")
+  
+  # What about A1, JO, KH, KP, MN, 
+  
+  tab$Zone <- ifelse(tab$EEZ %in% EEZn, "North", "Not Classified")
+  tab$Zone <- ifelse(tab$EEZ %in% EEZe, "Equatorial", tab$Zone)
+  tab$Zone <- ifelse(tab$EEZ %in% EEZs, "South", tab$Zone)
+  
+  
+  # Now generic plots which just separate EEZs from HS areas
+  dat.sum <- tab %>% group_by(Year = yy, Type, Zone) %>% summarise(Days = sum(VMSdays))
+  dat.sum$Zone <- factor(dat.sum$Zone, levels = c("North","Equatorial","South"))
+  dat.sum$Type <- factor(dat.sum$Type, levels = c("HS","EEZ"))
+  
+  
+  # Overall effort
+  # Three sectors
+  windows(5000,6000)
+    pl <- ggplot(dat.sum, aes(x = factor(Year), y = Days/1000, fill = Type)) + geom_bar(position = "stack", stat = "identity", colour = "black") +
+                 xlab("Year") + ylab("VMS days at sea (1,000's days)") + facet_wrap(~ Zone, ncol = 1) +
+                 scale_fill_manual(name = "Type", values = c("indianred1","palegreen3")) + guides(fill = guide_legend(nrow = 1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "top",
+                       axis.text = element_text(size = 12), axis.title = element_text(size = 14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_VMS_EEZvsHS_DaysAtSea.png"), type="png")
+  dev.off()
+  
+  
+  tab.hs <- tab %>% filter(EEZ %in% HSind[HSind != "IW"]) %>% group_by(Year = yy, EEZ) %>% summarise(Days = sum(VMSdays))
+  
+  windows(7000,4000)
+    pl <- ggplot(tab.hs, aes(x = factor(Year), y = Days/1000, fill = EEZ)) + geom_bar(position = "stack", stat = "identity", colour = "black") +
+                 xlab("Year") + ylab("VMS days at sea (1,000's days)") +
+                 scale_fill_brewer(palette = "Spectral") + guides(fill = guide_legend(nrow = 1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "top",
+                       axis.text=element_text(size = 12), axis.title=element_text(size = 14), legend.title = element_blank())
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_VMS_DaysAtSea_ByHSZone_Stacked.png"), type="png")
+  dev.off()
+  
+  tmp.hs <- tab.hs %>% pivot_wider(names_from = Year, values_from = Days)
+  
+  write.csv(tmp.hs, file=paste0(dirpth, "/Plots/LL_VMS_DaysAtSea_ByHSZone_Table.csv"), row.names = FALSE)
+  
+  
+  tab.hs <- tab %>% filter(EEZ %in% HSind[!HSind %in% c("I6","I7","IW")]) %>% group_by(Year = yy, EEZ) %>% summarise(Days = sum(VMSdays))
+  
+  windows(7000,4000)
+    pl <- ggplot(tab.hs, aes(x = factor(Year), y = Days/1000, fill = EEZ)) + geom_bar(position = "stack", stat = "identity", colour = "black") +
+                 xlab("Year") + ylab("VMS days at sea (1,000's days)") +
+                 scale_fill_brewer(palette = "Spectral") + guides(fill = guide_legend(nrow = 1)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "top",
+                       axis.text=element_text(size = 12), axis.title=element_text(size = 14), legend.title = element_blank())
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_VMS_DaysAtSea_ByHSZone_Stacked_20-20.png"), type="png")
+  dev.off()
+  
+  
+  tab.hs <- tab %>% filter(EEZ %in% HSind[HSind != "IW"]) %>% group_by(Year = yy, EEZ, Flag = flag) %>% summarise(Days = sum(VMSdays))
+  
+  windows(9000,8000)
+    pl <- ggplot(tab.hs, aes(x = factor(Year), y = Days/1000, fill = Flag)) + geom_bar(stat = "identity", colour = "black") +
+                 xlab("Year") + ylab("VMS days at sea (1,000's days)") + facet_wrap(~ EEZ, ncol = 3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "top",
+                       axis.text.x=element_text(size = 11, angle = 90, vjust = 0.5), axis.text.y=element_text(size = 12), axis.title = element_text(size = 14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_VMS_DaysAtSea_ByHSZone_Faceted.png"), type="png")
+  dev.off()
+  
+  tab.hs <- tab %>% filter(EEZ %in% HSind[HSind != "IW"]) %>% group_by(Year = yy, EEZ) %>% summarise(Days = sum(VMSdays))
+  
+  windows(9000,8000)
+    pl <- ggplot(tab.hs, aes(x = factor(Year), y = Days/1000)) + geom_bar(stat = "identity", colour = "black", fill = "steelblue3") +
+                 xlab("Year") + ylab("VMS days at sea (1,000's days)") + facet_wrap(~ EEZ, ncol = 3) +
+                 scale_fill_manual(name="Flag", values=cnt.cols) + guides(fill=guide_legend(nrow=2)) +
+                 theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "top",
+                       axis.text.x=element_text(size = 11, angle = 90, vjust = 0.5), axis.text.y=element_text(size = 12), axis.title = element_text(size = 14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/LL_VMS_DaysAtSea_ByHSZone_Grouped.png"), type="png")
+  dev.off()
+  
+  
+  # North of 20N
+  dat.tmp <- tab %>% filter(Zone == "North") %>% select(-VMSdays, -Boats, -Trips, -Zone)
+  dat.vms <- dat.tmp %>% spread(yy, Days) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.vms, align=rep("c", dim(dat.vms)[2] + 1), label="tab:1", digits=0,
+                    caption="Longline VMS days fished in EEZs and high seas areas North of 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_VMS_DaysFished_By_EEZ_20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # 20S to 20N
+  dat.tmp <- tab %>% filter(Zone == "Equatorial") %>% select(-VMSdays, -Boats, -Trips, -Zone)
+  dat.vms <- dat.tmp %>% spread(yy, Days) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.vms, align=rep("c", dim(dat.vms)[2] + 1), label="tab:1", digits=0,
+                    caption="Longline VMS days fished in EEZs and high seas areas between 20S and 20N.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_VMS_DaysFished_By_EEZ_20S-20N.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  # South of 20S
+  dat.tmp <- tab %>% filter(Zone == "South") %>% select(-VMSdays, -Boats, -Trips, -Zone)
+  dat.vms <- dat.tmp %>% spread(yy, Days) %>% arrange(Type, EEZ)
+  
+  pr.xtab <- xtable(dat.vms, align=rep("c", dim(dat.vms)[2] + 1), label="tab:1", digits=0,
+                    caption="Longline VMS days fished in EEZs and high seas areas South of 20S.")
+  print.xtable(pr.xtab, file=paste0(dirpth, "/Plots/LL_VMS_DaysFished_By_EEZ_20S.tex"), include.rownames=FALSE, sanitize.text.function = function(x) x, size="tiny", caption.placement="top")
+  
+  
+  
+
+  
+  
+  
+  
+#____________________________________________________________________________________________________________    
+# EEZ Effort tables to match with the TCC paper
+  
+  
+  PNAind <- c("FM","KI","MH","NR","PG","PW","SB","TV")
+  
+  cnt.switches <- list(old=c("GL","PX","LN","NF","MA","AS","GU","HB","JT","JV","MP","PY","WK","ES","PT"),
+                       new=c("KI","KI","KI","AU","NC","US","US","US","US","US","US","US","US","EU","EU"))
+  
+  
+  dat <- read.csv(file=paste0(dirpth, "/Data/ACE_Dat_Frm1990.csv"), header=TRUE)
+  
+  dat %<>% filter(gr_id == "S", yy >= 2010)
+  
+  dat$EEZ <- ifelse(dat$ez_id %in% cnt.switches$old, cnt.switches$new[match(dat$ez_id, cnt.switches$old)], dat$ez_id)
+  
+  dat.hs <- dat %>% filter(EEZ %in% HSind)
+  dat.pna <- dat %>% filter(EEZ %in% PNAind)
+  dat.oth <- dat %>% filter(!EEZ %in% c(HSind, PNAind, "I0","VU"))
+  
+  
+  
+  # PNA table
+  dat.all <- dat.pna %>% group_by(Year = yy, EEZ) %>% summarise(Days = sum(sum_days))
+  
+  tab.all <- dat.all %>% spread(Year, Days)
+  tab.all[is.na(tab.all)] <- 0
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/PS_Days_PNAzones_2010-19.csv"), row.names = FALSE)
+  
+  
+  # Other EEZ table
+  dat.all <- dat.oth %>% group_by(Year = yy, EEZ) %>% summarise(Days = sum(sum_days))
+  
+  tab.all <- dat.all %>% spread(Year, Days)
+  tab.all[is.na(tab.all)] <- 0
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/PS_Days_OTHzones_2010-19.csv"), row.names = FALSE)
+  
+  
+  # High seas EEZ table
+  dat.all <- dat.hs %>% group_by(Year = yy, EEZ) %>% summarise(Days = sum(sum_days))
+  
+  tab.all <- dat.all %>% spread(Year, Days)
+  tab.all[is.na(tab.all)] <- 0
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/PS_Days_HSzones_2010-19.csv"), row.names = FALSE)
+  
+  
+  # Archipelagic waters
+  dat.AW <- read.csv(file=paste0(dirpth, "/Data/ACE_Dat_Frm1990_Arch-Waters.csv"), header=TRUE)
+  
+  dat.AW %<>% filter(gr_id == "S", yy >= 2010)
+  
+  dat.all <- dat.AW %>% group_by(Year = yy, EEZ = ez_id) %>% summarise(Days = sum(sum_days))
+  
+  tab.all <- dat.all %>% spread(Year, Days)
+  tab.all[is.na(tab.all)] <- 0
+  
+  write.csv(tab.all, file=paste0(dirpth, "/Plots/PS_Days_Allzones_2010-19_Arch-Waters.csv"), row.names = FALSE)
+  
+  
+  
+  
+  
+  
+
+  

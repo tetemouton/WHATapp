@@ -1,0 +1,335 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{anysize}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames, x11names]{xcolor} % load xcolor and make it recognise the names... 
+\usepackage{colortbl}
+\usepackage{color, soul} %the soul package allows you to hilight text with \hl{}
+\usepackage{hyperref}   % this creates hyperlinks for figure and table referencing (and all other referencing too!)
+\usepackage{csvsimple}
+\usepackage{tablefootnote}
+\usepackage{floatrow}  % to hepl place table captions
+\usepackage[hang,flushmargin]{footmisc} %The 'hang' option flushes the footnote marker to the left margin of the page, while the 'flushmargin' option flushes the text as well
+\usepackage{lipsum} % these two are required to get good table footnotes
+\usepackage{threeparttable}
+\usepackage{tikz}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Defining format for hyperlinks 
+\hypersetup{colorlinks, % left blank (no == to) so no red square
+linkcolor= PineGreen, 
+filecolor= TealBlue, 
+urlcolor= PineGreen,
+citecolor= NavyBlue}
+\RequirePackage[margin=1in]{geometry} % customize margins 
+\RequirePackage{pdflscape}
+% this bit sets the section formatting
+\titleformat{\section}
+  {\normalfont\sffamily\Large\bfseries\color{CornflowerBlue}}
+  {\thesection}{1em}{}
+% this bit sets the caption formatting formatting
+\usepackage[font={bf,small}]{caption}
+% to get the table captions at the top of the table
+\floatsetup[table]{capposition=top}
+% remove the paragraph indenting 
+\setlength{\parindent}{0pt}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+% grab my numbers and tables created in R
+<<echo=FALSE>>=
+load("FAD_vals.RData")
+ct.short<-c("CK","FM","KI","MH","NR","PG","PNA","SB","TK","TV" )
+ct.med<-c("CK","FSM","KI","MH","NR","PNG","PNA","SB","TK","TV" )
+ct.long<-c("the Cook Islands","the Federated States of Micronesia ","Kiribati","the Republic of the Marshall Islands ","Nauru",
+           "Papua New Guinea","the PNA","the Solomon Islands","Tokelau","Tuvalu" )
+ct.flagobj <- c("flag_CK", "flag_FM", "flag_KI", "flag_MH", "flag_NR", "flag_PG", "flag_PNA", "flag_SB", "flag_TK", "flag_TV")
+ct.num<-as.numeric(which(ct.short == i))
+month="November"
+year=2019
+end_year=2018
+report.number=9
+tab3<-read.csv("tables/table3.csv", header=TRUE)
+@
+
+% make the cover page
+\pagenumbering{gobble} % switch off page numbering
+\makeatletter
+\def\parsecomma#1,#2\endparsecomma{\def\page@x{#1}\def\page@y{#2}}
+\tikzdeclarecoordinatesystem{page}{
+    \parsecomma#1\endparsecomma
+    \pgfpointanchor{current page}{north east}
+    % Save the upper right corner
+    \pgf@xc=\pgf@x%
+    \pgf@yc=\pgf@y%
+    % save the lower left corner
+    \pgfpointanchor{current page}{south west}
+    \pgf@xb=\pgf@x%
+    \pgf@yb=\pgf@y%
+    % Transform to the correct placement
+    \pgfmathparse{(\pgf@xc-\pgf@xb)/2.*\page@x+(\pgf@xc+\pgf@xb)/2.}
+    \expandafter\pgf@x\expandafter=\pgfmathresult pt
+    \pgfmathparse{(\pgf@yc-\pgf@yb)/2.*\page@y+(\pgf@yc+\pgf@yb)/2.}
+    \expandafter\pgf@y\expandafter=\pgfmathresult pt
+}
+\makeatother
+
+\begin{tikzpicture} [remember picture, overlay,every node/.style={anchor=center}] {               
+\node  at (page cs:0,0.8) {                                % [anchor=\bound]
+\includegraphics [width=22cm]{C:/FAD_closure/flag_logos/banner_new.png}};
+\node  at (page cs:0,0.5) { 
+{{\huge{\bfseries Purse seine fishing amongst FAD closure periods}}}};
+\node  at (page cs:0,0.3) { 
+{{\huge Ninth in a series of FAD closure reports for }}};
+\node  at (page cs:0,0.22) { 
+{{\huge \Sexpr{ct.long[ct.num]} }}};
+\node  at (page cs:0,-0.05) { 
+\includegraphics [width= 2in]{\Sexpr{paste("C:/FAD_closure/flag_logos/",i,"_flag.png",sep="")}}};
+\node  at (page cs:0,-0.6) { 
+\includegraphics [width= 1in]{\Sexpr{"C:/FAD_closure/flag_logos/NZ_aid_logo.png"}}};
+\node  at (page cs:0,-0.4) { 
+{\Large This report was funded by the New Zealand Aid Programme.}};
+\node  at (page cs:0,-0.8) { 
+{Issue Specific National Report, (Purse seine fishing amongst FAD closures) - \Sexpr{ct.med[ct.num]} November 2019 }};
+\node  at (page cs:0,-0.85) { 
+{\small Please address inquiries to: Sam McKechnie (samm@spc.int)  }};
+\draw [thick] [blue] (page cs:-1,-0.75) rectangle (page cs:1,-0.75);
+     }
+\end{tikzpicture}
+\clearpage     % goes to new page but progresses all floating figures up to that point 
+%\restoregeometry
+
+\pagenumbering{arabic}  % start the page numbering again
+\section*{Summary}
+This is the ninth in a series of FAD closure reports for \Sexpr{ct.long[ct.num]} (hereon denoted \Sexpr{ct.short[ct.num]}). The analyses use logsheet and observer data, and information on cannery prices to calculate catch value.  This report has a particular emphasis on purse seine fishing performance during the FAD closure periods since 2009. Since the 2014 report we have been analysing data for foreign flagged vessels fishing in your waters, and your flagged vessels fishing both in your waters and wherever they fished. Highlights include:
+\begin{itemize}
+  \item The percentage contribution of small (< 7.5lb or 3.4kg) bigeye and yellowfin tuna to FAD set catch varies among PNA members. The reliance on FAD sets is approximately \Sexpr{for.FAD.rel}\% for foreign flagged vessels fishing in your waters, but FAD reliance for your flagged vessels\footnote{Locally-based chartered (but foreign flagged) vessels are included in this category.} was \Sexpr{domall.FAD.rel}\% fishing in all areas and \Sexpr{domez.FAD.rel}\% within your waters (\autoref{fig1}). \textbf{Compared to other PNA members the reliance on FAD sets has been \Sexpr{lab[for.cut]} for foreign flagged vessels within your waters, and \Sexpr{lab[dom.cut]} for your flagged vessels in your waters. Compared to other PNA members the proportion of small bigeye and yellowfin tuna in the catch from FAD sets is \Sexpr{lab[for.fish.cut]} in your waters.} 
+  \textbf{\item Your flagged vessels fished more consistently outside of your waters. Most fishing in your waters by your flagged vessels and foreign fleets occurs during June - October each year (\autoref{fig2}).} The current periods chosen for the FAD closure coincides in some years with peak fishing activity in your waters.
+  \item CPUE for FAD sets is higher than that for free school, for foreign flagged vessels the difference is greater after 2005 (\autoref{fig3}). \textbf{The effort transferred from FAD to free schools has not been as productive as predicted and therefore the estimated negative impact of the FAD closure on overall CPUE and catch value is probably greater than expected.}
+\item Generally larger tuna are taken in your waters from free school sets than FADs which, due to higher prices for larger fish (\autoref{tab1}) results in slightly higher catch values per tonne. However, catch rates for a day fished have been much lower for free school fishing both during and outside the FAD closure.  \textbf{While increased value per tonne from free school sets partially offsets the loss in catch value due to lower catch rates during FAD closures, the difference in catch rates means that catch value per day is reduced during FAD closures (\autoref{fig4} and \autoref{tab2}). The catch value per day declines by \Sexpr{domall.FAD.val}\% for your vessels fishing in all areas, \Sexpr{domez.FAD.val}\% for your vessels fishing in your waters and \Sexpr{for.FAD.val}\% for foreign fleets fishing in your waters.}
+\item As shown in previous FAD closure reports, prior to the introduction of the FAD closure, the CPUE is lower during the FAD closure months.  \textbf{Therefore the lower catch rates (and catch value) during closure months (\autoref{fig4}) may be a result of less successful fishing during closure months (seasonality in catch rates or competition between vessels), not exclusively an effect of the FAD closure itself.} 
+\item An Addendum to this report is also provided. The analyses therein explicitly use the catch rate and value along with absolute effort estimates in your waters to \textbf{attempt to evaluate the overall change in revenue resulting from the FAD closures.}
+\end{itemize}
+\newpage
+\section*{Approach} 
+Fishery performance in the periods during (2009-\Sexpr{end_year}) and before FAD\footnote{FADs as described here include natural logs and artificial FADs consistent with the WCPFC and PNA definitions of FADs.} closures were in place (2000-2008), were compared to evaluate the possible impacts that the closures have had on fishing opportunities in your waters. In the analyses we analyzed separately three different types of fishing activities, which we will hereon refer to as the three ``fleets'', these being:
+\begin {enumerate} 
+\item Your purse seine flagged vessels irrespective of where they fished\footnote{This category pools your flagged vessels fishing inside your waters and those fishing in other areas of the WCPO. Your vessels outside your waters were not analyzed separately as low numbers of vessels and sets for some PNA members precluded meaningful comparisons.}; 
+\item Your purse seine flagged vessels fishing in your waters; and 
+\item Foreign flagged purse seine vessels fishing in your waters. 
+\end{enumerate} 
+The following analyses were undertaken:
+\begin{itemize}
+\item A general characterization of these fishing operations with some comparisons to other PNA and related FFA member waters\footnote{Analyses were undertaken for all PNA waters except for Palau because fishing activity was too low and variable in their waters to allow for analysis. In addition, the analyses for the dependence on FADs and capture rates of small yellowfin and bigeye also included data for the Cook Islands and Tokelau.};
+\item  A summary of catch, effort and CPUE during the 2009 (Aug-Sep), 2010-2012 and \Sexpr{end_year} (Jul-Sep), and 2013-2017 (Jul-Oct) FAD closures compared to a time period prior to FAD closures (2000-2008); and
+\item	A summary of fishery performance by month and set type during years with monthly FAD closures, 2009-\Sexpr{end_year}.  This specifically aims to evaluate observed differences in catch, effort, CPUE and catch value under three different circumstances:
+\begin{itemize}\item	when vessels were fishing FADs (non-closure months only);
+\item	when vessels were fishing free schools during FAD closure months (`forced' free school fishing); and
+\item	when vessels were fishing free schools during non-closure months (opportunistic free school fishing). \end{itemize} \end{itemize}
+The key information used in the analyses were:\begin{itemize}
+\item	Monthly distributions of purse seine effort by set type and fleet; 
+\item	Purse seine catch composition and fish size, from paired grab and spill sampling (SC8-ST-WP-03 Rev. 1) from \Sexpr{ct.short[ct.num]} and foreign flagged vessels in your waters (pooled); and 
+\item	The average \Sexpr{end_year} Bangkok prices (\autoref{tab1}) for common weight-based cannery pricing categories for skipjack, yellowfin, and bigeye.
+\end{itemize}
+For all analyses, small bigeye and yellowfin were defined as fish weighing less than 7.5lb.  This decision was based on the market categories commonly used by canneries for which all small tuna receive the same discounted price (\autoref{tab1}).
+
+\section* {Comparing fishery performance in years prior to and during FAD closure periods}
+For the period 2000-2008 for foreign flagged vessels fishing in your waters, approximately \Sexpr{for.FAD.rel}\% of sets were on schools associated with FADs.  Your flagged purse seine vessels (in your waters and in all areas) have shown an increase in reliance on FAD sets from around 40\% (average 2000-2008) to \Sexpr{domez.FAD.rel}\% in 2009-\Sexpr{end_year} (\autoref{fig1} - left). Across all PNA waters examined, the reliance on FAD sets for PNA country flagged fleets during years with monthly FAD closures ranged from \Sexpr{round(min(c(tab[tab[,4]>0,4]))*100)}\% to \Sexpr{round(max(c(tab[tab[,4]>0,4]))*100)}\% (\autoref{fig1} - top). In relative terms, your flagged vessels \Sexpr{FAD.lab[domall.cut]} on FADs but foreign flagged vessels fishing in your waters \Sexpr{FAD.lab[for.FAD.cut]}  on FADs.  Observer length frequency samples showed that the composition of small (< 7.5lb or 3.4kg) bigeye and yellowfin tuna combined (\Sexpr{for.FAD.comp}\%) in the FAD catch (in weight) in your waters during years with monthly FAD closures (2009-\Sexpr{end_year}) is \Sexpr{lab[for.fish.cut]} (\autoref{fig1} - right). The proportion of small bigeye and yellowfin catch on FADs have reduced both for your vessels and foreign flagged vessels fishing in your waters.  \vspace{0.4cm}\newline
+
+It was shown in previous FAD reports that relative to the years prior to 2008 the catch of small bigeye and yellowfin is low. It is not known why the catch of small bigeye and yellowfin during recent years (2009-\Sexpr{end_year}) outside of the closure have declined, but could be either good news (i.e. attempts to reduce bycatch during FAD sets or increased skipjack abundance) or bad news (i.e. reductions in the abundance of small bigeye and yellowfin tuna).\newline
+
+\section*{Fishery performance during years with monthly FAD closures, 2009-\Sexpr{end_year}}
+Fishing effort by set type, month and fleet are provided in \autoref{fig2}. Both your flagged and foreign flagged vessels fish in your waters, and your flagged vessels also fish in areas beyond your jurisdiction.  Effort by your flagged vessels since 2009 has averaged \Sexpr{prop.domestic}\% of total fishing effort within your waters. Your flagged vessels have a \Sexpr{ifelse(domall.FAD.rel > for.FAD.rel, "higher", "lower")} dependency on FADs and fished on FADs during the broader FAD closure. Fishing effort in your waters is seasonal with effort highest between June and October in most years (\autoref{fig2}). Effort in the last quarter by both your flagged and foreign flagged vessels was particularly low in your waters in 2013, 2014 and 2015. This appeared to be related to oceanographic conditions driving the fleet south and east of your waters, with some of this time period coinciding with a strong El Ni\~{n}o event which shifts fishing effort to the East. \newline
+
+Catch rates on FADs in your waters have fluctuated largely without trend over the period 2000-\Sexpr{end_year} but with some variability between fleets. Catch rates on free schools by foreign flagged vessels declined slightly from 2000 to 2010 (\autoref{fig3}).  Foreign vessels had a higher CPUE and bigger difference between FAD and free school CPUE than your flagged vessels fishing in your waters. Your flagged vessels had a lower CPUE when fishing in your waters than when fishing in all areas. During years with monthly FAD closures (2009-\Sexpr{end_year}), the catch per set for your flagged vessels fishing in all areas and foreign flagged vessels fishing in your waters is higher for FAD sets than for free school sets, regardless of the period when free school fishing (non-closure months or closure months). The difference between FAD and free school catch rates, of foreign flagged vessels, increased greatly after 2005.  Therefore, predictions of the negative impact of the FAD closure on foreign flagged catch rates were likely underestimated previously when using data from 2000-2008.  Your flagged vessels fishing in your waters have consistently low CPUE and the CPUE for FAD sets and free school sets (outside the FAD closure) is similar in recent years.  Foreign flagged vessels in your waters had high catch rates from 2006-2010, and from 2014-2016. The low CPUE in 2011, which was observed throughout the WCPO, appeared to be related to an extended La Ni\~{n}a event, which may have had negative effects on skipjack recruitment. However, this also coincided with a peak in the foreign effort in your waters that may have further depressed CPUE through inter-vessel competition for fish. \newline 
+
+The economic impact of reduced CPUE on free schools is partially offset by increased free school catch value per tonne. By combining catch size composition information by species, set-type and month, with cannery information, it was possible to estimate the value of a metric tonne of fish caught while FAD and free school fishing, during FAD closure and non-closure months. Based on recent prices (USD) and catch rates for the three fleets assessed, the average catch value per day fished while FAD fishing ranged from \$\Sexpr{formatC(min(c(tab2[1,4], tab2[6,4],tab2[11,4])), big.mark = ",", format = "d")} to \$\Sexpr{formatC(max(c(tab2[1,4], tab2[6,4],tab2[11,4])), big.mark = ",", format = "d")}, compared to \$\Sexpr{formatC(min(c(tab2[2,4], tab2[7,4],tab2[12,4])), big.mark = ",", format = "d")} to \$\Sexpr{formatC(max(c(tab2[2,4], tab2[7,4],tab2[12,4])), big.mark = ",", format = "d")} while free school fishing outside FAD closure months and \$\Sexpr{formatC(min(c(tab2[3,4], tab2[8,4],tab2[13,4])), big.mark = ",", format = "d")} to \$\Sexpr{formatC(max(c(tab2[3,4], tab2[8,4],tab2[13,4])), big.mark = ",", format = "d")} for free school catch during FAD closure months (\autoref{tab2}). This large difference in value of FAD catch is largely driven by the high CPUE of the foreign flagged vessels. Free school catch for your vessels within the FAD closure has about the same value per tonne (\$\Sexpr{val.ton}) irrespective of whether it is caught in your waters or not (\autoref{tab2}, \autoref{fig4}).  The comparison of catch value during and outside the FAD closure suggests that the fleets fishing in your waters are experiencing a decline in catch value of about \$\Sexpr{day.val.loss} (\Sexpr{pec.loss}\%) per day during (but not necessarily as a result of - see below) the FAD closure. The implications that this has for vessels fishing in your waters are discussed in more detail in Addendum 1. \newline
+
+Lower catch rates during closure months have been observed for both foreign and your flagged vessels fishing in your waters and for your flagged vessels in all areas (\autoref{fig4}), despite the fact that your flagged vessels use FADs during closure months.  This suggests that lower catch rates during closure months are a result of seasonality in catch rates with less successful fishing in general during closure months, not exclusively an effect of the FAD closure itself. \newline
+
+Previous FAD closure reports predicted the `best' FAD closure months for your waters to minimize small bigeye and yellowfin tuna catch while maintaining only small reductions in total tuna catch and catch value, was July to October.  For reference, these results are presented in \autoref{tab3}.\newline
+
+% Table 1
+\begin{center}
+\begin{table}[b]
+\begin{threeparttable}
+\caption {Cannery market categories and prices (USD/mt) used in analyses.  Values obtained from average \Sexpr{end_year} Bangkok weight-based  pricing.}
+\label{tab1}
+\begin{tabular}{| l | c | c | c |} % l is for left justification and | is for the line style 
+\hline
+\rowcolor{Azure2}
+Cannery category \tnote{1} & Bigeye & Skipjack & Yellowfin} \\ \hline
+0-1.4 kg & \Sexpr{tab1[1,2]} & \Sexpr{tab1[1,3]} & \Sexpr{tab1[1,4]}\\
+1.4-1.8 kg & \Sexpr{tab1[2,2]} & \Sexpr{tab1[2,3]} & \Sexpr{tab1[2,4]}\\
+1.8-3.4 kg & \Sexpr{tab1[3,2]} & \Sexpr{tab1[3,3]} & \Sexpr{tab1[3,4]}\\
+3.4-9.1 kg & \Sexpr{tab1[4,2]} & \Sexpr{tab1[4,3]} & \Sexpr{tab1[4,4]}\\
+>9.1 kg & \Sexpr{tab1[5,2]} & \Sexpr{tab1[5,3]} & \Sexpr{tab1[5,4]}\\
+\hline
+\end{tabular}
+\begin{tablenotes}
+\item[1] Equivalent to 0-3lb, 3-4lb, 4-7.5lb, 7.5-20lb, > 20lb
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+\end{center}
+\newline
+\clearpage
+%Table 2
+\begin{center}
+\begin{table}[t]
+\caption {Fleet-specific estimates of average landed value of a metric tonne (left), catch in weight per day (center), and the resulting landed value per day (right) for all fish caught on FADs, caught on free schools during non-closure months, and caught on free schools during closure months from 2009-\Sexpr{end_year}. Values are based on recent catch prices (\autoref{tab1}). The values in shaded cells correspond to those in \autoref{fig4}.}
+\label{tab2}
+\begin{tabular}{| l | c | c | c |} % l is for left justification and | is for the line style 
+\hline
+\rowcolor{Azure2}
+&\multicolumn{3}{c|}{Your flagged vessels in all areas} \\% the & before the function fills the cell with a blank 
+   & Value per tonne (US\$) & Catch per day (tonne) & Value per day (US\$)\\ \hline
+ ASS & \Sexpr{tab22[1,2]} & \Sexpr{tab22[1,3]} & \Sexpr{tab22[1,4]}\\
+ UNA No closure & \Sexpr{tab22[2,2]} & \Sexpr{tab22[2,3]} & \Sexpr{tab22[2,4]}\\
+ UNA Closure & \Sexpr{tab22[3,2]} & \Sexpr{tab22[3,3]} & \Sexpr{tab22[3,4]}\\
+ \rowcolor{MistyRose1}
+ No Closure all sets & \Sexpr{tab22[4,2]} & \Sexpr{tab22[4,3]} & \Sexpr{tab22[4,4]}\\
+ \rowcolor{MistyRose1}
+ Closure all sets & \Sexpr{tab22[5,2]} & \Sexpr{tab22[5,3]} & \Sexpr{tab22[5,4]}\\
+\hline
+\rowcolor{Azure2}
+&\multicolumn{3}{c|}{Your flagged vessels in your waters} \\ 
+   & Value per tonne (US\$) & Catch per day (tonne) & Value per day (US\$)\\ \hline
+ ASS & \Sexpr{tab22[6,2]} & \Sexpr{tab22[6,3]} & \Sexpr{tab22[6,4]}\\
+ UNA No closure & \Sexpr{tab22[7,2]} & \Sexpr{tab22[7,3]} & \Sexpr{tab22[7,4]}\\
+ UNA Closure & \Sexpr{tab22[8,2]} & \Sexpr{tab22[8,3]} & \Sexpr{tab22[8,4]}\\
+ \rowcolor{MistyRose1}
+ No Closure all sets & \Sexpr{tab22[9,2]} & \Sexpr{tab22[9,3]} & \Sexpr{tab22[9,4]}\\
+ \rowcolor{MistyRose1}
+ Closure all sets & \Sexpr{tab22[10,2]} & \Sexpr{tab22[10,3]} & \Sexpr{tab22[10,4]}\\
+\hline
+\rowcolor{Azure2}
+&\multicolumn{3}{c|}{Foreign flagged vessels in your waters} \\
+   & Value per tonne (US\$) & Catch per day (tonne) & Value per day (US\$)\\ \hline
+ ASS & \Sexpr{tab22[11,2]} & \Sexpr{tab22[11,3]} & \Sexpr{tab22[11,4]}\\
+ UNA No closure & \Sexpr{tab22[12,2]} & \Sexpr{tab22[12,3]} & \Sexpr{tab22[12,4]}\\
+ UNA Closure & \Sexpr{tab22[13,2]} & \Sexpr{tab22[13,3]} & \Sexpr{tab22[13,4]}\\
+ \rowcolor{MistyRose1}
+ No Closure all sets & \Sexpr{tab22[14,2]} & \Sexpr{tab22[14,3]} & \Sexpr{tab22[14,4]}\\
+ \rowcolor{MistyRose1}
+ Closure all sets & \Sexpr{tab22[15,2]} & \Sexpr{tab22[15,3]} & \Sexpr{tab22[15,4]}\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+\clearpage  % Need a clear page here to place the table at the top of the page otherwise it keeps the floating bits from somewhere else. 
+%Table 3
+\begin{center} 
+\begin{table}[!t]
+\caption {Rank of each month for the change in small bigeye and yellowfin tuna catch, total tuna catch in weight, and catch value in \Sexpr{i} waters (left) and across the PNA (right). Low ranks are `good', i.e., represents large reductions in small bigeye and yellowfin tuna catch and small reductions in total tuna catch weight and value. Rankings are relative to the median predicted monthly change across years (2000 - 2008).}
+\label{tab3}
+\begin{tabular}{ l  c  c  c  c  c  c  c} % l is for left justification and | is for the line style 
+\rowcolor{Azure2}
+&\multicolumn{3}{c}{\Sexpr{i} EEZ} & &\multicolumn{3}{c}{PNA EEZ}\\
+\rowcolor{Azure2}
+& Small & Total &  Value &  &  Small & Total &  Value} \\ \hline
+Jan & \Sexpr{tab3[1,2]} & \Sexpr{tab3[1,3]} & \Sexpr{tab3[1,4]} & & \Sexpr{tab3[1,5]} & \Sexpr{tab3[1,6]} & \Sexpr{tab3[1,7]}\\
+Feb & \Sexpr{tab3[2,2]} & \Sexpr{tab3[2,3]} & \Sexpr{tab3[2,4]} & & \Sexpr{tab3[2,5]} & \Sexpr{tab3[2,6]} & \Sexpr{tab3[2,7]}\\
+Mar & \Sexpr{tab3[3,2]} & \Sexpr{tab3[3,3]} & \Sexpr{tab3[3,4]} & & \Sexpr{tab3[3,5]} & \Sexpr{tab3[3,6]} & \Sexpr{tab3[3,7]}\\
+Apr & \Sexpr{tab3[4,2]} & \Sexpr{tab3[4,3]} & \Sexpr{tab3[4,4]} & & \Sexpr{tab3[4,5]} & \Sexpr{tab3[4,6]} & \Sexpr{tab3[4,7]}\\
+May & \Sexpr{tab3[5,2]} & \Sexpr{tab3[5,3]} & \Sexpr{tab3[5,4]} & & \Sexpr{tab3[5,5]} & \Sexpr{tab3[5,6]} & \Sexpr{tab3[5,7]}\\
+Jun & \Sexpr{tab3[6,2]} & \Sexpr{tab3[6,3]} & \Sexpr{tab3[6,4]} & & \Sexpr{tab3[6,5]} & \Sexpr{tab3[6,6]} & \Sexpr{tab3[6,7]}\\
+Jul & \Sexpr{tab3[7,2]} & \Sexpr{tab3[7,3]} & \Sexpr{tab3[7,4]} & & \Sexpr{tab3[7,5]} & \Sexpr{tab3[7,6]} & \Sexpr{tab3[7,7]}\\
+Aug & \Sexpr{tab3[8,2]} & \Sexpr{tab3[8,3]} & \Sexpr{tab3[8,4]} & & \Sexpr{tab3[8,5]} & \Sexpr{tab3[8,6]} & \Sexpr{tab3[8,7]}\\
+Sep & \Sexpr{tab3[9,2]} & \Sexpr{tab3[9,3]} & \Sexpr{tab3[9,4]} & & \Sexpr{tab3[9,5]} & \Sexpr{tab3[9,6]} & \Sexpr{tab3[9,7]}\\
+Oct & \Sexpr{tab3[10,2]} & \Sexpr{tab3[10,3]} & \Sexpr{tab3[10,4]} & & \Sexpr{tab3[10,5]} & \Sexpr{tab3[10,6]} & \Sexpr{tab3[10,7]}\\
+Nov & \Sexpr{tab3[11,2]} & \Sexpr{tab3[11,3]} & \Sexpr{tab3[11,4]} & & \Sexpr{tab3[11,5]} & \Sexpr{tab3[11,6]} & \Sexpr{tab3[11,7]}\\
+Dec & \Sexpr{tab3[12,2]} & \Sexpr{tab3[12,3]} & \Sexpr{tab3[12,4]} & & \Sexpr{tab3[12,5]} & \Sexpr{tab3[12,6]} & \Sexpr{tab3[12,7]}\\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+\clearpage  
+
+\begin{figure}
+  \centering
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_FAD_JUV_1.png",sep="")}} 
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_FAD_JUV_2.png",sep="")}}  
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_FAD_JUV_3.png",sep="")}} 
+\caption {Fleet-specific reliance on FAD sets (\% of total sets; left) and \% total catch in weight of small bigeye and yellowfin tuna in FAD sets (right) compared to the other PNA (+ CK and TK) members examined (shown by unlabeled bars, archipelagic waters excluded) \underline{during non-FAD closure months, 2009-\Sexpr{end_year}}. Note that blank bars in the top plot represent countries with no domestic fleet.\label{fig1} } 
+\end{figure}
+
+
+
+
+
+
+\newpage
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.495\textwidth]{\Sexpr{paste("C:/FAD_closure/2020_new/Plots/", i,"/",i,"_FAD_Reliance_Agdat_dom-all_mth_Late_HiddenLbl.png",sep="")}}
+    \includegraphics[width=0.495\textwidth]{\Sexpr{paste("C:/FAD_closure/2020_new/Plots/", i,"/",i,"_Psml_Agdat_dom-all_mth_Late_HiddenLbl.png",sep="")}}
+    \caption{Side by side figures.}
+    \label{fig:sidebyside}
+\end{figure}
+
+
+
+
+
+
+\newpage
+  \newgeometry{left=0.5cm,bottom=2.5cm,right=1cm,top=2.5cm}
+  \thispagestyle{empty}   % this removes the page number
+\begin{landscape}
+ \vspace*{\fill}
+ \begin{figure} [!h]
+  \centering
+\includegraphics [height=5cm]{\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_mo_set_1.png",sep="")}} 
+\includegraphics [height=5cm]{\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_mo_set_2.png",sep="")}}  
+\includegraphics [height=5cm]{\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_mo_set_3.png",sep="")}} 
+\caption {Fleet-specific monthly purse seine effort in sets by set type during closure months (Closure) and non-closure months (No closure) from January 2011 to December \Sexpr{end_year}. Note that the scales on the y-axes are not the same, vertical dashed lines represent the start of a new year and numbers on the x-axis represent the year. \label{fig2} }} 
+\end{figure}
+  \vspace*{\fill}
+\end{landscape}
+\restoregeometry
+\newpage
+
+\begin{figure}
+  \centering
+ \includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_cpue_1.png",sep="")}} 
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_cpue_2.png",sep="")}}  
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_cpue_3.png",sep="")}} 
+  \caption {Fleet-specific catch rates for sets on FADs (red), free schools during non-closure months (light blue), and free schools during closure months (dark blue) by year prior to (2000-2008) and after (2009-\Sexpr{end_year}) the implementation of FAD closure periods in your waters.  \label{fig3} }} 
+\end{figure}
+
+\newpage   % This ensures that the figure will appear on its own page
+  \newgeometry{left=0.5cm,bottom=2.5cm,right=1cm,top=2.5cm}
+   \thispagestyle{empty}   % this removes the page number
+\begin{landscape}
+ \vspace*{\fill}
+\begin{figure}[!h]
+  \centering
+\subfloat{
+\includegraphics [width= 7.5cm]{\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_closure_value_1.png",sep="")}} }
+\subfloat{
+\includegraphics [width= 7.5cm]{\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_closure_value_2.png",sep="")}}  }
+\subfloat{
+\includegraphics [width= 7.5cm]{\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_closure_value_3.png",sep="")}} }
+  \caption {Fleet-specific average (2009-\Sexpr{end_year}) catch weight per day and catch value during closure months (Closure) and non-closure months (No closure). \label{fig4} }} 
+\end{figure}
+  \vspace*{\fill}
+\end{landscape}
+\restoregeometry
+\newpage
+
+\begin{figure}
+\centering
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_set_year_1.png",sep="")}} 
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_set_year_2.png",sep="")}}  
+\includegraphics {\Sexpr{paste("C:/FAD_closure/2019/FAD_closure_reports_2019/final_figs/",i,"_set_year_3.png",sep="")}} 
+\caption {Number of sets on FADs (red), free schools during non-closure months (light blue), and free schools during closure months (dark blue) by year prior to (2000-2008) and after (2009-\Sexpr{end_year}) the implementation of monthly FAD closure periods in your EEZ. The line with points represents the percentage of FAD sets in each year. For your flagged vessels fishing in all areas (top); your flagged vessels fishing in your EEZ (middle); and foreign flagged vessels fishing in your EEZ (bottom). \label{fig5} }} 
+\end{figure}
+
+%\input{table2.tex} %once you have defined a table object in latex you can call it like this
+
+\end{document}

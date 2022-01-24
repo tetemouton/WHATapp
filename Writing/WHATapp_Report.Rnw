@@ -85,9 +85,9 @@ citecolor= NavyBlue}
 \begin{tikzpicture} [remember picture, overlay,every node/.style={anchor=center}] {               
 \node  at (page cs:0,0.8) {                                % [anchor=\bound]
 \includegraphics [width=22cm]{C:/GitHub/WHATapp/Writing/flag_logos/banner_new.png}};
-\node  at (page cs:0,0.3) [blue]{ 
+\node  at (page cs:0,0.3) { 
 {{\huge{\bfseries An introduction to the WHATapp tool for}}}};
-\node  at (page cs:0,0.23) [blue]{ 
+\node  at (page cs:0,0.23) { 
 {{\huge{\bfseries visualising high seas allocations}}}};
 \node  at (page cs:0,-0.05) {
 \includegraphics [width= 3in]{C:/GitHub/WHATapp/Writing/flag_logos/FFA.png}};
@@ -95,9 +95,9 @@ citecolor= NavyBlue}
 \includegraphics [width= 1in]{C:/GitHub/WHATapp/Writing/flag_logos/NZ_aid_logo.png}};
 \node  at (page cs:0,-0.4) {
 {\Large This work was funded by the New Zealand Aid Progamme.}};
-\node  at (page cs:0,-0.8) [blue]{ 
+\node  at (page cs:0,-0.8) { 
 {Issue Specific National Report, (An introduction to WHATapp for visualising allocations) October 2019 }};
-\node  at (page cs:0,-0.85) [blue]{ 
+\node  at (page cs:0,-0.85) { 
 {\small Please address inquiries to: Sam McKechnie (samm@spc.int)  }};
 \draw [thick] [blue] (page cs:-1,-0.75) rectangle (page cs:1,-0.75);
      }
@@ -114,6 +114,12 @@ Although there are difficulties in identifying (and sometimes formulating) crite
 The app is simply a tool to visualise the criteria (and their weightings) and so the difficulties associated with the allocation process tend to be centred around the selection and formulation of the criteria, rather than the development of the app itself. For example, some criteria such as economic dependency are difficult to define and synthesise into discrete values for each CCM. The set of criteria included in the app and the methods to weight them should not therefore be considered a final set or an accepted methodology. We will continue to develop the app to suit the needs of the membership as further criteria are suggested or existing criteria are modified.
 
 \section{Running the app}
+\subsection{Using the online version}
+The easiest way to utilise the app is to run the online version. This is done by simply clicking on the following address: \vspace{5mm} \\
+\href{https://smspc-apps.shinyapps.io/WHATapp_online/}{\qquad \qquad \qquad https://smspc-apps.shinyapps.io/WHATapp\_online/} \vspace{5mm} \\
+and then exploring the features described from section \ref{sec:features} onward.
+
+\subsection{Using the standalone portable version}
 Shiny apps are typically run either via a local server which requires users to have the R software (and applicable packages) installed, or are web-based which requires a robust internet connection. These are both barriers to easy distribution of an app, for example at workshops - particularly in the Pacific where internet connectivity can be limited.
 
 We have therefore developed a fully portable version of the app that does not require internet access, or the installation of R and knowledge of its use. The downside of this approach is that a web browser and a portable version of R must be packaged together with the usual components of the app. This leads to a relatively large file size, although  no true ``installation'' is necessary and so deletion of the app after use is simple. At this stage it is also restricted to windows operating systems. 
@@ -156,7 +162,7 @@ Depending on the security settings on your machine you may encounter a warning p
 \end{figure}
 
 
-\section{Features of the app}
+\section{Features of the app} \label{sec:features}
 \subsection{Controlling the scenarios}
 Once the app is running you will see two columns of text and features on the left hand side of the dashboard (Fig. \ref{fig:featpg}). These control the scenarios that you can investigate and also some other features of the plots and tables that show the resulting allocations. To control the app you can modify the following:
 \begin{itemize}
@@ -225,8 +231,10 @@ The CMM 2018-01 outlines flag-based catch limits for bigeye for six countries th
 
 \subsection*{Biomass of focal stock in EEZs}
 \noindent\textbf{\emph{Purse seine:}}
+This scenario attempts to allocate based on the relative levels of skipjack biomass in different EEZ's. It was calculated by taking the results of the diagnostic model of the stock assessment model and by calculating the area of each EEZ in each assessment model region. The total biomass in each region (over the period {\bf X--X must check the code and add here}) was assumed to be distributed uniformly and so was assigned to EEZ's based on the size of the EEZ in that model region. For EEZ's that straddled model region boundaries the biomass contributions from both regions were combined. For example, if EEZ X covers 10\% of region 1 (with a biomass of 1 million tonnes) and 20\% of region 2 (with a biomass of 3 million tonnes), then the total biomass in that EEZ is simply 0.1$\times$1 million $+$ 0.2$\times$3 million $=$ 700,000mt.
 
 \noindent\textbf{\emph{Longline:}}
+The longline scenario was exactly as described for purse seine except that the biomass of bigeye tuna was used from the diagnostic model of the last stock assessment.
 
 \subsection*{EEZ size}
 \noindent\textbf{\emph{Purse seine:}}

@@ -1,0 +1,217 @@
+
+################################################################
+#
+# SUMMARY OF DATA FOR SC-SPTBF MEMBERS
+# GMP 12/10/2015
+# SRH 15/05/2020
+# just code that works on VMS data
+# plus fills in EEZ gaps with logsheet info
+# and does the VMS maps
+#
+#################################################################
+setwd("C:/analysis/ALB_trends/2020")
+#library(gdata) #package for commas
+source("functions.r")
+library(maps)
+library(mapproj)
+library(mapdata)
+library(RODBC)
+library(reshape2)
+library(plyr)
+#####################
+
+## Load all the data ##
+load("data/alb_data.RData")
+
+endyear<-lastyear
+spll <- SPLL
+spll$yy <- as.numeric(substring(spll$vms_date,1,4))
+spll$lon <- ifelse(substring(spll$lon,4,4) == "W", 180+(180-as.numeric(substring(spll$lon,1,3))), as.numeric(substring(spll$lon,1,3)))
+spll$lat <- ifelse(substring(spll$lat,3,3) == "S",-1*as.numeric(substring(spll$lat,1,2)),as.numeric(substring(spll$lat,1,2)))
+# just south and exclude EPO
+spll <- spll[spll$lat < 0,]
+spll <- spll[spll$lon < 230 & spll$lon >141,]  #WCP_CA goes from 141 E Longitude
+#spll <- spll[spll$lon < 229 & spll$lon >139 ,]
+spll <- spll[!(spll$lon >209 & spll$lat > -5),]
+length(spll[,1])
+#spll <- spll[!(spll$in_arch == T),]           #remove VMS data within AW, noting that not all the AW for countries like PNG are within the WCPO area selected
+length(spll[,1])
+
+# Previously a text file (PFLOGSHEET) was read in here after
+# being manually created in CES.  Now the data extraction is
+#part of 00_data_extracts
+# SRH 17 Mar 20
+
+#depends if you want this only for PF or NC as well
+#for ( i in c("PF") {
+for ( i in c("PF", "NC")) {
+  if (i=="PF") t. <- PF.log
+  if (i=="NC") t. <- NC.log
+ t.<-subset(t., t.$yy > 2007)
+ t.$lond <- floor(t.$lond)
+ t.$latd <- floor(t.$latd)
+ t.$ez_id <- "PF"                                  #needed if you forget to group by EZ in the CES extract!
+ t.$vms_date <- NA
+ t.$ocean_id <- "WS"
+ t.$in_arch <- "FALSE"
+ t.$sum_days <- NA
+ dimnames(t.)[[2]][2] <- "lon"
+ dimnames(t.)[[2]][3] <- "lat"
+ dimnames(t.)[[2]][4] <- "sum_days_vms"
+ t.. <- t.[,c(6,7,5,2,3,8,9,4,1)]
+ spll <- rbind(spll,t..)
+}
+
+
+### if wanted for comparability with other plots, do below 10?S ###
+spll <- spll[spll$lat < -10,]
+
+#knock off any partial years
+spll <- spll[!(spll$yy > lastyear),]
+spll <- spll[!(spll$yy < 2010),] # remove some shit from 1970 that seems to have come in * limit to 2010+
+
+# Simple tables with all EZs
+tmp <- spll
+#tmp$ez_id[tmp$ez_id %in% c("H4","H5","I2","I5","I7","I8","I9")] <- "HS"
+tmp$ez_id[tmp$ez_id %in% c("GL","LN","PX")] <- "KI"
+tmp$ez_id[tmp$ez_id %in% c("AU","NF")] <- "AU"
+hs<-c("H4","H5","I2","I5","I7","I8","I9")
+# by HS area
+tmp2<-subset(tmp, tmp$ez_id %in% hs)
+
+HS_vms <- round(tapply(tmp2$sum_days_vms,list(tmp2$ez_id,tmp2$yy),sum,na.rm=T),0)    #total days
+HS_vms [is.na(HS_vms )]<-0
+
+#vtb1 <- round(tapply(tmp$sum_days,list(tmp$ez_id,spll$yy),sum,na.rm=T),0)         #fishing days
+vtb1a <- round(tapply(tmp$sum_days_vms,list(tmp$ez_id,spll$yy),sum,na.rm=T),0)    #total days
+vtb1a[is.na(vtb1a)]<-0
+head(vtb1a)
+head(HS_vms)
+write.csv(vtb1a,"tabs/SOUTH_LL_VMS_ez.csv")
+write.csv(HS_vms,"tabs/VMS_HS.csv")
+
+### Make a VMS by EEZ and HS table
+tmp2<-tmp
+tmp2$ez_id[tmp2$ez_id %in% c("H4","H5","I2","I5","I7","I8","I9")] <- "HS"
+vtb1ab <- round(tapply(tmp2$sum_days_vms,list(tmp2$ez_id,spll$yy),sum,na.rm=T),0)    #total days
+vtb1ab[is.na(vtb1ab)]<-0
+head(vtb1ab)
+write.csv(vtb1ab,"tabs/SOUTH_LL_VMS_ez2.csv")
+# Make A VMS effort plot
+vms_days<-colSums(vtb1a)
+
+maxi<-ceiling(max(vms_days)*1/100)*100
+ee<-pretty(seq(from=0, to =maxi, by =maxi/10 ))     # get numbers fo y axis
+axlab<-formatC(ee, big.mark = ",", format = "d")         # add in a 1000's seperator
+
+if (dev.cur()!=1) dev.off()
+windows(20,15)
+par(mar=c(2,2,2,1), oma=c(1,4,2,1))
+x<-barplot(vms_days, col="blue", axes=FALSE, xaxt = "n", ylim=c(0,max(ee)))
+  axis(side=2, las=1, labels=axlab, at =ee, cex.axis=1.0) 
+  axis(side=1, labels=c(2010:endyear), at =x, cex.axis=1.0) 
+  #mtext("Year",1, line=2.5, cex=1.5)
+  mtext("Days",2, line=4, cex=1.5)
+  mtext("VMS effort (days) south of 10?S in the WCPFC-CA",3, line=1, cex=2.0)
+  box()
+savePlot("figs/southernLL_VMS", type="png")
+
+################
+
+# do summary tables
+tmp <- spll
+tmp$ez_id[tmp$ez_id %in% c("H4","H5","I2","I5","I7","I8","I9")] <- "HS"
+tmp$ez_id[tmp$ez_id !="HS"] <- "EZ"
+
+#drop odd "IW" codes
+tmp <- tmp[!(tmp$ez_id=="IW"),]
+
+#vmtb1 <- tapply(tmp$sum_days,list(tmp$yy,tmp$ez_id),sum)
+vmtb1a <- tapply(tmp$sum_days_vms,list(tmp$yy,tmp$ez_id),sum)
+vmtb1a [is.na(vmtb1a)]<-0
+
+head(vmtb1a)
+tm<-data.frame(region=c("EZ","HS"),round(t(vmtb1a[c((length(vtb1a[1,])-9):(length(vtb1a[1,]))),]) ))
+nam_list<-seq(length(vtb1a[1,])-9,(length(vtb1a[1,])),1)
+colnames(tm)<-c("region", rownames(vmtb1a[c(nam_list),]))
+tm
+tm2<-data.frame(region="Total", t(colSums(tm[,-1])))
+colnames(tm2)<-c("region", rownames(vmtb1a[c(nam_list),]))
+tm3<-data.frame(region=c("pec_EZ"), round(tm[1,-1]/tm2[1,-1]*100))
+tm4<-data.frame(region=c("pec_HS"), round(tm[2,-1]/tm2[1,-1]*100))
+colnames(tm3)<-c("region", rownames(vmtb1a[c(nam_list),]))
+colnames(tm4)<-c("region", rownames(vmtb1a[c(nam_list),]))
+
+tab3<-rbind(tm,tm2,tm3,tm4)
+tab3$region<-c("EEZ", "High seas", "Total", "% EEZ", "% High seas")
+head(tab3)
+write.csv(tab3,"tabs/VMS_ez_hs.csv")
+
+#vmtb2 <- tapply(spll$sum_days,list(spll$yy,spll$ez_id),sum)[,c("H4","H5","I2","I5","I7","I8","I9")]
+#vmtb2a <- tapply(spll$sum_days_vms,list(spll$yy,spll$ez_id),sum)[,c("H4","H5","I2","I5","I7","I8","I9")]
+vmtb2a <- tapply(spll[spll$ez_id %in% c("H4","H5","I2","I5","I7","I8","I9"),"sum_days_vms"],list(spll[spll$ez_id %in% c("H4","H5","I2","I5","I7","I8","I9"),"yy"],spll[spll$ez_id %in% c("H4","H5","I2","I5","I7","I8","I9"),"ez_id"]),sum)
+# if south of 10deg S
+#vmtb2 <- tapply(spll$sum_days,list(spll$yy,spll$ez_id),sum)[,c("I2","I5","I7","I8","I9")]
+vmtb2a <- tapply(spll$sum_days_vms,list(spll$yy,spll$ez_id),sum)[,c("I2","I5","I7","I8","I9")]
+# Maps
+ez <- read.table("data/EZNEW2.txt")
+
+#maximum annual days AT SEA
+maxsize <- max(aggregate(spll[spll$yy %in% seq(lastyear-6,lastyear,1),"sum_days_vms"],list(spll[spll$yy %in% seq(lastyear-6,lastyear,1),"lon"],spll[spll$yy %in% seq(lastyear-6,lastyear,1),"lat"],spll[spll$yy %in% seq(lastyear-6,lastyear,1),"yy"]),sum)$x)
+maxsize 
+
+### all on one
+SP="sum_days_vms"
+lonvar =c("lon")
+latvar=c("lat")
+LIMS=c(130,250,-55,5)
+WH=c(1200,800)
+fudge=0.1
+
+if (dev.cur()!=1) dev.off()
+windows(28,30)
+par(mfrow=c(3,2))
+par(mar=c(2,2.5,3,1), oma=c(2,3,2,1))
+for(i in (lastyear-5):lastyear)
+{
+  ii<-as.numeric(i)
+  DATA=spll[spll$yy==ii,]
+plot.pacific(lims=LIMS,add.reg=F,bckgr="lightblue1")
+mat <- aggregate(DATA[,SP],list(DATA[,lonvar],DATA[,latvar]),sum)
+scalar <- max(mat$x)/maxsize
+jnk <- mat[mat$x>0,]
+title(main=i, cex.main=1.75)
+symbols(jnk[,1]+0.5,jnk[,2]+0.5,circles=sqrt(jnk$x/pi),add=T,bg="blue",inches=fudge*scalar)         #inches = 0.25*scalar
+} 
+
+savePlot("figs/VMS_alb",type="png")
+
+## each on their own
+fudge=0.2
+for(i in 2010:lastyear)#(lastyear-5):lastyear)
+{
+  if (dev.cur()!=1) dev.off()
+  windows(30,15)
+  par(mar=c(2,2.5,3,1), oma=c(2,3,2,1))
+  ii<-as.numeric(i)
+  DATA=spll[spll$yy==ii,]
+  plot.pacific(lims=LIMS,add.reg=F,bckgr="lightblue1")
+  mat <- aggregate(DATA[,SP],list(DATA[,lonvar],DATA[,latvar]),sum)
+  scalar <- max(mat$x)/maxsize
+  jnk <- mat[mat$x>0,]
+  title(main=i, cex.main=1.75)
+  symbols(jnk[,1]+0.5,jnk[,2]+0.5,circles=sqrt(jnk$x/pi),add=T,bg="blue",inches=fudge*scalar)         #inches = 0.25*scalar
+savePlot(paste("figs/VMS_alb_",i,sep=""),type="png")
+#dev.off()
+}
+
+eff_ez<-ddply(spll,~ez_id+yy, summarise, days=sum(sum_days_vms))#aggregate(spll$sum_days_vms,list(yy),mean)
+
+head(eff_ez)
+eff_ez<-reshape2::dcast(eff_ez, ez_id ~yy, value.var = "days", fun.aggregate = sum )
+write.csv(eff_ez,"tabs/VMS_eff.csv")
+
+#graphics.off()
+#################################################################
+save(tab3, maxsize, file="data/alb_vms_dat.RData")
+#################################################################

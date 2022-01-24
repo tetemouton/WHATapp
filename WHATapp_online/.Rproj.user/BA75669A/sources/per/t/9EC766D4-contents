@@ -1,0 +1,700 @@
+library(MASS)
+library(data.table)
+library(ggplot2)
+library(sp)
+library(sf)
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+library(scales)
+library(grid)
+library(gridExtra)
+library(statmod)
+
+  theme_set(theme_bw())
+
+  dirpth <- "C:/Tuvalu/2020/Updated/"
+  
+  
+  cnt.keep <- read.csv(file="C:/EEZs/Data/PacCountries.csv", header=TRUE)
+  eez <- st_read("C:/EEZs/Data/World_EEZ_Files/World_EEZ_v10_2018_0_360.shp")
+  arch <- st_read("C:/EEZs/Data/World_Arch_Files/eez_archipelagic_waters_v2_2018_0_360.shp")
+  land <- st_read("C:/EEZs/Data/EEZ_land_union/EEZ_land_v2_201410.shp")
+  land$geometry <- st_set_crs(land$geometry + c(180,0), 4326)
+  
+  pac.eez <- eez[eez$Territory1 %in% cnt.keep$Ctry,]
+  pac.arc <- arch[arch$Territory1 %in% cnt.keep$Ctry,]
+  
+  
+  school.cds <- data.frame(sht = 0:9,
+                           lng = c("NoInfo","Unass","Baitfish","Log","DriftFAD","AnchFAD","Whale","WhlShk","Other","OldWhlorShk"))
+
+  ASSvec <- c(3:7,9)
+  
+  
+#____________________________________________________________________________________________________________    
+# Purse seine operational logsheet data    
+  
+  act.codes <- read.csv("C:/References/Database_Codes/Purse_Seine_Activity_codes.csv", header=TRUE, stringsAsFactors=FALSE)
+    
+  load(paste0(dirpth, "Data/OPPS_EEZ_DATA.RData"), verbose=TRUE)      # Load set-level operational PS data
+  load(paste0(dirpth, "Data/OPPS_EEZ_TRIP-DATA.RData"), verbose=TRUE) # Load trip-level operational PS data  
+  
+  
+  opdat %<>% mutate(latd=as.numeric(substring(lat_long, 1, 2)), latd=latd+as.numeric(substring(lat_long, 3, 8))/60, latd=ifelse(substring(lat_long, 9, 9) == "S", -1 * latd, latd),
+                    lond=as.numeric(substring(lon_long, 1, 3)), lond=lond+as.numeric(substring(lon_long, 4, 9))/60, lond=ifelse(substring(lon_long, 10, 10) == 'W', 360-lond, lond),
+                    lubdt=ymd(logdate), yy = year(lubdt), mm = month(lubdt), dd = day(lubdt), yrqtr = yy + (mm - .5)/12)
+  
+  opdat$school <- school.cds$lng[match(opdat$sch_id, school.cds$sht)]
+  
+  opps <- left_join(opdat, opdat_trip, by="trip_id", suffix=c("","y")) %>% mutate(ez_rep=ifelse(ez_id %in% c("GL","PX","LN"), "KI", as.character(ez_id)))
+  
+  opps$activity <- act.codes$Description[match(opps$s_act_id, act.codes$ID)]
+  
+  opps[] <- lapply(opps, function(x) if (is.factor(x)) as.character(x) else {x})
+  
+
+  optv <- opps %>% filter(ez_id == "TV", s_act_id %in% c(1,2))
+  
+  
+  # windows(3000,2000)
+  #   pl <- ggplot() + geom_sf(data = pac.eez, fill = alpha("dodgerblue", 0.3)) +
+  #                xlab("Longitude") + ylab("Latitude") +
+  #                geom_point(data = optv, aes(x = lond, y  = latd, colour = activity), shape = 19, size = 3) +
+  #                scale_colour_manual(values = alpha(c("dodgerblue","firebrick"), 0.5)) + coord_sf(datum = st_crs(pac.eez)) +
+  #                scale_x_continuous(limits = c(160,200)) + scale_y_continuous(limits = c(-15,5)) +
+  #                theme(legend.title = element_blank(), legend.position = "top", axis.text = element_text(size = 15),
+  #                      axis.title = element_text(size = 18), legend.text = element_text(size = 18))
+  #   print(pl)
+  #   ggsave(filename = paste0(dirpth, "/Plots/PS_Sets_TVeez.pdf"), plot=pl, width = 12, height = 8, units = "in", dpi = 600)
+  # dev.off()  
+  
+  
+
+  opmod <- opps %>% filter(yy >= 2010,
+                           s_act_id %in% 1:2,
+                           ez_id %in% c("CK","FM","KI","MH","NR","PG","PW","SB","TK","TV","GL","LN","PX")) %>% #,"H4","H5"))
+                    mutate(tot_c = bet_c + skj_c + yft_c)
+  
+  # write.csv(opmod, file = paste0(dirpth, "/Data/opmod.csv"))
+  
+  
+
+  tvop <- opmod %>% filter(ez_id == "TV")
+  
+  tvyr <- tvop %>% filter(flag_id %in% c("KI","KR","PG","TW","US")) %>% group_by(yy, flag_id) %>% summarise(muCPUE = mean(tot_c), Nsets = n())
+
+  windows(5000,3000)
+    pl <- ggplot(tvyr, aes(x = yy, y = muCPUE, colour = flag_id)) + geom_point(aes(size = Nsets)) + geom_line(size = 1) +
+                 scale_y_continuous(limits = c(0,NA)) + scale_x_continuous(breaks = seq(min(tvyr$yy), max(tvyr$yy), 1)) +
+                 scale_size_continuous(range = c(1,15)) +
+                 xlab("") + ylab("CPUE (catch per set)") +
+                 scale_colour_manual(values = alpha(c("goldenrod3","firebrick3","seagreen3","dodgerblue","black"), 0.8)) +
+                 theme(legend.text=element_text(size=12), axis.text=element_text(size=14), axis.title=element_text(size=14),
+                       legend.key.size=unit(0.7, "cm"), legend.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/Opdat_CPUE_TVeez_ByFlag_Year.png"), type="png")
+  dev.off()
+  
+  
+  tvop <- opmod %>% filter(ez_id == "TV")
+  
+  tvyr <- tvop %>% filter(sch_id %in% ASSvec, flag_id %in% c("KI","KR","PG","TW","US")) %>% group_by(yy, flag_id) %>%
+                   summarise(muCPUE = mean(tot_c), Nsets = n())
+  
+  windows(5000,3000)
+    pl <- ggplot(tvyr, aes(x = yy, y = muCPUE, colour = flag_id)) + geom_point(aes(size = Nsets)) + geom_line(size = 1) +
+                 scale_y_continuous(limits = c(0,NA)) + scale_x_continuous(breaks = seq(min(tvyr$yy), max(tvyr$yy), 1)) +
+                 scale_size_continuous(range = c(1,15)) +
+                 xlab("") + ylab("CPUE (catch per set)") +
+                 scale_colour_manual(values = alpha(c("goldenrod3","firebrick3","seagreen3","dodgerblue","black"), 0.8)) +
+                 theme(legend.text=element_text(size=12), axis.text=element_text(size=14), axis.title=element_text(size=14),
+                       legend.key.size=unit(0.7, "cm"), legend.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/Opdat_CPUE_TVeez_ByFlag_Year_JustAss.png"), type="png")
+  dev.off()
+  
+
+  tvyrqtr <- tvop %>% filter(flag_id %in% c("KI","KR","PG","TW","US")) %>% group_by(yrqtr, flag_id) %>% summarise(muCPUE = mean(tot_c))
+  
+  windows(5000,3000)
+    pl <- ggplot(tvyrqtr, aes(x = yrqtr, y = muCPUE, colour = flag_id)) + geom_point(size = 4) + geom_line(size = 1) +
+                 xlab("") + ylab("CPUE (catch per set)") +
+                 scale_y_continuous(limits = c(0,NA)) + scale_colour_manual(values = c("goldenrod3","firebrick3","seagreen3","dodgerblue","black")) +
+                 theme(legend.text=element_text(size=12), axis.text=element_text(size=14), axis.title=element_text(size=14),
+                       legend.key.size=unit(0.7, "cm"), legend.title=element_text(size=14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/Opdat_CPUE_ByFlag_YearMon.png"), type="png")
+  dev.off()
+  
+  
+
+
+#____________________________________________________________________________________________________________   
+# Annual catch estimate comparisons  
+  
+  ace.dat <- read.csv(file = paste0(dirpth, "/Data/PS_ACE_EEZS.TXT"), header=TRUE, stringsAsFactors=FALSE)
+  
+  pna.dat <- filter(ace.dat, eez %in% c("CK","FM","KI","MH","NR","PG","PW","SB","TK","TV","H4","H5","GL","LN","PX")) %>%
+                    mutate(EEZ = ifelse(eez %in% c("H4","H5"), "IW", eez), EEZ = ifelse(eez %in% c("GL","LN","PX"), "KI", eez))
+  
+  ag.dat <- pna.dat %>% group_by(yy, EEZ) %>% summarise(Days = sum(days), BET = sum(bet_mt), SKJ = sum(skj_mt), YFT = sum(yft_mt)) %>%
+                        mutate(TOT = BET + SKJ + YFT, CPUE = TOT / Days) %>% filter(yy >= 2010)
+    
+    
+  #________________________________________________
+  # CPUE
+  
+  av.dat <- ag.dat %>% group_by(EEZ) %>% summarise(Days = sum(Days), BET = sum(BET), SKJ = sum(SKJ), YFT = sum(YFT), TOT = sum(TOT)) %>%
+                       mutate(CPUE = TOT / Days, Days = round(Days))  %>% arrange(desc(CPUE)) %>% mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"))
+    
+    
+  windows(6000,4000)
+    pl <- ggplot(av.dat, aes(x=ord, y=CPUE, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black", width=1) +
+                 geom_text(aes(label = Days), angle = 90, hjust = 1.2, size = 4, colour = "white") +
+                 xlab("EEZ") + ylab("CPUE (mt per day)") +
+                 scale_fill_manual(name="Type", values=alpha(c("bisque4","firebrick2"), 0.6)) +
+                 scale_x_continuous(breaks=av.dat$ord, labels=av.dat$EEZ, expand = c(0.01,0.01)) +
+                 theme(legend.text=element_text(size=12),
+                       axis.text=element_text(size=11), axis.title=element_text(size=12), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/ACE_CPUE_PNAeezs_All.png"), type="png")
+  dev.off()
+    
+    
+  ag.dat %<>% ungroup() %>% arrange(yy, desc(CPUE)) %>% mutate(ord=row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"), Days = round(Days))
+    
+  windows(6000,5000)
+    pl1 <- ggplot(ag.dat, aes(x=ord, y=CPUE, fill=Type)) + geom_bar(stat="identity", colour="black", width=1) +
+                  geom_text(aes(label = Days), angle = 90, hjust = 1.2, size = 2.3, colour = "white") +
+                  xlab("EEZ") + ylab("CPUE (mt per day)") + facet_wrap(~ yy, ncol=2, scales="free_x") +
+                  scale_fill_manual(name="Type", values=alpha(c("bisque4","firebrick2"), 0.6)) + 
+                  scale_x_continuous(breaks=ag.dat$ord, labels=ag.dat$EEZ, expand = c(0.01,0.01)) +              
+                  theme(legend.position="none",
+                        axis.text=element_text(size=9), axis.title=element_text(size=14))
+    print(pl1)
+    savePlot(paste0(dirpth, "/Plots/ACE_CPUE_PNAeezs_ByYr.png"), type="png")
+  dev.off()
+    
+    
+  pl <- pl + theme(panel.border=element_rect(size=2))
+    
+  lay.mat <- rbind(c(NA,1,1,1,1,1,1,1),
+                   c(NA,1,1,1,1,1,1,1),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2))
+    
+  windows(8000,11000)
+    grid.newpage()
+    grid.arrange(pl, pl1, layout_matrix=lay.mat, nrow=3)
+    savePlot(paste0(dirpth, "/Plots/ACE_CPUE_PNAeezs_Composite.png"), type="png")
+    dev.off()  
+    
+    
+  #________________________________________________
+  # Days fished
+    
+  av.dat <- ag.dat %>% group_by(EEZ) %>% summarise(Days = sum(Days), BET = sum(BET), SKJ = sum(SKJ), YFT = sum(YFT), TOT = sum(TOT)) %>%
+                       mutate(CPUE = TOT / Days)  %>% arrange(desc(Days)) %>% mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"))
+    
+  windows(6000,4000)
+    pl <- ggplot(av.dat, aes(x=ord, y=Days/10/1000, fill=Type)) + geom_bar(position="stack", stat="identity", colour="black", width=1) +
+                 xlab("EEZ") + ylab("Days per Yr (1,000's)") +
+                 scale_fill_manual(name="Type", values=alpha(c("bisque4","firebrick2"), 0.6)) +
+                 scale_x_continuous(breaks=av.dat$ord, labels=av.dat$EEZ, expand = c(0.01,0.01)) +
+                 theme(legend.text=element_text(size=12),
+                       axis.text=element_text(size=11), axis.title=element_text(size=12), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/ACE_Days_PNAeezs_All.png"), type="png")
+  dev.off()
+    
+    
+  ag.dat %<>% ungroup() %>% arrange(yy, desc(Days)) %>% mutate(ord=row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"))
+    
+  windows(6000,5000)
+    pl1 <- ggplot(ag.dat, aes(x=ord, y=Days/1000, fill=Type)) + geom_bar(stat="identity", colour="black", width=1) +
+                  xlab("EEZ") + ylab("Days fished (1,000's)") + facet_wrap(~ yy, ncol=2, scales="free_x") +
+                  scale_fill_manual(name="Type", values=alpha(c("bisque4","firebrick2"), 0.6)) + 
+                  scale_x_continuous(breaks=ag.dat$ord, labels=ag.dat$EEZ, expand = c(0.01,0.01)) +              
+                  theme(legend.position="none",
+                        axis.text=element_text(size=9), axis.title=element_text(size=14))
+    print(pl1)
+    savePlot(paste0(dirpth, "/Plots/ACE_Days_PNAeezs_ByYr.png"), type="png")
+  dev.off()
+    
+    
+  pl <- pl + theme(panel.border=element_rect(size=2))
+    
+  lay.mat <- rbind(c(NA,1,1,1,1,1,1,1),
+                   c(NA,1,1,1,1,1,1,1),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2))
+    
+  windows(8000,11000)
+    grid.newpage()
+    grid.arrange(pl, pl1, layout_matrix=lay.mat, nrow=3)
+    savePlot(paste0(dirpth, "/Plots/ACE_Days_PNAeezs_Composite.png"), type="png")
+  dev.off()  
+    
+  
+  
+  #________________________________________________
+  # Korea CPUE
+  
+
+  ag.dat <- pna.dat %>% filter(flag == "KR", yy >= 2010) %>% group_by(yy, EEZ) %>%
+                        summarise(Days = sum(days), BET = sum(bet_mt), SKJ = sum(skj_mt), YFT = sum(yft_mt)) %>%
+                        mutate(TOT = BET + SKJ + YFT, CPUE = TOT / Days) %>% filter(yy >= 2010)
+  
+  
+  av.dat <- ag.dat %>% group_by(EEZ) %>% summarise(Days = sum(Days), BET = sum(BET), SKJ = sum(SKJ), YFT = sum(YFT), TOT = sum(TOT)) %>%
+                       mutate(CPUE = TOT / Days, Days = round(Days))  %>% arrange(desc(CPUE)) %>% mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"))
+  
+  
+  windows(6000,3000)
+    pl <- ggplot(ag.dat, aes(x = yy, y = Days, fill = EEZ)) + geom_bar(position = "stack", stat = "identity", colour = "black", width = 1) +
+                 xlab("") + ylab("Days") +
+                 scale_fill_brewer(palette = "Spectral") +
+                 scale_x_continuous(breaks = seq(min(ag.dat$yy), max(ag.dat$yy), 1), expand = c(0.01,0.01)) +
+                 theme(legend.text = element_text(size = 14),
+                       axis.text = element_text(size = 12), axis.title = element_text(size = 14), legend.key.size = unit(0.7, "cm"), legend.title = element_text(size = 14))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/ACE_DaysYear_PNAeezs_KR.png"), type = "png")
+  dev.off()
+  
+  
+  windows(6000,4000)
+    pl <- ggplot(av.dat, aes(x = ord, y = CPUE, fill = Type)) + geom_bar(position = "stack", stat = "identity", colour = "black", width = 1) +
+                 geom_text(aes(label = Days), angle = 90, hjust = 1.2, size = 4, colour = "white") +
+                 xlab("EEZ") + ylab("CPUE (mt per day)") +
+                 scale_fill_manual(name = "Type", values = alpha(c("bisque4","firebrick2"), 0.6)) +
+                 scale_x_continuous(breaks = av.dat$ord, labels = av.dat$EEZ, expand = c(0.01,0.01)) +
+                 theme(legend.text = element_text(size = 12),
+                       axis.text=element_text(size=11), axis.title=element_text(size=12), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/ACE_CPUE_PNAeezs_All_KR.png"), type="png")
+  dev.off()
+  
+  
+  ag.dat %<>% ungroup() %>% arrange(yy, desc(CPUE)) %>% mutate(ord=row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"), Days = round(Days))
+  
+  windows(6000,5000)
+    pl1 <- ggplot(ag.dat, aes(x = ord, y = CPUE, fill = Type)) + geom_bar(stat = "identity", colour = "black", width = 1) +
+                  geom_text(aes(label = Days), angle = 90, hjust = 1.2, size = 2.3, colour = "white") +
+                  xlab("EEZ") + ylab("CPUE (mt per day)") + facet_wrap(~ yy, ncol = 2, scales = "free_x") +
+                  scale_fill_manual(name = "Type", values = alpha(c("bisque4","firebrick2"), 0.6)) + 
+                  scale_x_continuous(breaks = ag.dat$ord, labels = ag.dat$EEZ, expand = c(0.01,0.01)) +              
+                  theme(legend.position = "none",
+                  axis.text = element_text(size = 9), axis.title = element_text(size = 14))
+    print(pl1)
+    savePlot(paste0(dirpth, "/Plots/ACE_CPUE_PNAeezs_ByYr_KR.png"), type="png")
+  dev.off()
+  
+  
+  pl <- pl + theme(panel.border=element_rect(size=2))
+  
+  lay.mat <- rbind(c(NA,1,1,1,1,1,1,1),
+                   c(NA,1,1,1,1,1,1,1),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2))
+  
+  windows(8000,11000)
+  grid.newpage()
+  grid.arrange(pl, pl1, layout_matrix=lay.mat, nrow=3)
+  savePlot(paste0(dirpth, "/Plots/ACE_CPUE_PNAeezs_Composite_KR.png"), type="png")
+  dev.off()  
+  
+  
+  #________________________________________________
+  # Associated CPUE
+  
+  opcpue <- opps %>% filter(ez_rep %in% c("CK","FM","KI","MH","NR","PG","PW","SB","TK","TV","H4","H5","GL","LN","PX")) %>%
+                     mutate(School = ifelse(sch_id %in% 0:2, "UNA", "ASS"))
+  
+  opass <- opcpue %>% filter(s_act_id == 1, yy >= 2010, School == "ASS") %>% group_by(EEZ = ez_rep) %>%
+                      summarise(Sets = n(), BET = sum(bet_c), SKJ = sum(skj_c), YFT = sum(yft_c)) %>% mutate(TOT = BET + SKJ + YFT, CPUE = TOT / Sets) %>%
+                      arrange(desc(CPUE)) %>% mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"), Type1 = ifelse(EEZ == "TV", "TV", " "))
+  
+  
+  windows(6000,4000)
+    pl <- ggplot(opass, aes(x = ord, y = CPUE, fill = Type)) + geom_bar(stat = "identity", colour = "black", width = 1) +
+                 geom_text(aes(label = Sets), angle = 90, hjust = 1.2, size = 4, colour = "white") +
+                 xlab("EEZ") + ylab("CPUE (mt per set)") +
+                 scale_fill_manual(name = "Type", values = alpha(c("bisque4","firebrick2"), 0.6)) + 
+                 scale_x_continuous(breaks = opass$ord, labels = opass$EEZ, expand = c(0.01,0.01)) +              
+                 theme(legend.text = element_text(size = 12),
+                       axis.text=element_text(size=11), axis.title=element_text(size=12), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/OPDAT_CPUE_PNAeezs_All_ASS.png"), type="png")
+  dev.off()
+  
+  pl <- pl + theme(panel.border=element_rect(size=2)) + scale_x_continuous(breaks = opass$ord, labels = opass$Type1, expand = c(0.01,0.01)) 
+  
+  opass <- opcpue %>% filter(s_act_id == 1, yy >= 2010, School == "ASS") %>% group_by(EEZ = ez_rep, yy) %>%
+                      summarise(Sets = n(), BET = sum(bet_c), SKJ = sum(skj_c), YFT = sum(yft_c)) %>% mutate(TOT = BET + SKJ + YFT, CPUE = TOT / Sets) %>%
+                      arrange(yy, desc(CPUE)) %>% ungroup() %>%
+                      mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"), Type1 = ifelse(EEZ == "TV", "TV", " "))
+  
+  
+  windows(6000,5000)
+    pl1 <- ggplot(opass, aes(x = ord, y = CPUE, fill = Type)) + geom_bar(stat = "identity", colour = "black", width = 1) +
+                  geom_text(aes(label = Sets), angle = 90, hjust = 1.2, size = 2.3, colour = "white") +
+                  xlab("EEZ") + ylab("CPUE (mt per set)") + facet_wrap(~ yy, ncol = 2, scales = "free_x") +
+                  scale_fill_manual(name = "Type", values = alpha(c("bisque4","firebrick2"), 0.6)) + 
+                  scale_x_continuous(breaks = opass$ord, labels = opass$EEZ, expand = c(0.01,0.01)) +              
+                  theme(legend.position = "none",
+                        axis.text = element_text(size = 9), axis.title = element_text(size = 14))
+    print(pl1)
+    savePlot(paste0(dirpth, "/Plots/OPDAT_CPUE_PNAeezs_ByYr_ASS.png"), type="png")
+  dev.off()
+  
+  
+  pl1 <- pl1 + scale_x_continuous(breaks = opass$ord, labels = opass$Type1, expand = c(0.01,0.01))
+
+  
+  lay.mat <- rbind(c(NA,1,1,1,1,1,1,1),
+                   c(NA,1,1,1,1,1,1,1),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2))
+  
+  windows(8000,11000)
+    grid.newpage()
+    grid.arrange(pl, pl1, layout_matrix=lay.mat, nrow=3)
+    savePlot(paste0(dirpth, "/Plots/OPDAT_CPUE_PNAeezs_Composite_ASS.png"), type="png")
+  dev.off()  
+  
+
+  #________________________________________________
+  # Unassociated CPUE
+  
+  opcpue <- opps %>% filter(ez_rep %in% c("CK","FM","KI","MH","NR","PG","PW","SB","TK","TV","H4","H5","GL","LN","PX")) %>%
+                     mutate(School = ifelse(sch_id %in% 0:2, "UNA", "ASS"))
+  
+  opun <- opcpue %>% filter(s_act_id == 1, yy >= 2010, School == "UNA") %>% group_by(EEZ = ez_rep) %>%
+                      summarise(Sets = n(), BET = sum(bet_c), SKJ = sum(skj_c), YFT = sum(yft_c)) %>% mutate(TOT = BET + SKJ + YFT, CPUE = TOT / Sets) %>%
+                      arrange(desc(CPUE)) %>% mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"), Type1 = ifelse(EEZ == "TV", "TV", " "))
+  
+  
+  windows(6000,4000)
+    pl <- ggplot(opun, aes(x = ord, y = CPUE, fill = Type)) + geom_bar(stat = "identity", colour = "black", width = 1) +
+                 geom_text(aes(label = Sets), angle = 90, hjust = 1.2, size = 4, colour = "white") +
+                 xlab("EEZ") + ylab("CPUE (mt per set)") +
+                 scale_fill_manual(name = "Type", values = alpha(c("bisque4","firebrick2"), 0.6)) + 
+                 scale_x_continuous(breaks = opun$ord, labels = opun$EEZ, expand = c(0.01,0.01)) +              
+                 theme(legend.text = element_text(size = 12),
+                       axis.text=element_text(size=11), axis.title=element_text(size=12), legend.key.size=unit(0.5, "cm"), legend.title=element_text(size=12))
+    print(pl)
+    savePlot(paste0(dirpth, "/Plots/OPDAT_CPUE_PNAeezs_All_UNA.png"), type="png")
+  dev.off()
+  
+  pl <- pl + theme(panel.border=element_rect(size=2)) + scale_x_continuous(breaks = opun$ord, labels = opun$Type1, expand = c(0.01,0.01))
+  
+  opun <- opcpue %>% filter(s_act_id == 1, yy >= 2010, School == "UNA") %>% group_by(EEZ = ez_rep, yy) %>%
+                      summarise(Sets = n(), BET = sum(bet_c), SKJ = sum(skj_c), YFT = sum(yft_c)) %>% mutate(TOT = BET + SKJ + YFT, CPUE = TOT / Sets) %>%
+                      arrange(yy, desc(CPUE)) %>% ungroup() %>%
+                      mutate(ord = row_number(), Type = ifelse(EEZ == "TV", "TV", "Other"), Type1 = ifelse(EEZ == "TV", "TV", " "))
+  
+  
+  windows(6000,5000)
+    pl1 <- ggplot(opun, aes(x = ord, y = CPUE, fill = Type)) + geom_bar(stat = "identity", colour = "black", width = 1) +
+                  geom_text(aes(label = Sets), angle = 90, hjust = 1.2, size = 2.3, colour = "white") +
+                  xlab("EEZ") + ylab("CPUE (mt per set)") + facet_wrap(~ yy, ncol = 2, scales = "free_x") +
+                  scale_fill_manual(name = "Type", values = alpha(c("bisque4","firebrick2"), 0.6)) + 
+                  scale_x_continuous(breaks = opun$ord, labels = opun$EEZ, expand = c(0.01,0.01)) +              
+                  theme(legend.position = "none",
+                        axis.text = element_text(size = 9), axis.title = element_text(size = 14))
+    print(pl1)
+    savePlot(paste0(dirpth, "/Plots/OPDAT_CPUE_PNAeezs_ByYr_UNA.png"), type="png")
+  dev.off()
+  
+  pl1 <- pl1 + scale_x_continuous(breaks = opun$ord, labels = opun$Type1, expand = c(0.01,0.01))
+  
+  lay.mat <- rbind(c(NA,1,1,1,1,1,1,1),
+                   c(NA,1,1,1,1,1,1,1),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2),
+                   c(2,2,2,2,2,2,2,2))
+  
+  windows(8000,11000)
+    grid.newpage()
+    grid.arrange(pl, pl1, layout_matrix=lay.mat, nrow=3)
+    savePlot(paste0(dirpth, "/Plots/OPDAT_CPUE_PNAeezs_Composite_UNA.png"), type="png")
+  dev.off()  
+  
+  
+#____________________________________________________________________________________________________________  
+# Modelling
+  
+  
+  op.fish <- filter(opmod, s_act_id == 1) %>% mutate(School = ifelse(sch_id %in% 0:2, "UNA", "ASS"))
+  
+  op.fish %<>% filter(ez_rep != "PW")
+  
+  op.fish.mod <- op.fish %>% mutate(Year = as.factor(yy),
+                                    Month = as.factor(mm),
+                                    Ves = as.factor(boat_id),
+                                    EEZ = as.factor(ez_id),
+                                    SchType = as.factor(School)) %>% dplyr::select(tot_c, Year,  Month, Ves, EEZ, SchType)
+  
+  ves.tab <- op.fish.mod %>% group_by(Ves) %>% summarise(Nsets = n()) %>% filter(Nsets >= 20)
+  
+  op.fish.mod %<>% filter(Ves %in% ves.tab$Ves) %>% mutate(postiv = ifelse(tot_c == 0, 0, 1))
+  
+  # Remove all sets with catches below 1mt but keep 0 catches?
+  
+  
+  # twfit <- glm(tot_c ~ Year + Month + SchType + EEZ, family = tweedie(var.power = 1.5, link.power = 0), data = op.fish.mod, control = list(trace=TRUE, maxit = 50))
+  # summary(twfit)
+  # windows()
+  # plot(twfit)
+  # tmp <- predict.glm(twfit)
+  
+  
+  
+  # twfit <- glm(tot_c ~ Year + Month * EEZ + SchType, family = tweedie(var.power = 1.6, link.power = 0), data = op.fish.mod, control = list(trace=TRUE, maxit = 50))
+  # summary(twfit)
+  # windows()
+  # plot(twfit, 2)
+  # tmp <- exp(predict.glm(twfit))
+  # plot(op.fish.mod$tot_c, tmp)
+  # abline(a=0, b=1, col = "red")
+  
+  
+  bin.mod <- op.fish.mod
+  
+  pos.mod <- filter(op.fish.mod, postiv != 0)
+  
+  
+  binfit <- glm(postiv ~ Year + Month*EEZ + SchType*EEZ + Ves, family = binomial(link = "logit"), data = bin.mod, control = list(trace=TRUE, maxit = 50))
+  save(binfit, file = paste0(dirpth, "/Plots/Binfit.RData"))
+  #load(paste0(dirpth, "/Plots/Binfit.RData"))
+  
+  posfit <- glm(tot_c ~ Year + Month*EEZ + SchType*EEZ + Ves, family = Gamma(link = "log"), data = pos.mod, control = list(trace=TRUE, maxit = 50))
+  save(posfit, file = paste0(dirpth, "/Plots/Posfit.RData"))
+  #load(paste0(dirpth, "/Plots/Posfit.RData"))
+  
+  # windows()
+  # plot(posfit)
+  
+  
+  
+  
+  
+  # pos.vcov <- vcov(posfit)
+  # pos.coef <- as.vector(posfit$coefficients)
+  # pos.mmat <- model.matrix(posfit)
+  # 
+  # r.coef <- mvrnorm(100, mu = pos.coef, Sigma = pos.vcov)
+  # 
+  # pos.prd <- exp(pos.mmat %*% pos.coef)
+  # 
+  # pos.pred <- predict(posfit, type = "response")
+  # pos.pred.se <- predict(posfit, type = "response", se.fit = TRUE)
+  # 
+  # tmp1 <- simulate(posfit, nsim = 1000)
+  # tmp1.mu <- apply(tmp1, 1, mean)
+  # tmp1.sd <- apply(tmp1, 1, sd)
+  
+  
+  # Function for simulating from a fitted model
+  
+  sim.gam.mod <- function(Nsamp = 100, mod.fit = posfit){
+    
+    pos.vcov <- vcov(mod.fit)
+    pos.coef <- as.vector(mod.fit$coefficients)
+    pos.mmat <- model.matrix(mod.fit)
+    Nrecords <- dim(mod.fit$data)[1]
+    
+    r.coef <- mvrnorm(Nsamp, mu = pos.coef, Sigma = pos.vcov)
+    
+    sum.lst <- list()
+    
+    for(i in 1:Nsamp){
+      
+      pos.prd <- exp(pos.mmat %*% r.coef[i,])
+      
+      sum.lst[[i]] <- data.frame(samp = 1:Nrecords, val = rgamma(Nrecords, shape = summary(mod.fit)$dispersion, rate = summary(mod.fit)$dispersion/pos.prd))
+      
+    }
+    
+    return(sum.lst)
+    
+  }
+  
+  
+  
+  sim.res <- sim.gam.mod(Nsamp = 10, mod.fit = posfit)
+  
+  windows()
+  hist(sim.res[[1]]$val, breaks = 300)
+  windows()
+  hist(sim.res[[2]]$val, breaks = 300)
+  windows()
+  hist(sim.res[[3]]$val, breaks = 300)
+  
+  ref.cdf <- data.frame(samp = 1:length(pos.mod$tot_c), catX = sort(pos.mod$tot_c))
+  sim.cdf <- data.frame(samp = 1:length(sim.res[[1]]$val), catX = sort(sim.res[[1]]$val))
+  
+  windows()
+  plot(ref.cdf$catX, ref.cdf$samp, type = "l")
+  lines(sim.cdf$catX, sim.cdf$samp, col = "red")
+  
+  
+  
+  sim.cdf <- data.frame(samp = 1:length(sim.res[[2]]$val), catX = sort(sim.res[[2]]$val))
+  
+  windows()
+  plot(ref.cdf$catX, ref.cdf$samp, type = "l")
+  lines(sim.cdf$catX, sim.cdf$samp, col = "red")
+  
+  
+  
+  newdat <- data.frame(Year = as.factor(2017), EEZ = rep(unique(pos.mod$EEZ), 24), Month = as.factor(1:12), Ves = as.factor(4226),
+                       SchType = as.factor(rep(c("ASS","UNA"), c(132,132))))
+  
+  newdat$pred <- predict(posfit, newdata = newdat, type = "response")
+  newdat$bin <- predict(binfit, newdata = newdat, type = "response")
+  newdat %<>% mutate(CperSet = bin * pred)
+  
+  
+  pred.ass <- newdat %>% filter(SchType == "ASS")
+  
+  windows()
+  pl <- ggplot(pred.ass, aes(x = Month, y = pred, colour = EEZ)) + geom_point()
+  print(pl)
+  
+  
+  pred.una <- newdat %>% filter(SchType == "UNA")
+  
+  windows()
+  pl <- ggplot(pred.una, aes(x = Month, y = pred, colour = EEZ)) + geom_point()
+  print(pl)
+  
+  
+  pred.ass.gp <- pred.ass %>% group_by(EEZ) %>% summarise(Cpos = mean(pred), Cbin = mean(bin), Cfull = mean(CperSet)) %>%
+                              mutate(IsTV = ifelse(EEZ == "TV", "TV", "  ")) %>% arrange(Cpos)
+  
+  # windows(5000,3000)
+  #   pl <- ggplot(pred.ass.gp, aes(x = reorder(EEZ, desc(Cpos)), y = Cpos, fill = IsTV)) + geom_bar(stat = "identity", colour = "black") +
+  #                xlab("EEZ") + ylab("Catch per set (mt)") + scale_fill_manual(values = c("grey50","orchid1")) +
+  #                scale_x_discrete(labels = rev(pred.ass.gp$IsTV)) +
+  #                theme(legend.position = "none", axis.text = element_text(size = 14), axis.title = element_text(size = 14))
+  #   print(pl)
+  #   savePlot(paste0(dirpth, "/Plots/Model_Predict_Positive_CPUE-EEZ_ASS.png"), type="png")
+  
+  pred.ass.gp %<>% arrange(Cfull)
+  
+  windows(5000,3000)
+    pl <- ggplot(pred.ass.gp, aes(x = reorder(EEZ, desc(Cfull)), y = Cfull, fill = IsTV)) + geom_bar(stat = "identity", colour = "black") +
+                 xlab("EEZ") + ylab("Catch per set (mt)") + scale_fill_manual(values = c("grey50","orchid1")) +
+                 scale_x_discrete(labels = rev(pred.ass.gp$IsTV)) +
+                 theme(legend.position = "none", axis.text = element_text(size = 14), axis.title = element_text(size = 14))
+    print(pl)
+    #savePlot(paste0(dirpth, "/Plots/Model_Predict_FullPrediction_CPUE-EEZ_ASS.png"), type="png")
+  
+  
+  
+  
+  pred.una.gp <- pred.una %>% group_by(EEZ) %>% summarise(Cpos = mean(pred), Cbin = mean(bin), Cfull = mean(CperSet)) %>%
+                              mutate(IsTV = ifelse(EEZ == "TV", "TV", "  ")) %>% arrange(Cpos)
+  
+  # windows(5000,3000)
+  #   pl <- ggplot(pred.una.gp, aes(x = reorder(EEZ, desc(Cpos)), y = Cpos, fill = IsTV)) + geom_bar(stat = "identity", colour = "black") +
+  #                xlab("EEZ") + ylab("Catch per set (mt)") + scale_fill_manual(values = c("grey50","orchid1")) +
+  #                scale_x_discrete(labels = rev(pred.una.gp$IsTV)) +
+  #                theme(legend.position = "none", axis.text = element_text(size = 14), axis.title = element_text(size = 14))
+  #   print(pl)
+  #   savePlot(paste0(dirpth, "/Plots/Model_Predict_Positive_CPUE-EEZ_UNA.png"), type="png")
+  
+  pred.una.gp %<>% arrange(Cfull)
+  
+  windows(5000,3000)
+    pl <- ggplot(pred.una.gp, aes(x = reorder(EEZ, desc(Cfull)), y = Cfull, fill = IsTV)) + geom_bar(stat = "identity", colour = "black") +
+                 xlab("EEZ") + ylab("Catch per set (mt)") + scale_fill_manual(values = c("grey50","orchid1")) +
+                 scale_x_discrete(labels = rev(pred.una.gp$IsTV)) +
+                 theme(legend.position = "none", axis.text = element_text(size = 14), axis.title = element_text(size = 14))
+    print(pl)
+    #savePlot(paste0(dirpth, "/Plots/Model_Predict_FullPrediction_CPUE-EEZ_UNA.png"), type="png")
+  dev.off()
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  #
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  windows()
+  hist(op.fish$skj_c, breaks=150)
+  
+  
+  tmp <- opmod[1:80000,]
+  windows()
+  hist(tmp$skj_c, breaks=100)
+  
+  opmod %>% group_by(school) %>% summarise(mean(tot_c))
+  
+  
+  twfit <- glm(skj_c ~ as.factor(boat_id), family = tweedie(var.power = 1.7, link.power = 0), data = tmp, control = list(trace=TRUE, maxit = 50))
+  summary(twfit)
+  windows()
+  plot(twfit)
+  
+  table(tmp$boat_id)
+  
+  
+  
+  y <- c(4.0,5.9,3.9,13.2,10.0,9.0)
+  x <- 1:6
+  fit <- glm(y~x, family=tweedie(var.power=1.1, link.power=0))
+  summary(fit)
+  windows()
+  plot(fit)
+  
+  
+#________________________________________________
+  
+  
+  
+  
+  
+  
+  

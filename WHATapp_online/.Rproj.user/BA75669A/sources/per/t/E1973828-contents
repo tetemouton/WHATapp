@@ -1,0 +1,32 @@
+library(RODBC)
+
+#________________________________________________
+# Catches outside archipelagic waters
+
+  sqlcall="SELECT yy, gr_id, ez_id, flag_id, sum(days), sum(alb_c), sum(bet_c), sum(skj_c), sum(yft_c) FROM a_yb_ez WHERE yy > 1959 and in_arch='F' GROUP BY yy, gr_id, ez_id, flag_id "
+
+  channellog <- odbcDriverConnect("DSN=Visual FoxPro Database;UID=;PWD=;
+                                  SourceDB=\\\\corp.spc.int\\shared\\FAME\\NC_NOU\\OFP\\db1\\tuna_dbs\\Log_dbs\\DBF\\logsheet.dbc;SourceType=DBC;Exclusive=No;
+                                  BackgroundFetch=Yes;Collate=Machine;Null=Yes;Deleted=Yes;")
+
+  exdat <- sqlQuery(channellog, sqlcall, max=0, stringsAsFactors=FALSE)
+
+  write.csv(exdat, file="C:/HighSeas_Allocation_2020/Data/ACE_Dat_Frm1990.csv", row.names=FALSE)
+
+
+#________________________________________________
+# Catches inside archipelagic waters
+  
+sqlcall="SELECT yy, gr_id, ez_id, flag_id, sum(days), sum(alb_c), sum(bet_c), sum(skj_c), sum(yft_c) FROM a_yb_ez WHERE yy > 1959 and in_arch='T' GROUP BY yy, gr_id, ez_id, flag_id "
+
+channellog <- odbcDriverConnect("DSN=Visual FoxPro Database;UID=;PWD=;
+                                  SourceDB=\\\\corp.spc.int\\shared\\FAME\\NC_NOU\\OFP\\db1\\tuna_dbs\\Log_dbs\\DBF\\logsheet.dbc;SourceType=DBC;Exclusive=No;
+                                  BackgroundFetch=Yes;Collate=Machine;Null=Yes;Deleted=Yes;")
+
+exdat <- sqlQuery(channellog, sqlcall, max=0, stringsAsFactors=FALSE)
+
+write.csv(exdat, file="C:/HighSeas_Allocation_2020/Data/ACE_Dat_Frm1990_Arch-Waters.csv", row.names=FALSE)
+
+
+
+
