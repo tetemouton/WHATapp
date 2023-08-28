@@ -12,7 +12,7 @@ library(R4MFCL)
 
   theme_set(theme_bw())
 
-  base.dir <- "C:/GitHub/WHATapp/EEZs"
+  base.dir <- "C:/GitRep/WHATapp/EEZs"
 
 
   cnt.keep <- read.csv(file=paste0(base.dir, "/Data/PacCountries.csv"), header=TRUE)
